@@ -1,0 +1,43 @@
+{
+  "project_id": "studyit-35f1b",
+  "project_info": {
+    "project_number": "816957253372",
+    "firebase_url": "https://studyit-35f1b.firebaseio.com",
+    "project_id": "studyit-35f1b",
+    "storage_bucket": "studyit-35f1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816957253372:android:a31d81cb3714e364",
+        "android_client_info": {
+          "package_name": "com.studyit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "816957253372-nmgdeolvr59orehiagrc955qiljmiclv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALJsQ4Xqag26OAKVN-s0cns0Ap-qs_keg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

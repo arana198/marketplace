@@ -1,0 +1,76 @@
+info:
+  component: This is REST API for Study Buddy application.
+
+server:
+  port: 8080
+  contextPath: /api/
+
+spring:
+  application:
+    name: studyit-api
+  datasource:
+    driverClassName: ${db.driver.class}
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  jpa:
+    database-platform: ${db.platform}
+    properties:
+      hibernate:
+        dialect: ${db.hibernate.dialect}
+    show-sql: ${db.show.sql}
+    hibernate:
+      naming:
+        implicit-strategy: ${db.hibernate.naming.implicit-strategy}
+        physical-strategy: ${db.hibernate.naming.physical-strategy}
+      ddl-auto: none
+      format-sql: true
+  bus:
+    amqp:
+      exchange: ${exchange.name}
+      enabled: true
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
+  social:
+    facebook:
+      appId: ${facebook.appId}
+      appSecret: ${facebook.appSecret}
+    google:
+      appId: ${google.appId}
+      appSecret: ${google.appSecret}
+    linkedin:
+      appId: ${linkedin.appId}
+      appSecret: ${linkedin.appSecret}
+
+hystrix:
+  streamEnabled: true
+  enabled: true
+
+archaius:
+  dynamicPropertyFactory:
+    registerConfigWithJMX: true
+
+endpoints:
+    restart:
+      enabled: true
+
+validator:
+  api:
+    company:
+      url: ${company.url.prefix}
+      key: ${company.api.key}
+    vat:
+      url: ${vat.url.prefix}
+
+oauth:
+  resourceId: marketplace-api
+  clientId: 4f7ec648a48b9d3fa239b497f7b6b4d8019697bd
+  clientSecret: edfeba07ec1dd4ff45928ee715a8e1ecc149a060
+  tokenEndpoint: http://${oauth.hostname}/oauth/check_token
+  authzEndpoint: http://${oauth.hostname}/oauth/authorize

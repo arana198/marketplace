@@ -1,5 +1,6 @@
 package com.marketplace.broker.profile.domain;
 
+import com.marketplace.common.domain.AbstractAuditEntity;
 import com.marketplace.common.domain.AbstractEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +16,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = {"id"})
 @Entity
 @Table(name = "companies")
-public class CompanyBO extends AbstractEntity implements Serializable {
+public class CompanyBO extends AbstractAuditEntity implements Serializable {
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -32,5 +33,6 @@ public class CompanyBO extends AbstractEntity implements Serializable {
     @Column(name = "website_url")
     private String websiteUrl;
 
-
+    @Column(name = "is_active", nullable = false)
+    private boolean active;
 }

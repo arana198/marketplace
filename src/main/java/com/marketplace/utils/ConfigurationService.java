@@ -1,10 +1,9 @@
 package com.marketplace.utils;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-@Data
+@lombok.Value
 @Service
 public class ConfigurationService {
     @Value("${oauth.authzEndpoint}")

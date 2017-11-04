@@ -15,15 +15,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
-import org.springframework.social.connect.*;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.social.connect.ConnectionRepository;
+import org.springframework.social.connect.ConnectionSignUp;
+import org.springframework.social.connect.NoSuchConnectionException;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.annotation.security.RolesAllowed;
@@ -47,20 +52,20 @@ public class LoginController {
     private final UserConnectionService userConnectionService;
     private final JdbcTokenStore jdbcTokenStore;
 
-    @RequestMapping(value = "/singup", method = RequestMethod.POST)
+    @PostMapping(value = "/singup")
     public ResponseEntity<ResourceSupport> signup(@Valid @RequestBody final Oauth oauth) throws ResourceNotFoundException {
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @RolesAllowed({UserRole.ROLE_USER})
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    @DeleteMapping(value = "/logout")
     public ResponseEntity<ResourceSupport> logout(final Principal principal) throws ResourceNotFoundException {
         userService.logout(principal);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @PutMapping(value = "/login")
     public ResponseEntity<OAuth2AccessToken> login(final Principal principal,
                                                    @Valid @RequestBody final Oauth oauth,
                                                    final BindingResult bindingResult) throws HttpRequestMethodNotSupportedException {

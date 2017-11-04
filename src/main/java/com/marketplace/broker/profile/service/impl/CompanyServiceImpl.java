@@ -13,6 +13,8 @@ import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -28,6 +30,16 @@ class CompanyServiceImpl implements CompanyService {
     private final VATValidator vatValidator;
     private final CompanyValidator companyValidator;
     private final PublishService publishService;
+
+    @Override
+    public Page<CompanyResponse> findAll(final String companyName, final Pageable pageable) {
+        //TODO: DO company like query
+        Optional.ofNullable(companyName)
+                .map(companyRepository::findByName);
+
+        return companyRepository.findAll(pageable)
+                .map(companyResponseConverter::convert);
+    }
 
     @Override
     public Optional<CompanyResponse> findById(final String companyId) {
@@ -65,7 +77,8 @@ class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void inactivateCompany(final String companyId) {
-        companyRepository.findById(companyId);
-               // .map(companyBO -> companyBO.se)
+        companyRepository.findById(companyId)
+                .map(companyBO -> companyBO.setActive(false))
+                .ifPresent(companyRepository::save);
     }
 }

@@ -27,7 +27,7 @@ public class CompanyBO extends AbstractAuditEntity implements Serializable {
     @Column(name = "vat_number", nullable = false)
     private String vatNumber;
 
-    @Column(name = "logoUrl")
+    @Column(name = "logo_url")
     private String logoUrl;
 
     @Column(name = "website_url")

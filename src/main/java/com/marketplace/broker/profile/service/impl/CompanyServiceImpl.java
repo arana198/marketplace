@@ -33,11 +33,9 @@ class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Page<CompanyResponse> findAll(final String companyName, final Pageable pageable) {
-        //TODO: DO company like query
-        Optional.ofNullable(companyName)
-                .map(companyRepository::findByName);
-
-        return companyRepository.findAll(pageable)
+        return Optional.ofNullable(companyName)
+                .map(cn -> companyRepository.findByName(cn, pageable))
+                .orElse(companyRepository.findAll(pageable))
                 .map(companyResponseConverter::convert);
     }
 

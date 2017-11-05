@@ -151,3 +151,22 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   CONSTRAINT fk_user_profiles_users FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+/*Broker*/
+CREATE TABLE IF NOT EXISTS companies (
+  id varchar(36) NOT NULL,
+  name varchar(255) NOT NULL,
+  company_number varchar(15) NOT NULL,
+  vat_number varchar(15) NOT NULL,
+  logo_url varchar(500) NULL,
+  website_url varchar(500) NULL,
+  is_active varchar(255) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_by varchar(36) NULL,
+  version int(11) DEFAULT 0,
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_company_number (company_number),
+  UNIQUE KEY ux_vat_number (vat_number),
+  INDEX ix_company_number_vat_number (company_number, vat_number),
+  FULLTEXT (name)
+);

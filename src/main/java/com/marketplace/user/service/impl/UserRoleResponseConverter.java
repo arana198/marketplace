@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 @Service
 class UserRoleResponseConverter implements BaseConverter<UserRoleBO, UserRoleResponse> {
 
-    private final RoleConverter roleConverter;
+    private final RoleResponseConverter roleConverter;
 
     @Autowired
-    public UserRoleResponseConverter(final RoleConverter roleConverter) {
+    public UserRoleResponseConverter(final RoleResponseConverter roleConverter) {
         this.roleConverter = roleConverter;
     }
 

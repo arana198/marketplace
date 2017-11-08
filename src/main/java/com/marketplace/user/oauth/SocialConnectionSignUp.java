@@ -1,8 +1,8 @@
 package com.marketplace.user.oauth;
 
-import com.marketplace.user.dto.Role.UserRole;
-import com.marketplace.user.dto.User;
-import com.marketplace.user.dto.User.LoginProvider;
+import com.marketplace.user.dto.RoleRequest.UserRole;
+import com.marketplace.user.dto.UserRequest;
+import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.exception.RoleNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
@@ -26,15 +26,15 @@ public class SocialConnectionSignUp implements ConnectionSignUp {
         return userService.findByUsername(profile.getEmail())
                 .map(UserResponse::getEmail)
                 .orElseGet(() -> {
-                    User user = new User(profile.getEmail(), null);
+                    UserRequest userRequest = new UserRequest(profile.getEmail(), null);
                     LoginProvider loginProvider = LoginProvider.getRoleFromString(connection.getKey().getProviderId());
-                    user.setLoginProvider(loginProvider);
-                    user.setLoginProviderId(connection.getKey().getProviderUserId());
-                    user.setProfileImageUrl(connection.getImageUrl());
+                    userRequest.setLoginProvider(loginProvider);
+                    userRequest.setLoginProviderId(connection.getKey().getProviderUserId());
+                    userRequest.setProfileImageUrl(connection.getImageUrl());
 
                     try {
-                        userService.createUser(user, UserRole.ROLE_USER);
-                        return user.getEmail();
+                        userService.createUser(userRequest, UserRole.ROLE_USER);
+                        return userRequest.getEmail();
                     } catch (UserAlreadyExistsException | RoleNotFoundException e) {
                         return null;
                     }

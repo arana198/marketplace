@@ -1,6 +1,6 @@
 SET default_storage_engine=ARIA;
 
-/*User Service*/
+/*UserRequest Service*/
 CREATE TABLE IF NOT EXISTS oauth_access_token (
   token_id varchar(256) DEFAULT NULL,
   token blob,
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS user_password_tokens (
   CONSTRAINT fk_users_password_token_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS roles (
+CREATE TABLE IF NOT EXISTS roleResponses (
   id varchar(36) NOT NULL,
   name varchar(255) NOT NULL,
   description varchar(255) NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   KEY ix_user_id (user_id),
-  CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles (id),
+  CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roleResponses (id),
   CONSTRAINT fk_user_roles_users FOREIGN KEY (user_id) REFERENCES users (id),
   CONSTRAINT fk_user_roles_user_status FOREIGN KEY (user_status_id) REFERENCES user_status (id)
 );

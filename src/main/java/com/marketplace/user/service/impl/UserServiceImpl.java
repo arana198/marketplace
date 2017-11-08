@@ -1,14 +1,23 @@
 package com.marketplace.user.service.impl;
 
-import com.marketplace.user.domain.*;
-import com.marketplace.user.domain.UserStatusBO.UserStatus;
-import com.marketplace.user.dto.Role.UserRole;
-import com.marketplace.user.dto.User;
-import com.marketplace.user.dto.UserResponse;
-import com.marketplace.user.exception.*;
-import com.marketplace.user.oauth.TokenRevoker;
 import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
+import com.marketplace.user.domain.RoleBO;
+import com.marketplace.user.domain.UserBO;
+import com.marketplace.user.domain.UserPasswordTokenBO;
+import com.marketplace.user.domain.UserRoleBO;
+import com.marketplace.user.domain.UserStatusBO;
+import com.marketplace.user.domain.UserStatusBO.UserStatus;
+import com.marketplace.user.dto.RoleRequest.UserRole;
+import com.marketplace.user.dto.UserRequest;
+import com.marketplace.user.dto.UserResponse;
+import com.marketplace.user.exception.RoleNotFoundException;
+import com.marketplace.user.exception.UserAlreadyExistsException;
+import com.marketplace.user.exception.UserNotFoundException;
+import com.marketplace.user.exception.UserPasswordNotFoundTokenException;
+import com.marketplace.user.exception.UserPasswordTokenExpiredException;
+import com.marketplace.user.exception.UsernameNotFoundException;
+import com.marketplace.user.oauth.TokenRevoker;
 import com.marketplace.user.service.RoleService;
 import com.marketplace.user.service.UserPasswordTokenService;
 import com.marketplace.user.service.UserService;
@@ -55,20 +64,20 @@ class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void createUser(final User user, final UserRole role) throws UserAlreadyExistsException, RoleNotFoundException {
+    public void createUser(final UserRequest userRequest, final UserRole role) throws UserAlreadyExistsException, RoleNotFoundException {
 
-        log.debug("Creating pending {}", user.getEmail());
-        final Optional<UserBO> oldUser = userRepository.findByUsername(user.getEmail());
+        log.debug("Creating pending {}", userRequest.getEmail());
+        final Optional<UserBO> oldUser = userRepository.findByUsername(userRequest.getEmail());
         if (oldUser.filter(u -> u.getRoles()
                 .parallelStream()
                 .map(UserRoleBO::getRole)
                 .anyMatch(r -> r.getName().equalsIgnoreCase(role.getValue())))
                 .isPresent()
-                || userRepository.findByProviderUserId(user.getLoginProviderId()).isPresent()) {
-            throw new UserAlreadyExistsException(user.getEmail());
+                || userRepository.findByProviderUserId(userRequest.getLoginProviderId()).isPresent()) {
+            throw new UserAlreadyExistsException(userRequest.getEmail());
         }
 
-        final UserBO userBO = oldUser.orElse(userConverter.convert(user));
+        final UserBO userBO = oldUser.orElse(userConverter.convert(userRequest));
         final UserStatusBO userStatusBO = userStatusService.findByName(UserStatus.PENDING).get();
         final RoleBO userRole = roleService.findByName(role)
                 .orElseThrow(() -> new RoleNotFoundException(role));
@@ -81,7 +90,7 @@ class UserServiceImpl implements UserService {
 
         userRepository.save(userBO);
         final UserResponse newUser = userResponseConverter.convert(userBO)
-                .setProfileImageUrl(user.getProfileImageUrl());
+                .setProfileImageUrl(userRequest.getProfileImageUrl());
 
         publishService.sendMessage(PublishAction.USER_CREATED, newUser);
     }

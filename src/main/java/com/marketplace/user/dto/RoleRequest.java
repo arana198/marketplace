@@ -2,7 +2,7 @@ package com.marketplace.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.marketplace.common.dto.BaseDomain;
+import com.marketplace.common.dto.BaseResponseDomain;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -10,28 +10,34 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-public class Role extends BaseDomain {
+public class RoleRequest extends BaseResponseDomain {
 
     private final String roleId;
 
-    @NotNull(message = "username is compulsory")
+    @NotNull(message = "name is mandatory")
     private final UserRole name;
 
     @Size(min = 5, max = 50, message = "description is wrong size")
-    @NotBlank(message = "description is compulsory")
+    @NotBlank(message = "description is mandatory")
     private final String description;
 
+    @NotNull(message = "isSelectable is mandatory")
+    private final boolean isSelectable;
+
     @JsonCreator
-    public Role(@JsonProperty(value = "roleId") final String roleId,
-                @JsonProperty(value = "name") final UserRole name,
-                @JsonProperty(value = "description") final String description) {
+    public RoleRequest(@JsonProperty(value = "roleId") final String roleId,
+                       @JsonProperty(value = "name") final UserRole name,
+                       @JsonProperty(value = "description") final String description,
+                       @JsonProperty(value = "isSelectable") boolean isSelectable) {
         this.roleId = roleId;
         this.name = name;
         this.description = description;
+        this.isSelectable = isSelectable;
     }
 
     public enum UserRole {
         ROLE_ADMIN("ROLE_ADMIN"),
+        ROLE_COMPANY_ADMIN("ROLE_COMPANY_ADMIN"),
         ROLE_BROKER("ROLE_BROKER"),
         ROLE_USER("ROLE_USER");
 

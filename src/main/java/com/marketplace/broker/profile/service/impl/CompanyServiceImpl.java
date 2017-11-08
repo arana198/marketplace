@@ -34,7 +34,7 @@ class CompanyServiceImpl implements CompanyService {
     @Override
     public Page<CompanyResponse> findAll(final String companyName, final Pageable pageable) {
         return Optional.ofNullable(companyName)
-                .map(cn -> companyRepository.findByName(cn, pageable))
+                .map(cn -> companyRepository.findByFulltextName(cn, pageable))
                 .orElse(companyRepository.findAll(pageable))
                 .map(companyResponseConverter::convert);
     }
@@ -71,12 +71,26 @@ class CompanyServiceImpl implements CompanyService {
     @Override
     public void updateCompany(final String companyId, final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
 
-    }
-
-    @Override
-    public void inactivateCompany(final String companyId) {
         companyRepository.findById(companyId)
-                .map(companyBO -> companyBO.setActive(false))
-                .ifPresent(companyRepository::save);
+                .orElseThrow(() -> new CompanyNotFoundException(companyId));
+
+        if (companyRepository.findByName(companyRequest.getName())
+                .filter(companyBO -> !companyBO.getId().equalsIgnoreCase(companyId))
+                .isPresent()) {
+            throw new CompanyAlreadyExistsException(companyRequest.getName());
+        }
+
+        if (!vatValidator.validate(companyRequest.getName(), companyRequest.getVatNumber())) {
+            new BadRequestException("Invalid VAT number");
+        }
+
+        if (!companyValidator.validate(companyRequest.getName(), companyRequest.getCompanyNumber())) {
+            new BadRequestException("Invalid company number");
+        }
+
+        CompanyBO companyBO = companyRequestConverter.convert(companyRequest);
+        companyBO = companyRepository.save(companyBO);
+        final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
+        publishService.sendMessage(PublishAction.COMPANY_CREATED, companyResponse);
     }
 }

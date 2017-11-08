@@ -1,7 +1,9 @@
 package com.marketplace.user.exception;
 
 import com.marketplace.common.exception.ResourceNotFoundException;
-import com.marketplace.user.dto.Role;
+import com.marketplace.user.dto.RoleRequest;
+import com.marketplace.user.dto.RoleRequest.UserRole;
+import com.marketplace.user.dto.RoleResponse;
 
 public class RoleNotFoundException extends ResourceNotFoundException {
     public RoleNotFoundException() {
@@ -9,10 +11,10 @@ public class RoleNotFoundException extends ResourceNotFoundException {
     }
 
     public RoleNotFoundException(final String roleId) {
-        super("Role [ " + roleId + " ] not found");
+        super("RoleResponse [ " + roleId + " ] not found");
     }
 
-    public RoleNotFoundException(final Role.UserRole role) {
+    public RoleNotFoundException(final UserRole role) {
         super("UserRole [ " + role + " ] not found");
     }
 }

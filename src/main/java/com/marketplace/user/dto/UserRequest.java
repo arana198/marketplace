@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @Accessors(chain = true)
-public class User {
+public class UserRequest {
 
     public enum LoginProvider {
         LOCAL("local"),
@@ -44,12 +44,12 @@ public class User {
     }
 
     @Size(min = 5, max = 50, message = "email is wrong size")
-    @NotBlank(message = "email is compulsory")
+    @NotBlank(message = "email is mandatory")
     @Email(message = "email format incorrect")
     private final String email;
 
     @Size(min = 6, max = 30, message = "password is wrong size")
-    @NotBlank(message = "password is compulsory")
+    @NotBlank(message = "password is mandatory")
     private final String password;
 
     @JsonIgnore
@@ -71,8 +71,8 @@ public class User {
     private String userStatus;
 
     @JsonCreator
-    public User(@JsonProperty(value = "email") final String email,
-                @JsonProperty(value = "password") final String password) {
+    public UserRequest(@JsonProperty(value = "email") final String email,
+                       @JsonProperty(value = "password") final String password) {
         this.email = email;
         this.password = password;
     }

@@ -3,8 +3,7 @@ package com.marketplace.profile.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.marketplace.common.dto.BaseDomain;
-import com.vividsolutions.jts.geom.Polygon;
+import com.marketplace.common.dto.BaseResponseDomain;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @JsonDeserialize(builder = UserProfileResponse.UserProfileResponseBuilder.class)
 @JsonIgnoreProperties
-public class UserProfileResponse extends BaseDomain {
+public class UserProfileResponse extends BaseResponseDomain {
 
     private final String profileId;
     private final String userId;

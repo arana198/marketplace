@@ -3,7 +3,7 @@ package com.marketplace.user.service.impl;
 import com.marketplace.user.domain.RoleBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.domain.UserRoleBO;
-import com.marketplace.user.dto.User.LoginProvider;
+import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.exception.UserAuthenticationException;
 import lombok.Data;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,14 +37,14 @@ class UserAuthenticationManager implements AuthenticationManager, UserDetailsSer
                         .parallelStream()
                         .anyMatch(ur -> ur.getProvider().equalsIgnoreCase(LoginProvider.LOCAL.getValue())) || passwordEncoder.matches(password.toString(), user.getPassword()))
                 .map(u -> new UsernamePasswordAuthenticationToken(u.getUsername(), u.getPassword(), this.getRoleFromUser(u)))
-                .orElseThrow(() -> new UserAuthenticationException("User authentication failed"));
+                .orElseThrow(() -> new UserAuthenticationException("UserRequest authentication failed"));
     }
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .map(u -> new org.springframework.security.core.userdetails.User(u.getUsername(), u.getPassword() == null ? "pass" : u.getPassword(), this.getRoleFromUser(u)))
-                .orElseThrow(() -> new UserAuthenticationException("User authentication failed"));
+                .orElseThrow(() -> new UserAuthenticationException("UserRequest authentication failed"));
     }
 
     private List<RoleBO> getRoleFromUser(final UserBO userBO) {

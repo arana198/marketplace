@@ -18,7 +18,4 @@ public interface CompanyService {
     CompanyResponse createCompany(CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
 
     void updateCompany(String companyId, CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
-
-    void inactivateCompany(String companyId);
-
 }

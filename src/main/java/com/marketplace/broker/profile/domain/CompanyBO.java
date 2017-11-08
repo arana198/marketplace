@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "companies")
+@Table(name = "company")
 public class CompanyBO extends AbstractAuditEntity implements Serializable {
 
     @Column(name = "name", nullable = false)

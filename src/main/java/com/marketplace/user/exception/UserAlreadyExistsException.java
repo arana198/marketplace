@@ -4,6 +4,6 @@ import com.marketplace.common.exception.ResourceAlreadyExistsException;
 
 public class UserAlreadyExistsException extends ResourceAlreadyExistsException {
     public UserAlreadyExistsException(final String username) {
-        super("User [ " + username + " ] already exists");
+        super("UserRequest [ " + username + " ] already exists");
     }
 }

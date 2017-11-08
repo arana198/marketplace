@@ -19,25 +19,25 @@ import java.time.LocalDate;
 @JsonIgnoreProperties
 public class UserProfileRequest {
 
-    @NotBlank(message = "userId is compulsory")
+    @NotBlank(message = "userId is mandatory")
     private String userId;
 
     @Size(min = 1, max = 50, message = "firstName is wrong size")
-    @NotBlank(message = "firstName is compulsory")
+    @NotBlank(message = "firstName is mandatory")
     @Pattern(regexp = "[A-Za-z ]*", message = "firstName has invalid characters")
     private final String firstName;
 
     @Size(min = 1, max = 50, message = "lastName is wrong size")
-    @NotBlank(message = "lastName is compulsory")
+    @NotBlank(message = "lastName is mandatory")
     @Pattern(regexp = "[A-Za-z ]*", message = "lastName has invalid characters")
     private final String lastName;
 
     @Size(min = 1, max = 11, message = "mobileNumber is wrong size")
-    @NotBlank(message = "mobileNumber is compulsory")
+    @NotBlank(message = "mobileNumber is mandatory")
     @Pattern(regexp = "^(07\\d{9})$", message = "mobileNumber is invalid")
     private final String mobileNumber;
 
-    @NotNull(message = "dateOfBirth is compulsory")
+    @NotNull(message = "dateOfBirth is mandatory")
     private final String postcode;
 
     private LocalDate dateOfBirth;

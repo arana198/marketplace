@@ -7,6 +7,7 @@ import com.marketplace.broker.profile.service.CompanyService;
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
+import com.marketplace.common.security.AuthUser;
 import com.marketplace.common.security.UserRole;
 import com.marketplace.utils.PagedResourceConverter;
 import lombok.Data;
@@ -41,7 +42,7 @@ public class CompanyController {
 
     @RolesAllowed({UserRole.ROLE_ADMIN})
     @GetMapping
-    public PagedResources<CompanyResponse> getProfile(@RequestParam(value = "name", required = false) final String companyName,
+    public PagedResources<CompanyResponse> getCompanies(@RequestParam(value = "name", required = false) final String companyName,
                                                       final Pageable pageable) {
         final Page<CompanyResponse> companyResponses = companyService.findAll(companyName, pageable);
         return PagedResourceConverter.convert(companyResponses);
@@ -49,7 +50,7 @@ public class CompanyController {
 
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @GetMapping(value = "/{companyId}")
-    public ResponseEntity<CompanyResponse> getProfile(@PathVariable final String companyId)
+    public ResponseEntity<CompanyResponse> getCompany(@PathVariable final String companyId)
             throws ResourceNotFoundException {
         log.info("Getting company for id: {}", companyId);
         return companyService.findById(companyId)
@@ -67,9 +68,9 @@ public class CompanyController {
             throw new BadRequestException("Invalid company object", bindingResult);
         }
 
-        final CompanyResponse companyResponse = companyService.createCompany(companyRequest);
+        final CompanyResponse companyResponse = companyService.createCompany(AuthUser.getUserId(), companyRequest);
         final URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
+                .fromCurrentRequest().path("/{companyId}")
                 .buildAndExpand(companyResponse.getCompanyId()).toUri();
 
         return ResponseEntity.created(location).build();

@@ -31,7 +31,6 @@ class UserAuthenticationManager implements AuthenticationManager, UserDetailsSer
         String username = (String) authentication.getPrincipal();
         Object password = authentication.getCredentials();
 
-
         return userRepository.findByUsername(username)
                 .filter(user -> !user.getRoles()
                         .parallelStream()

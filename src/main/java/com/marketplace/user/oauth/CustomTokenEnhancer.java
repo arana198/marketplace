@@ -28,7 +28,7 @@ class CustomTokenEnhancer implements TokenEnhancer {
     private List<TokenEnhancer> delegates = Collections.emptyList();
 
     @Override
-    public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+    public OAuth2AccessToken enhance(final OAuth2AccessToken accessToken, final OAuth2Authentication authentication) {
         DefaultOAuth2AccessToken tempResult = (DefaultOAuth2AccessToken) accessToken;
 
         final Map<String, Object> additionalInformation = new HashMap<>();

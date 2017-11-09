@@ -1,6 +1,6 @@
 package com.marketplace.broker.profile.domain;
 
-import com.marketplace.common.domain.AbstractAuditEntity;
+import com.marketplace.common.domain.AbstractEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -16,15 +16,15 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "company_employee")
-public class CompanyEmployeeBO extends AbstractAuditEntity implements Serializable {
+@Table(name = "company_employee_invite")
+public class CompanyEmployeeInviteBO extends AbstractEntity implements Serializable {
 
     @Column(name = "company_id", nullable = false)
     private String companyId;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+    @Column(name = "email", nullable = false)
+    private String email;
 
-    @Column(name = "is_admin", nullable = false)
-    private boolean adminPrivilege;
+    @Column(name = "token", nullable = false)
+    private String token;
 }

@@ -85,14 +85,14 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS user_password_tokens (
   id varchar(36) NOT NULL,
   user_id varchar(36) NOT NULL,
-  token varchar(255) NOT NULL,
+  token varchar(36) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   UNIQUE KEY ix_user_password_token_user_id (user_id),
   CONSTRAINT fk_users_password_token_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS roleResponses (
+CREATE TABLE IF NOT EXISTS roles (
   id varchar(36) NOT NULL,
   name varchar(255) NOT NULL,
   description varchar(255) NOT NULL,

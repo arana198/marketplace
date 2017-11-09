@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(of = {"id"})
 @Entity
 @Table(name = "broker_profile")
-public class BrokerProfile extends AbstractAuditEntity implements Serializable {
+public class BrokerProfileBO extends AbstractAuditEntity implements Serializable {
 
     @Column(name = "user_id", nullable = false)
     private String userId;

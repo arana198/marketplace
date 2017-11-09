@@ -23,6 +23,8 @@ public interface UserService {
 
     void updatePassword(String userId, String password) throws UserNotFoundException;
 
+    void resetPassword(String username) throws UserNotFoundException;
+
     void resetPassword(String userId, String token, String password) throws UserPasswordNotFoundTokenException, UserPasswordTokenExpiredException;
 
     void updateUserStatus(String userId, UserRole userRole, UserStatus userStatus) throws UserNotFoundException;

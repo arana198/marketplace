@@ -96,6 +96,14 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void resetPassword(final String username) throws UserNotFoundException {
+        final UserBO userBO = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+
+        userPasswordTokenService.createToken(userBO);
+    }
+
+    @Override
     @Transactional
     public void resetPassword(final String userId,
                               final String token,

@@ -15,7 +15,7 @@ public interface CompanyService {
 
     Optional<CompanyResponse> findById(String companyId);
 
-    CompanyResponse createCompany(CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
+    CompanyResponse createCompany(String userId, CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
 
     void updateCompany(String companyId, CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
 }

@@ -3,6 +3,7 @@ package com.marketplace.common.domain;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(of = {"createdAt", "updatedBy", "updatedAt"})
 @ToString(of = {"createdAt", "updatedBy", "updatedAt"})
+@Accessors(chain = true)
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
 public abstract class AbstractAuditEntity implements Serializable {

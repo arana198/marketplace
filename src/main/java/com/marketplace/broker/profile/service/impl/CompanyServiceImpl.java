@@ -1,6 +1,7 @@
 package com.marketplace.broker.profile.service.impl;
 
 import com.marketplace.broker.profile.domain.CompanyBO;
+import com.marketplace.broker.profile.domain.CompanyEmployeeBO;
 import com.marketplace.broker.profile.dto.CompanyRequest;
 import com.marketplace.broker.profile.dto.CompanyResponse;
 import com.marketplace.broker.profile.exception.CompanyAlreadyExistsException;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Slf4j
@@ -25,6 +27,7 @@ import java.util.Optional;
 class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
+    private final CompanyEmployeeRepository companyEmployeeRepository;
     private final CompanyResponseConverter companyResponseConverter;
     private final CompanyRequestConverter companyRequestConverter;
     private final VATValidator vatValidator;
@@ -34,9 +37,9 @@ class CompanyServiceImpl implements CompanyService {
     @Override
     public Page<CompanyResponse> findAll(final String companyName, final Pageable pageable) {
         return Optional.ofNullable(companyName)
-                .map(cn -> companyRepository.findByFulltextName(cn, pageable))
-                .orElse(companyRepository.findAll(pageable))
-                .map(companyResponseConverter::convert);
+                .map(cn -> this.companyRepository.findByFulltextName(cn, pageable))
+                .orElse(this.companyRepository.findAll(pageable))
+                .map(this.companyResponseConverter::convert);
     }
 
     @Override
@@ -45,8 +48,9 @@ class CompanyServiceImpl implements CompanyService {
                 .map(companyResponseConverter::convert);
     }
 
+    @Transactional
     @Override
-    public CompanyResponse createCompany(final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
+    public CompanyResponse createCompany(final String userId, final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
 
         if (!companyRepository.findByCompanyNumberOrVatNumber(companyRequest.getCompanyNumber(), companyRequest.getVatNumber()).isEmpty()) {
             log.info("Company Number [ {} ] or VAT Number [ {} ] already exists", companyRequest.getCompanyNumber(), companyRequest.getVatNumber());
@@ -63,8 +67,16 @@ class CompanyServiceImpl implements CompanyService {
 
         CompanyBO companyBO = companyRequestConverter.convert(companyRequest);
         companyBO = companyRepository.save(companyBO);
+
         final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
+        final CompanyEmployeeBO companyEmployeeBO = new CompanyEmployeeBO()
+                .setCompanyId(companyBO.getId())
+                .setUserId(userId)
+                .setAdminPrivilege(true);
+
+        companyEmployeeRepository.save(companyEmployeeBO);
         publishService.sendMessage(PublishAction.COMPANY_CREATED, companyResponse);
+
         return companyResponse;
     }
 
@@ -91,6 +103,6 @@ class CompanyServiceImpl implements CompanyService {
         CompanyBO companyBO = companyRequestConverter.convert(companyRequest);
         companyBO = companyRepository.save(companyBO);
         final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
-        publishService.sendMessage(PublishAction.COMPANY_CREATED, companyResponse);
+        publishService.sendMessage(PublishAction.COMPANY_UPDATED, companyResponse);
     }
 }

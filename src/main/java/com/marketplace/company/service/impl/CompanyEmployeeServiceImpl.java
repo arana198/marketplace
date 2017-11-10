@@ -120,7 +120,7 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
 
         this.checkIfCompanyAdmin(companyId);
 
-        final CompanyEmployeeInviteBO companyEmployeeInviteBO = companyEmployeeInviteRepository.findByEmail(companyEmployeeInviteRequest.getEmail())
+        final CompanyEmployeeInviteBO companyEmployeeInviteBO = companyEmployeeInviteRepository.findByCompanyIdAndEmail(companyId, companyEmployeeInviteRequest.getEmail())
                 .map(cei -> cei.setToken(UUID.randomUUID().toString()))
                 .map(cei -> (CompanyEmployeeInviteBO) cei.setCreatedAt(LocalDate.now()))
                 .orElse(new CompanyEmployeeInviteBO()

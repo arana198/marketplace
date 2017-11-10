@@ -1,4 +1,4 @@
-package com.marketplace.company.domain;
+package com.marketplace.broker.domain;
 
 import com.marketplace.common.domain.AbstractAuditEntity;
 import lombok.Data;

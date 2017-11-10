@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   KEY ix_user_id (user_id),
-  CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roleResponses (id),
+  CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles (id),
   CONSTRAINT fk_user_roles_users FOREIGN KEY (user_id) REFERENCES users (id),
   CONSTRAINT fk_user_roles_user_status FOREIGN KEY (user_status_id) REFERENCES user_status (id)
 );
@@ -169,4 +169,34 @@ CREATE TABLE IF NOT EXISTS companies (
   UNIQUE KEY ux_vat_number (vat_number),
   INDEX ix_company_number_vat_number (company_number, vat_number),
   FULLTEXT (name)
+);
+
+CREATE TABLE IF NOT EXISTS company_employee (
+  id varchar(36) NOT NULL,
+  company_id varchar(36) NOT NULL,
+  user_id varchar(36) NOT NULL,
+  is_admin varchar(36) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_by varchar(36) NULL,
+  version int(11) DEFAULT 0,
+  PRIMARY KEY (id),
+  INDEX ux_company_id (company_id),
+  INDEX ux_user_id (user_id),
+  INDEX ux_company_id_is_admin (company_id, is_admin),
+  CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (company_id) REFERENCES companies (id),
+  CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE IF NOT EXISTS company_employee_invite (
+  id varchar(36) NOT NULL,
+  company_id varchar(36) NOT NULL,
+  email varchar(255) NOT NULL,
+  token varchar(36) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_company_id_email (company_id, email),
+  CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (company_id) REFERENCES companies (id),
+  CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (user_id) REFERENCES users (id)
 );

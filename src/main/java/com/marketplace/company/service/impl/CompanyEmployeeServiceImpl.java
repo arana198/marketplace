@@ -1,5 +1,9 @@
 package com.marketplace.company.service.impl;
 
+import com.marketplace.common.exception.BadRequestException;
+import com.marketplace.common.exception.InternalServerException;
+import com.marketplace.common.exception.ResourceForbiddenException;
+import com.marketplace.common.security.AuthUser;
 import com.marketplace.company.domain.CompanyEmployeeBO;
 import com.marketplace.company.domain.CompanyEmployeeInviteBO;
 import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
@@ -12,11 +16,6 @@ import com.marketplace.company.exception.CompanyEmployeeNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.CompanyEmployeeService;
 import com.marketplace.company.service.CompanyService;
-import com.marketplace.common.exception.BadRequestException;
-import com.marketplace.common.exception.InternalServerException;
-import com.marketplace.common.exception.ResourceForbiddenException;
-import com.marketplace.common.security.AuthUser;
-import com.marketplace.queue.publish.PublishService;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.service.UserService;
 import lombok.Data;
@@ -38,7 +37,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
     private final CompanyEmployeeInviteRepository companyEmployeeInviteRepository;
     private final CompanyService companyService;
     private final UserService userService;
-    private final PublishService publishService;
 
     @Override
     public Page<CompanyEmployeeResponse> findByCompanyId(final String companyId, final Pageable pageable) {
@@ -70,7 +68,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
 
         companyEmployeeInviteRepository.delete(companyEmployeeInviteBO);
         companyEmployeeRepository.save(companyEmployeeBO);
-        //publishService.sendMessage(PublishAction.EMPLOYEE_ADDED_TO_COMPANY, );
         return companyEmployeeBO.getId();
     }
 
@@ -109,8 +106,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
         companyEmployeeRepository.findById(employeeId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
                 .ifPresent(companyEmployeeRepository::delete);
-
-        //publishService.sendMessage(PublishAction.EMPLOYEE_ADDED_TO_COMPANY, );
     }
 
     @Override
@@ -128,6 +123,7 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
                         .setEmail(companyEmployeeInviteRequest.getEmail())
                         .setToken(UUID.randomUUID().toString()));
 
+        //TODO: Email the user
         companyEmployeeInviteRepository.save(companyEmployeeInviteBO);
     }
 

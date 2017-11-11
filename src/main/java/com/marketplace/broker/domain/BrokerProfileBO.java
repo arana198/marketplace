@@ -29,8 +29,7 @@ public class BrokerProfileBO extends AbstractAuditEntity implements Serializable
     @Column(name = "mobile_number", nullable = false)
     private String mobileNumber;
 
-    //personal details
-    //company details
+    //personal details - address
     //billing if independant
     //
 }

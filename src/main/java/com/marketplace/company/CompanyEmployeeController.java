@@ -37,7 +37,7 @@ public class CompanyEmployeeController {
     private final CompanyEmployeeService companyEmployeeService;
 
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-    @PostMapping
+    @PostMapping(path = "/invite")
     public ResponseEntity<CompanyEmployeeResponse> inviteEmployee(@PathVariable final String companyId,
                                                                   final CompanyEmployeeInviteRequest companyEmployeeInviteRequest,
                                                                   final BindingResult bindingResult)

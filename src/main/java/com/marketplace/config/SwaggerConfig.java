@@ -13,8 +13,8 @@ public class SwaggerConfig {
 
     /*private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Study Buddy API")
-                .description("This pending provides a JSON API for managing cricket club related data")
+                .title("Study Buddy EmailSender")
+                .description("This pending provides a JSON EmailSender for managing cricket club related data")
                 .termsOfServiceUrl("http://springfox.io")
                 .license("Apache License Version 2.0")
                 .licenseUrl("https://github.com/springfox/springfox/blob/master/LICENSE")

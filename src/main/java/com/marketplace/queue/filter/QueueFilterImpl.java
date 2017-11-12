@@ -15,7 +15,7 @@ class QueueFilterImpl implements MessageSelector {
     public boolean accept(Message<?> message) {
         final Object applicationName = message.getHeaders().get("applicationName");
         log.info("Received message from application [ {} ] with action [ {} ]", applicationName, message.getHeaders().get("action"));
-        if ("profile-service".equals(applicationName)) {
+        if ("company-service".equals(applicationName)) {
             return true;
         }
         return false;

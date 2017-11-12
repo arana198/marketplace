@@ -68,6 +68,11 @@ validator:
     vat:
       url: ${vat.url.prefix}
 
+mail:
+  api:
+    url: ${zoho.mail.api.url}
+    token: ${zoho.mail.api.auth.token}
+
 oauth:
   resourceId: marketplace-api
   clientId: 4f7ec648a48b9d3fa239b497f7b6b4d8019697bd

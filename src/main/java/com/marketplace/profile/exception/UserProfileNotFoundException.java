@@ -4,6 +4,6 @@ import com.marketplace.common.exception.ResourceNotFoundException;
 
 public class UserProfileNotFoundException extends ResourceNotFoundException {
     public UserProfileNotFoundException(final String userId, final String profileId) {
-        super("UserRequest profile for user [ " + userId + " ] and [ " + profileId + " ] not found");
+        super("UserRequest company for user [ " + userId + " ] and [ " + profileId + " ] not found");
     }
 }

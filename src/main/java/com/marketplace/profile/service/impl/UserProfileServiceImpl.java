@@ -40,14 +40,14 @@ class UserProfileServiceImpl implements UserProfileService {
     @Override
     public UserProfileResponse createProfile(final String userId, final UserProfileRequest userProfile)
             throws UserProfileAlreadyExistsException, MobileNumberAlreadyExistsException, UserNotFoundException {
-        log.info("Creating profile for user {}", userId);
+        log.info("Creating company for user {}", userId);
         if (!userId.equalsIgnoreCase(userProfile.getUserId())) {
             log.info("UserRequest id [ {} ] does not match body's user id [ {} ]", userId, userProfile.getUserId());
             throw new BadRequestException("UserRequest id does not match body's user id");
         }
 
         if (userProfileRepository.findByUserId(userProfile.getUserId()).isPresent()) {
-            log.info("UserRequest [ {} ] profile already exists", userId);
+            log.info("UserRequest [ {} ] company already exists", userId);
             throw new UserProfileAlreadyExistsException(userProfile.getUserId());
         }
 
@@ -58,7 +58,7 @@ class UserProfileServiceImpl implements UserProfileService {
         final UserProfileBO userProfileBO = userProfileRequestConverter.convert(userProfile);
 
         userProfileRepository.save(userProfileBO);
-        log.info("UserRequest profile created [ {} ]", userId);
+        log.info("UserRequest company created [ {} ]", userId);
 
         final UserProfileResponse userProfileResponse = userProfileResponseConverter.convert(userProfileBO);
         publishService.sendMessage(PublishAction.USER_PROFILE_CREATED, userProfileResponse);
@@ -67,7 +67,7 @@ class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public void updateProfile(final String userId, final String profileId, final UserProfileRequest userProfile) throws UserProfileNotFoundException, MobileNumberAlreadyExistsException, UsernameAlreadyExistsException {
-        log.info("Updating profile for user {}", userId);
+        log.info("Updating company for user {}", userId);
         if (!userId.equalsIgnoreCase(userProfile.getUserId())) {
             log.info("UserRequest id [ {} ] does not match body's user id [ {} ]", userId, userProfile.getUserId());
             throw new BadRequestException("UserRequest id does not match body's user id");

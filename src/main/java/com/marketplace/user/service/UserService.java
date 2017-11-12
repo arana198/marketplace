@@ -2,7 +2,9 @@ package com.marketplace.user.service;
 
 import com.marketplace.user.domain.UserStatusBO.UserStatus;
 import com.marketplace.user.dto.RoleRequest.UserRole;
+import com.marketplace.user.dto.SocialUserRequest;
 import com.marketplace.user.dto.UserRequest;
+import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.exception.RoleNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
@@ -19,9 +21,13 @@ public interface UserService {
 
     void logout(Principal principal) throws UsernameNotFoundException;
 
-    void createUser(UserRequest userRequest, UserRole role) throws UserAlreadyExistsException, RoleNotFoundException;
+    void createUser(UserRequest userRequest, UserType userType) throws UserAlreadyExistsException;
+
+    void createUser(SocialUserRequest userRequest) throws UserAlreadyExistsException;
 
     void updatePassword(String userId, String password) throws UserNotFoundException;
+
+    void resetPassword(String username) throws UserNotFoundException;
 
     void resetPassword(String userId, String token, String password) throws UserPasswordNotFoundTokenException, UserPasswordTokenExpiredException;
 

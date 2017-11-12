@@ -14,9 +14,9 @@ public interface RoleService {
 
     void updateRole(String roleId, RoleRequest roleRequest) throws RoleNotFoundException;
 
-    Optional<RoleBO> findById(String id) throws RoleNotFoundException;
+    Optional<RoleBO> findById(String id);
 
-    Optional<RoleBO> findByName(UserRole role) throws RoleNotFoundException;
+    Optional<RoleBO> findByName(UserRole role);
 }
 
 

@@ -1,10 +1,8 @@
 package com.marketplace.user.oauth;
 
-import com.marketplace.user.dto.RoleRequest.UserRole;
-import com.marketplace.user.dto.UserRequest;
+import com.marketplace.user.dto.SocialUserRequest;
 import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.dto.UserResponse;
-import com.marketplace.user.exception.RoleNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.service.UserService;
 import lombok.Data;
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Slf4j
 @Component
-public class SocialConnectionSignUp implements ConnectionSignUp {
+class SocialConnectionSignUp implements ConnectionSignUp {
     private final UserService userService;
 
     @Override
@@ -26,16 +24,17 @@ public class SocialConnectionSignUp implements ConnectionSignUp {
         return userService.findByUsername(profile.getEmail())
                 .map(UserResponse::getEmail)
                 .orElseGet(() -> {
-                    UserRequest userRequest = new UserRequest(profile.getEmail(), null);
                     LoginProvider loginProvider = LoginProvider.getRoleFromString(connection.getKey().getProviderId());
-                    userRequest.setLoginProvider(loginProvider);
-                    userRequest.setLoginProviderId(connection.getKey().getProviderUserId());
-                    userRequest.setProfileImageUrl(connection.getImageUrl());
+                    SocialUserRequest socialUserRequest = (SocialUserRequest) new SocialUserRequest(
+                            profile.getEmail(),
+                            connection.getKey().getProviderUserId(),
+                            connection.getImageUrl())
+                            .setLoginProvider(loginProvider);
 
                     try {
-                        userService.createUser(userRequest, UserRole.ROLE_USER);
-                        return userRequest.getEmail();
-                    } catch (UserAlreadyExistsException | RoleNotFoundException e) {
+                        userService.createUser(socialUserRequest);
+                        return socialUserRequest.getEmail();
+                    } catch (UserAlreadyExistsException e) {
                         return null;
                     }
                 });

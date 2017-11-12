@@ -3,6 +3,7 @@ package com.marketplace.user.domain;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(of = {"user"})
 @ToString(of = {"id"})
+@Accessors(chain = true)
 @Entity
 @Table(name = "user_password_tokens")
 public class UserPasswordTokenBO implements Serializable {

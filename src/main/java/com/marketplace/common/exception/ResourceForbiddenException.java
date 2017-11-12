@@ -1,6 +1,6 @@
 package com.marketplace.common.exception;
 
-public abstract class ResourceForbiddenException extends Exception {
+public class ResourceForbiddenException extends RuntimeException {
     public ResourceForbiddenException(final String message) {
         super(message);
     }

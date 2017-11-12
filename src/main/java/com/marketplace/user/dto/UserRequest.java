@@ -2,14 +2,12 @@ package com.marketplace.user.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
@@ -43,6 +41,10 @@ public class UserRequest {
         }
     }
 
+    public enum UserType {
+        BROKER, COMPANY_ADMIN;
+    }
+
     @Size(min = 5, max = 50, message = "email is wrong size")
     @NotBlank(message = "email is mandatory")
     @Email(message = "email format incorrect")
@@ -52,23 +54,7 @@ public class UserRequest {
     @NotBlank(message = "password is mandatory")
     private final String password;
 
-    @JsonIgnore
-    private String userId;
-
-    @JsonIgnore
-    private RoleList roles;
-
-    @JsonIgnore
-    private LoginProvider loginProvider = LoginProvider.LOCAL;
-
-    @JsonIgnore
-    private String loginProviderId;
-
-    @JsonIgnore
-    private String profileImageUrl;
-
-    @JsonIgnore
-    private String userStatus;
+    private LoginProvider loginProvider;
 
     @JsonCreator
     public UserRequest(@JsonProperty(value = "email") final String email,

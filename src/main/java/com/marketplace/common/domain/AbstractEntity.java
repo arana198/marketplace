@@ -3,6 +3,7 @@ package com.marketplace.common.domain;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(of = {"createdAt", "updatedAt"})
 @ToString(of = {"createdAt", "updatedAt"})
+@Accessors(chain = true)
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
 public abstract class AbstractEntity implements Serializable {

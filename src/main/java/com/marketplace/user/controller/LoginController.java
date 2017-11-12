@@ -26,7 +26,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
@@ -44,23 +43,18 @@ public class LoginController {
 
     private static final String SCOPE = "read write";
 
-    private final TokenEndpoint tokenEndpoint;
     private final UserService userService;
+    private final TokenEndpoint tokenEndpoint;
     private final ConnectionFactoryLocator connectionFactoryLocator;
     private final ConnectionRepository connectionRepository;
     private final ConnectionSignUp connectionSignUp;
     private final UserConnectionService userConnectionService;
     private final JdbcTokenStore jdbcTokenStore;
 
-    @PostMapping(value = "/singup")
-    public ResponseEntity<ResourceSupport> signup(@Valid @RequestBody final Oauth oauth) throws ResourceNotFoundException {
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
     @RolesAllowed({UserRole.ROLE_USER})
     @DeleteMapping(value = "/logout")
     public ResponseEntity<ResourceSupport> logout(final Principal principal) throws ResourceNotFoundException {
+
         userService.logout(principal);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -132,6 +126,6 @@ public class LoginController {
             }
         }
 
-        throw new RuntimeException("Invalid request");
+        throw new BadRequestException("Invalid request");
     }
 }

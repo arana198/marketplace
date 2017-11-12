@@ -9,9 +9,10 @@ import com.marketplace.user.domain.UserRoleBO;
 import com.marketplace.user.domain.UserStatusBO;
 import com.marketplace.user.domain.UserStatusBO.UserStatus;
 import com.marketplace.user.dto.RoleRequest.UserRole;
+import com.marketplace.user.dto.SocialUserRequest;
 import com.marketplace.user.dto.UserRequest;
+import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.dto.UserResponse;
-import com.marketplace.user.exception.RoleNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
 import com.marketplace.user.exception.UserPasswordNotFoundTokenException;
@@ -43,7 +44,8 @@ class UserServiceImpl implements UserService {
     private final UserPasswordTokenService userPasswordTokenService;
     private final TokenRevoker tokenRevoker;
     private final UserResponseConverter userResponseConverter;
-    private final UserConverter userConverter;
+    private final UserRequestConverter userRequestConverter;
+    private final SocialUserRequestConverter socialUserRequestConverter;
     private final PublishService publishService;
     private final PasswordEncoder passwordEncoder;
 
@@ -64,35 +66,47 @@ class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void createUser(final UserRequest userRequest, final UserRole role) throws UserAlreadyExistsException, RoleNotFoundException {
+    public void createUser(final UserRequest userRequest, final UserType userType) throws UserAlreadyExistsException {
 
         log.debug("Creating pending {}", userRequest.getEmail());
+        final UserRole role = userType == UserType.COMPANY_ADMIN ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
         final Optional<UserBO> oldUser = userRepository.findByUsername(userRequest.getEmail());
-        if (oldUser.filter(u -> u.getRoles()
-                .parallelStream()
-                .map(UserRoleBO::getRole)
-                .anyMatch(r -> r.getName().equalsIgnoreCase(role.getValue())))
-                .isPresent()
-                || userRepository.findByProviderUserId(userRequest.getLoginProviderId()).isPresent()) {
+        if (this.doesUserExists(oldUser, role)) {
             throw new UserAlreadyExistsException(userRequest.getEmail());
         }
 
-        final UserBO userBO = oldUser.orElse(userConverter.convert(userRequest));
-        final UserStatusBO userStatusBO = userStatusService.findByName(UserStatus.PENDING).get();
-        final RoleBO userRole = roleService.findByName(role)
-                .orElseThrow(() -> new RoleNotFoundException(role));
+        final UserBO userBO = oldUser.orElse(userRequestConverter.convert(userRequest));
+        this.addUserRoleBO(userBO, role);
+        final UserResponse newUser = userResponseConverter.convert(userBO);
 
-        final UserRoleBO userRoleBO = new UserRoleBO();
-        userRoleBO.setUser(userBO);
-        userRoleBO.setRole(userRole);
-        userRoleBO.setUserStatus(userStatusBO);
-        userBO.getRoles().add(userRoleBO);
+        PublishAction publishAction = userType == UserType.COMPANY_ADMIN ? PublishAction.COMPANY_ADMIN_USER_CREATED : PublishAction.BROKER_USER_CREATED;
+        publishService.sendMessage(publishAction, newUser);
+    }
 
-        userRepository.save(userBO);
+    @Override
+    public void createUser(final SocialUserRequest socialUserRequest) throws UserAlreadyExistsException {
+        log.debug("Creating pending {}", socialUserRequest.getEmail());
+        final UserRole role = UserRole.ROLE_USER;
+        final Optional<UserBO> oldUser = userRepository.findByUsername(socialUserRequest.getEmail());
+        if (this.doesUserExists(oldUser, role)
+                || userRepository.findByProviderUserId(socialUserRequest.getLoginProviderId()).isPresent()) {
+            throw new UserAlreadyExistsException(socialUserRequest.getEmail());
+        }
+
+        final UserBO userBO = oldUser.orElse(socialUserRequestConverter.convert(socialUserRequest));
+        this.addUserRoleBO(userBO, role);
         final UserResponse newUser = userResponseConverter.convert(userBO)
-                .setProfileImageUrl(userRequest.getProfileImageUrl());
+                .setProfileImageUrl(socialUserRequest.getProfileImageUrl());
 
         publishService.sendMessage(PublishAction.USER_CREATED, newUser);
+    }
+
+    @Override
+    public void resetPassword(final String username) throws UserNotFoundException {
+        final UserBO userBO = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+
+        userPasswordTokenService.createToken(userBO);
     }
 
     @Override
@@ -144,5 +158,25 @@ class UserServiceImpl implements UserService {
         userRepository.save(userBO);
         tokenRevoker.revoke(userId);
         publishService.sendMessage(PublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
+    }
+
+    private boolean doesUserExists(final Optional<UserBO> oldUser, final UserRole role) {
+        return oldUser.filter(u -> u.getRoles()
+                .parallelStream()
+                .map(UserRoleBO::getRole)
+                .anyMatch(r -> r.getName().equalsIgnoreCase(role.getValue())))
+                .isPresent();
+    }
+
+    private void addUserRoleBO(final UserBO userBO, final UserRole role) {
+        final UserStatusBO userStatusBO = userStatusService.findByName(UserStatus.PENDING).get();
+        final RoleBO userRole = roleService.findByName(role).get();
+
+        final UserRoleBO userRoleBO = new UserRoleBO();
+        userRoleBO.setUser(userBO);
+        userRoleBO.setRole(userRole);
+        userRoleBO.setUserStatus(userStatusBO);
+        userBO.getRoles().add(userRoleBO);
+        userRepository.save(userBO);
     }
 }

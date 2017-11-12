@@ -39,7 +39,7 @@ public class ProfileController {
     public ResponseEntity<UserProfileResponse> getProfile(@PathVariable final String userId,
                                                           @PathVariable final String profileId)
             throws ResourceNotFoundException {
-        log.info("Getting profile for id: {}", profileId);
+        log.info("Getting company for id: {}", profileId);
         return userProfileService.findByUserId(userId)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new UserProfileNotFoundException(userId, profileId));
@@ -51,9 +51,9 @@ public class ProfileController {
                                               @RequestBody @Valid final UserProfileRequest userProfile,
                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
-        log.info("Creating profile for user: {}", userId);
+        log.info("Creating company for user: {}", userId);
         if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Invalid user profile object", bindingResult);
+            throw new BadRequestException("Invalid user company object", bindingResult);
         }
 
         final UserProfileResponse userProfileResponse = userProfileService.createProfile(userId, userProfile);
@@ -71,9 +71,9 @@ public class ProfileController {
                                               @RequestBody @Valid final UserProfileRequest userProfile,
                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
-        log.info("Updating profile {}, for user: {}", profileId, userId);
+        log.info("Updating company {}, for user: {}", profileId, userId);
         if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Invalid user profile object", bindingResult);
+            throw new BadRequestException("Invalid user company object", bindingResult);
         }
 
         userProfileService.updateProfile(userId, profileId, userProfile);

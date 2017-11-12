@@ -36,14 +36,14 @@ class UserAuthenticationManager implements AuthenticationManager, UserDetailsSer
                         .parallelStream()
                         .anyMatch(ur -> ur.getProvider().equalsIgnoreCase(LoginProvider.LOCAL.getValue())) || passwordEncoder.matches(password.toString(), user.getPassword()))
                 .map(u -> new UsernamePasswordAuthenticationToken(u.getUsername(), u.getPassword(), this.getRoleFromUser(u)))
-                .orElseThrow(() -> new UserAuthenticationException("UserRequest authentication failed"));
+                .orElseThrow(() -> new UserAuthenticationException("User authentication failed"));
     }
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .map(u -> new org.springframework.security.core.userdetails.User(u.getUsername(), u.getPassword() == null ? "pass" : u.getPassword(), this.getRoleFromUser(u)))
-                .orElseThrow(() -> new UserAuthenticationException("UserRequest authentication failed"));
+                .orElseThrow(() -> new UserAuthenticationException("User authentication failed"));
     }
 
     private List<RoleBO> getRoleFromUser(final UserBO userBO) {

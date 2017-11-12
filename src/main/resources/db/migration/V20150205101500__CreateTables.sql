@@ -74,22 +74,38 @@ CREATE TABLE IF NOT EXISTS users (
   id varchar(36) NOT NULL,
   username varchar(255) NOT NULL,
   password varchar(255) NULL,
+  is_email_verified bit(1) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_by varchar(36) NULL,
   version int(11) NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY ix_username_provider (username)
+  INDEX ix_username_is_email_verified (username, is_email_verified),
+  INDEX ix_username (username)
 );
 
-CREATE TABLE IF NOT EXISTS user_password_tokens (
-  id varchar(36) NOT NULL,
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+  id BIGINT(11) NOT NULL,
   user_id varchar(36) NOT NULL,
   token varchar(36) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
+  UNIQUE KEY ix_email_verification_tokens_user_id (user_id),
+  INDEX ix_email_verification_tokens_user_id_token (user_id, token),
+  INDEX ix_email_verification_tokens_token (token),
+  CONSTRAINT fk_email_verification_tokens_user FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE IF NOT EXISTS user_password_tokens (
+  id BIGINT(11) NOT NULL,
+  user_id varchar(36) NOT NULL,
+  token varchar(36) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  PRIMARY KEY (id),
+  INDEX ix_user_password_tokens_token (token),
+  INDEX ix_user_password_tokens_user_id_token (user_id, token),
   UNIQUE KEY ix_user_password_token_user_id (user_id),
-  CONSTRAINT fk_users_password_token_user FOREIGN KEY (user_id) REFERENCES users (id)
+  CONSTRAINT fk_user_password_token_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS roles (
@@ -99,21 +115,6 @@ CREATE TABLE IF NOT EXISTS roles (
   is_selectable bit(1) NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY ux_role_name (name)
-);
-
-CREATE TABLE IF NOT EXISTS users (
-  id varchar(36) NOT NULL,
-  username varchar(255) NOT NULL,
-  password varchar(255) NULL,
-  created_ts TIMESTAMP NOT NULL DEFAULT now(),
-  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
-  updated_by varchar(36) NULL,
-  version int(11) NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY ix_username_provider (username, provider),
-  KEY ix_provider (provider),
-  KEY ix_username (username),
-  CONSTRAINT fk_user_user_status FOREIGN KEY (user_status_id) REFERENCES user_status (id)
 );
 
 CREATE TABLE IF NOT EXISTS user_roles (
@@ -159,7 +160,7 @@ CREATE TABLE IF NOT EXISTS companies (
   vat_number varchar(15) NOT NULL,
   logo_url varchar(500) NULL,
   website_url varchar(500) NULL,
-  is_active varchar(255) NOT NULL,
+  is_active bit(1) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_by varchar(36) NULL,
@@ -175,7 +176,7 @@ CREATE TABLE IF NOT EXISTS company_employee (
   id varchar(36) NOT NULL,
   company_id varchar(36) NOT NULL,
   user_id varchar(36) NOT NULL,
-  is_admin varchar(36) NOT NULL,
+  is_admin bit(1) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_by varchar(36) NULL,
@@ -189,7 +190,7 @@ CREATE TABLE IF NOT EXISTS company_employee (
 );
 
 CREATE TABLE IF NOT EXISTS company_employee_invite (
-  id varchar(36) NOT NULL,
+  id BIGINT(11) NOT NULL AUTO_INCREMENT,
   company_id varchar(36) NOT NULL,
   email varchar(255) NOT NULL,
   token varchar(36) NOT NULL,

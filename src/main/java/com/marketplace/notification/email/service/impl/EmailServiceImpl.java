@@ -30,6 +30,11 @@ class EmailServiceImpl implements EmailService {
         this.sendEmail("123", new EmailRequest("accounts@codenest.uk", "accounts@codenest.uk", "Template", content));
     }
 
+
+    //email verification - broker + admin
+    //reset password
+    //welcome email user
+
     @Override
     public void sendEmail(final String sentTo, final EmailRequest emailRequest) {
 

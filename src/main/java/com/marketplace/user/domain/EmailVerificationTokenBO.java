@@ -1,7 +1,8 @@
-package com.marketplace.company.domain;
+package com.marketplace.user.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
@@ -11,29 +12,29 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode(of = {"user"})
+@ToString(of = {"id"})
 @Accessors(chain = true)
-@EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "company_employee_invite")
-public class CompanyEmployeeInviteBO implements Serializable {
+@Table(name = "email_verifiation_tokens")
+public class EmailVerificationTokenBO implements Serializable {
+
+    private static final long serialVersionUID = 2780670648745098454L;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "company_id", nullable = false)
-    private String companyId;
-
-    @Column(name = "email", nullable = false)
-    private String email;
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
     @Column(name = "token", nullable = false)
     private String token;
 
     @Column(name = "created_ts", nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdTs;
 }

@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
@@ -19,7 +18,7 @@ import java.time.LocalDate;
 @Table(name = "user_profiles", indexes = {
         @Index(name = "ix_user_id", columnList = "user_id", unique = true)
 })
-public class UserProfileBO extends AbstractAuditEntity implements Serializable {
+public class UserProfileBO extends AbstractAuditEntity {
 
     @Column(name = "user_id", nullable = false)
     private String userId;

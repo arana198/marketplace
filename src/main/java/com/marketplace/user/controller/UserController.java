@@ -1,7 +1,10 @@
 package com.marketplace.user.controller;
 
+import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
+import com.marketplace.common.security.UserRole;
+import com.marketplace.user.dto.UpdatePasswordRequest;
 import com.marketplace.user.dto.UserRequest;
 import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.service.UserService;
@@ -11,11 +14,15 @@ import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 @Data
@@ -27,10 +34,33 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<ResourceSupport> signup(@RequestParam UserType userType, @Valid @RequestBody final UserRequest userRequest)
+    public ResponseEntity<ResourceSupport> signup(@RequestParam UserType userType,
+                                                  @Valid @RequestBody final UserRequest userRequest,
+                                                  final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
+        log.info("Signup user: {}", userRequest.getEmail());
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Invalid user request object", bindingResult);
+        }
+
         userService.createUser(userRequest, userType);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @RolesAllowed({UserRole.ROLE_USER})
+    @PutMapping(path = "/{userId}/passwords")
+    public ResponseEntity<ResourceSupport> updatePassword(@PathVariable String userId,
+                                                          @Valid @RequestBody final UpdatePasswordRequest updatePasswordRequest,
+                                                          final BindingResult bindingResult)
+            throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
+        log.info("Update password for user: {}", userId);
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Invalid update password request object", bindingResult);
+        }
+
+        userService.updatePassword(userId, updatePasswordRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

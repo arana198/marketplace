@@ -12,6 +12,7 @@ class UserRequestConverter implements BaseConverter<UserRequest, UserBO> {
     public UserBO convert(final UserRequest source) {
         return new UserBO()
                 .setUsername(source.getEmail())
-                .setPassword(source.getPassword());
+                .setPassword(source.getPassword())
+                .setEmailVerified(false);
     }
 }

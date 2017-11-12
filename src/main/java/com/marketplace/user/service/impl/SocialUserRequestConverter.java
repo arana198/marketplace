@@ -11,6 +11,7 @@ class SocialUserRequestConverter implements BaseConverter<SocialUserRequest, Use
     @Override
     public UserBO convert(final SocialUserRequest source) {
         return new UserBO()
-                .setUsername(source.getEmail());
+                .setUsername(source.getEmail())
+                .setEmailVerified(true);
     }
 }

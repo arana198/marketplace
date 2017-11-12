@@ -3,16 +3,19 @@ package com.marketplace.user.domain;
 import com.marketplace.common.domain.AbstractEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Data
 @EqualsAndHashCode(callSuper = true, of = {"user_id", "role_id"})
 @Entity
 @Table(name = "user_roles")
-public class UserRoleBO extends AbstractEntity implements Serializable {
+public class UserRoleBO extends AbstractEntity {
 
     private static final long serialVersionUID = -5889526109417397633L;
 

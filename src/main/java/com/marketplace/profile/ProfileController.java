@@ -51,7 +51,7 @@ public class ProfileController {
                                               @RequestBody @Valid final UserProfileRequest userProfile,
                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
-        log.info("Creating company for user: {}", userId);
+        log.info("Creating profile for user: {}", userId);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid user company object", bindingResult);
         }
@@ -71,7 +71,7 @@ public class ProfileController {
                                               @RequestBody @Valid final UserProfileRequest userProfile,
                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
-        log.info("Updating company {}, for user: {}", profileId, userId);
+        log.info("Updating profile {}, for user: {}", profileId, userId);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid user company object", bindingResult);
         }

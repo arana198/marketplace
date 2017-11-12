@@ -1,4 +1,4 @@
-package com.marketplace.queue.publish.domain;
+package com.marketplace.queue.consume;
 
 import lombok.Getter;
 
@@ -6,13 +6,13 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Getter
-public enum PublishAction {
+public enum ConsumeAction {
     USER_CREATED("USER_CREATED"),
     COMPANY_ADMIN_USER_CREATED("COMPANY_ADMIN_USER_CREATED"),
     BROKER_USER_CREATED("BROKER_USER_CREATED"),
-    USER_STATUS_UPDATED("USER_STATUS_UPDATED"),
     VERIFY_EMAIL("VERIFY_EMAIL"),
     FORGOTTEN_PASSWORD("FORGOTTEN_PASSWORD"),
+    USER_STATUS_UPDATED("USER_STATUS_UPDATED"),
     USER_PROFILE_CREATED("USER_PROFILE_CREATED"),
     USER_PROFILE_UPDATED("USER_PROFILE_UPDATED"),
     COMPANY_CREATED("COMPANY_CREATED"),
@@ -22,20 +22,20 @@ public enum PublishAction {
 
     private final String value;
 
-    PublishAction(final String value) {
+    ConsumeAction(final String value) {
         this.value = value;
     }
 
-    public static PublishAction getActionFromString(final String value) {
-        return Stream.of(PublishAction.values())
+    public static ConsumeAction getActionFromString(final String value) {
+        return Stream.of(ConsumeAction.values())
                 .filter(a -> a.getValue().equalsIgnoreCase(value))
                 .findAny()
                 .orElse(null);
     }
 
-    public static String getStringFromAction(final PublishAction value) {
+    public static String getStringFromAction(final ConsumeAction value) {
         return Optional.ofNullable(value)
-                .map(PublishAction::getValue)
+                .map(ConsumeAction::getValue)
                 .orElse(null);
     }
 }

@@ -1,4 +1,4 @@
-package com.marketplace.notification.email.service.impl;
+package com.marketplace.notification.email.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

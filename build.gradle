@@ -41,6 +41,8 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-hateoas"
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.boot:spring-boot-starter-web"
+    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+
     compile "org.springframework.data:spring-data-envers:0.2.0.RELEASE"
 
     compile "org.springframework.boot:spring-boot-starter-social-facebook"

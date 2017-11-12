@@ -1,6 +1,7 @@
 package com.marketplace.notification.email.service.impl;
 
 import com.marketplace.common.converter.BaseConverter;
+import com.marketplace.notification.email.domain.EmailBO;
 import com.marketplace.notification.email.dto.EmailRequest;
 import org.springframework.stereotype.Service;
 

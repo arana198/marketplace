@@ -5,14 +5,16 @@ import com.marketplace.notification.email.dto.EmailRequest;
 import com.marketplace.notification.email.exception.EmailFailedException;
 import com.marketplace.utils.ConfigurationService;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Data
 @Service
 class EmailSenderService {
@@ -29,6 +31,9 @@ class EmailSenderService {
         HttpEntity<EmailRequest> request = new HttpEntity<EmailRequest>(emailRequest, headers);
         try {
             REST_TEMPLATE.postForEntity(configurationService.getEmailApiUrl(), request, String.class);
+        } catch (HttpServerErrorException ex) {
+            log.warn("Email failed to sent: ", ex);
+            throw ex;
         } catch (HttpClientErrorException ex) {
             throw new EmailFailedException(ex.getMessage());
         }

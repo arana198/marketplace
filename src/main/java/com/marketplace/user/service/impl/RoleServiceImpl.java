@@ -1,10 +1,9 @@
 package com.marketplace.user.service.impl;
 
 import com.marketplace.user.domain.RoleBO;
+import com.marketplace.user.dto.RoleList;
 import com.marketplace.user.dto.RoleRequest;
 import com.marketplace.user.dto.RoleRequest.UserRole;
-import com.marketplace.user.dto.RoleResponse;
-import com.marketplace.user.dto.RoleList;
 import com.marketplace.user.exception.RoleNotFoundException;
 import com.marketplace.user.service.RoleService;
 import lombok.Data;
@@ -47,12 +46,12 @@ class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Optional<RoleBO> findById(final String id) throws RoleNotFoundException {
+    public Optional<RoleBO> findById(final String id) {
         return roleRepository.findById(id);
     }
 
 
-    public Optional<RoleBO> findByName(final UserRole role) throws RoleNotFoundException {
+    public Optional<RoleBO> findByName(final UserRole role) {
         return roleRepository.findByName(role.getValue());
     }
 }

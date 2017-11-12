@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS company_employee_invite (
 
 CREATE TABLE IF NOT EXISTS email_notifications (
   id varchar(36) NOT NULL PRIMARY KEY,
-  sent_to varchar(36) NOT NULL,
+  sent_to varchar(36) NULL,
   email JSON NOT NULL,
   /*toAddress VARCHAR(255) AS (JSON_VALUE(email, '$.toAddress')),
   status VARCHAR(10) AS (JSON_VALUE(email, '$.status')),*/

@@ -7,13 +7,16 @@ import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.domain.UserRoleBO;
 import com.marketplace.user.domain.UserStatusBO;
 import com.marketplace.user.domain.UserStatusBO.UserStatus;
+import com.marketplace.user.dto.EmailVerificationRequest;
 import com.marketplace.user.dto.ForgottenPasswordRequest;
 import com.marketplace.user.dto.RoleRequest.UserRole;
 import com.marketplace.user.dto.SocialUserRequest;
 import com.marketplace.user.dto.UpdatePasswordRequest;
 import com.marketplace.user.dto.UserRequest;
+import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.dto.UserResponse;
+import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
 import com.marketplace.user.exception.UserPasswordTokenExpiredException;
@@ -76,7 +79,7 @@ class UserServiceImpl implements UserService {
         }
 
         final UserBO userBO = oldUser.orElse(userRequestConverter.convert(userRequest));
-        this.addUserRoleBO(userBO, role);
+        this.addUserRoleBO(userBO, role, LoginProvider.LOCAL, null);
         final UserResponse newUser = userResponseConverter.convert(userBO);
 
         PublishAction publishAction = userType == UserType.COMPANY_ADMIN ? PublishAction.COMPANY_ADMIN_USER_CREATED : PublishAction.BROKER_USER_CREATED;
@@ -95,7 +98,7 @@ class UserServiceImpl implements UserService {
         }
 
         final UserBO userBO = oldUser.orElse(socialUserRequestConverter.convert(socialUserRequest));
-        this.addUserRoleBO(userBO, role);
+        this.addUserRoleBO(userBO, role, socialUserRequest.getLoginProvider(), socialUserRequest.getLoginProviderId());
         final UserResponse newUser = userResponseConverter.convert(userBO)
                 .setProfileImageUrl(socialUserRequest.getProfileImageUrl());
 
@@ -135,6 +138,17 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void verifyEmail(final String userId) {
+        userRepository.findById(userId)
+                .ifPresent(emailVerificationTokenService::createToken);
+    }
+
+    @Override
+    public void verifyEmail(final String userId, final EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException {
+        emailVerificationTokenService.verifyToken(userId, emailVerificationRequest.getToken());
+    }
+
+    @Override
     @Transactional
     public void updateUserStatus(final String userId, final UserRole userRole, final UserStatus userStatus) throws UserNotFoundException {
         log.debug("Update pending domain for pending {}", userId);
@@ -161,7 +175,7 @@ class UserServiceImpl implements UserService {
                 .isPresent();
     }
 
-    private void addUserRoleBO(final UserBO userBO, final UserRole role) {
+    private void addUserRoleBO(final UserBO userBO, final UserRole role, final LoginProvider loginProvider, final String loginProviderUserId) {
         final UserStatusBO userStatusBO = userStatusService.findByName(UserStatus.PENDING).get();
         final RoleBO userRole = roleService.findByName(role).get();
 
@@ -169,6 +183,8 @@ class UserServiceImpl implements UserService {
         userRoleBO.setUser(userBO);
         userRoleBO.setRole(userRole);
         userRoleBO.setUserStatus(userStatusBO);
+        userRoleBO.setProvider(loginProvider.getValue().toString());
+        userRoleBO.setProviderUserId(loginProviderUserId);
         userBO.getRoles().add(userRoleBO);
         userRepository.save(userBO);
     }

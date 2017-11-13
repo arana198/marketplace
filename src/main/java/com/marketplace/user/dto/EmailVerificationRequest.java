@@ -12,25 +12,19 @@ import javax.validation.constraints.Size;
 
 @Data
 @Accessors(chain = true)
-public class ForgottenPasswordRequest {
+public class EmailVerificationRequest {
 
     @NotBlank(message = "email is mandatory")
     @Email(message = "email format incorrect")
     private final String email;
 
-    @Size(min = 6, max = 30, message = "password is wrong size")
-    @NotBlank(message = "password is mandatory")
-    private final String password;
-
     @NotBlank(message = "token is mandatory")
     private final String token;
 
     @JsonCreator
-    public ForgottenPasswordRequest(@JsonProperty(value = "email") final String email,
-                                    @JsonProperty(value = "password") final String password,
+    public EmailVerificationRequest(@JsonProperty(value = "email") final String email,
                                     @JsonProperty(value = "token") String token) {
         this.email = email;
-        this.password = password;
         this.token = token;
     }
 }

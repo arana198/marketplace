@@ -54,7 +54,7 @@ public class UserRequest {
     @NotBlank(message = "password is mandatory")
     private final String password;
 
-    private LoginProvider loginProvider;
+    private LoginProvider loginProvider = LoginProvider.LOCAL;
 
     @JsonCreator
     public UserRequest(@JsonProperty(value = "email") final String email,

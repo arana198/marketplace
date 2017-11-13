@@ -26,7 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -51,7 +51,7 @@ public class LoginController {
     private final UserConnectionService userConnectionService;
     private final JdbcTokenStore jdbcTokenStore;
 
-    @RolesAllowed({UserRole.ROLE_USER})
+    @RolesAllowed({UserRole.ROLE_USER, UserRole.ROLE_BROKER})
     @DeleteMapping(value = "/logout")
     public ResponseEntity<ResourceSupport> logout(final Principal principal) throws ResourceNotFoundException {
 
@@ -59,7 +59,7 @@ public class LoginController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping(value = "/login")
+    @PostMapping(value = "/login")
     public ResponseEntity<OAuth2AccessToken> login(final Principal principal,
                                                    @Valid @RequestBody final Oauth oauth,
                                                    final BindingResult bindingResult) throws HttpRequestMethodNotSupportedException {

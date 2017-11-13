@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @ToString(of = {"id"})
 @Accessors(chain = true)
 @Entity
-@Table(name = "email_verifiation_tokens")
+@Table(name = "email_verification_tokens")
 public class EmailVerificationTokenBO implements Serializable {
 
     private static final long serialVersionUID = 2780670648745098454L;

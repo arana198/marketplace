@@ -32,7 +32,7 @@ class UserAuthenticationManager implements AuthenticationManager, UserDetailsSer
         Object password = authentication.getCredentials();
 
         return userRepository.findByUsername(username)
-                .filter(user -> !user.getRoles()
+                .filter(user -> user.getRoles()
                         .parallelStream()
                         .anyMatch(ur -> ur.getProvider().equalsIgnoreCase(LoginProvider.LOCAL.getValue())) || passwordEncoder.matches(password.toString(), user.getPassword()))
                 .map(u -> new UsernamePasswordAuthenticationToken(u.getUsername(), u.getPassword(), this.getRoleFromUser(u)))

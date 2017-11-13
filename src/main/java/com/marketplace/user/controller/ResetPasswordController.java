@@ -7,6 +7,7 @@ import com.marketplace.user.service.UserService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -32,7 +33,7 @@ public class ResetPasswordController {
 
         log.info("Creating reset password for user: {}", email);
         userService.resetPassword(email);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<ResourceSupport>(HttpStatus.CREATED);
     }
 
     @PutMapping

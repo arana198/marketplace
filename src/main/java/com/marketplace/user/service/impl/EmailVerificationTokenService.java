@@ -38,7 +38,7 @@ class EmailVerificationTokenService {
                 emailVerificationTokenBO.getToken(),
                 emailVerificationTokenBO.getCreatedTs());
 
-        publishService.sendMessage(PublishAction.FORGOTTEN_PASSWORD, emailVerificationResponse);
+        publishService.sendMessage(PublishAction.VERIFY_EMAIL, emailVerificationResponse);
     }
 
     public void verifyToken(final String userId, final String token) throws EmailVerificationTokenNotFoundException {

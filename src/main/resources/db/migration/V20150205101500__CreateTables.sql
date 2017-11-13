@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS email_verification_tokens (
-  id BIGINT(11) NOT NULL,
+  id BIGINT(11) NOT NULL AUTO_INCREMENT,
   user_id varchar(36) NOT NULL,
   token varchar(36) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS email_verification_tokens (
 );
 
 CREATE TABLE IF NOT EXISTS user_password_tokens (
-  id BIGINT(11) NOT NULL,
+  id BIGINT(11) NOT NULL AUTO_INCREMENT ,
   user_id varchar(36) NOT NULL,
   token varchar(36) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),

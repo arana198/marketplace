@@ -1,24 +1,49 @@
 package com.marketplace.config;
 
 import lombok.Data;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
+import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @Configuration
 @EnableResourceServer
 public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
     private final Environment env;
+    private final TokenStore tokenStore;
 
     @Override
     public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
-        resources.resourceId(env.getProperty("oauth.resourceId"));
+        resources.resourceId(env.getProperty("oauth.resourceId"))
+                .tokenServices(getTokenServices());
     }
 
     @Override
@@ -38,6 +63,7 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers("/metrics").permitAll()
                 .antMatchers("/health").permitAll()
                 .antMatchers("/webjars/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/users").permitAll()
                 .antMatchers("/connect/**").denyAll()
                 .antMatchers("/swagger-ui.js", "/swagger-ui.min.js", "/api-docs", "/fonts/*", "/api-docs/*", "/api-docs/default/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/roles").permitAll()
@@ -59,5 +85,79 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
         });
 
         // @formatter:on
+    }
+
+    @Primary
+    @Bean
+    CustomTokenServices getTokenServices() {
+        return new CustomTokenServices(tokenStore);
+    }
+
+    class CustomTokenServices implements ResourceServerTokenServices {
+
+        private final TokenConverter tokenConverter = new TokenConverter();
+        private final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+
+        CustomTokenServices(final TokenStore tokenStore) {
+            defaultTokenServices.setTokenStore(tokenStore);
+        }
+
+        @Override
+        public OAuth2Authentication loadAuthentication(final String accessToken) throws AuthenticationException, InvalidTokenException {
+            OAuth2AccessToken token = this.readAccessToken(accessToken);
+            OAuth2Authentication oAuth2Authentication = defaultTokenServices.loadAuthentication(accessToken);
+            Map<String, ?> response = tokenConverter.convertAccessToken(token, oAuth2Authentication);
+            Assert.state(response.containsKey("client_id"), "Client id must be present in response from auth server");
+            return tokenConverter.extractAuthentication(response);
+        }
+
+        @Override
+        public OAuth2AccessToken readAccessToken(final String accessToken) {
+            return defaultTokenServices.readAccessToken(accessToken);
+        }
+    }
+
+    class TokenConverter extends DefaultAccessTokenConverter {
+
+        private UserAuthenticationConverter userTokenConverter = new DefaultUserAuthenticationConverter();
+
+        private static final String AUTHORITIES = "authorities";
+
+        private static final String USER_ID = "user_id";
+
+        private static final String PROFILE_ID = "profile_id";
+
+        private static final String ROLES = "roles";
+
+        private static final String USERNAME = "user_name";
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public OAuth2Authentication extractAuthentication(final Map<String, ?> map) {
+            final Map<String, String> parameters = new HashMap<>();
+            final Set<String> scope = new LinkedHashSet<>(map.containsKey(SCOPE) ? (Collection<String>) map.get(SCOPE) : Collections.emptySet());
+            final Authentication user = userTokenConverter.extractAuthentication(map);
+            final StringBuilder roleStr = new StringBuilder();
+
+            ((Map) map.get(ROLES)) forEach((key, value) -> {
+                roleStr.append(key);
+                roleStr.append(":");
+                roleStr.append(value);
+                roleStr.append(",");
+            });
+
+            roleStr.setLength(roleStr.length() - 1);
+
+            String clientId = (String) map.get(CLIENT_ID);
+            parameters.put(CLIENT_ID, clientId);
+            parameters.put(ROLES, roleStr.toString());
+            parameters.put(USERNAME, (String) map.get(USERNAME));
+            parameters.put(PROFILE_ID, (String) map.get(PROFILE_ID));
+            parameters.put(USER_ID, (String) map.get(USER_ID));
+
+
+            OAuth2Request request = new OAuth2Request(parameters, clientId, new ArrayList((Set) map.get(AUTHORITIES)), true, scope, null, null, null, null);
+            return new OAuth2Authentication(request, user);
+        }
     }
 }

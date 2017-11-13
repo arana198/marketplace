@@ -27,7 +27,7 @@ class EmailServiceImpl implements EmailService {
         Map map = new HashMap<>();
         map.put("message", "http://tokenvalue.com");
         final String content = mailContentBuilder.build("brokerEmailVerification", map);
-        this.sendEmail("123", new EmailRequest("accounts@codenest.uk", "accounts@codenest.uk", "Template", content));
+        //this.sendEmail("123", new EmailRequest("accounts@codenest.uk", "accounts@codenest.uk", "Template", content));
     }
 
 

@@ -48,7 +48,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @RolesAllowed({UserRole.ROLE_USER})
+    @RolesAllowed({UserRole.ROLE_BROKER})
     @PutMapping(path = "/{userId}/passwords")
     public ResponseEntity<ResourceSupport> updatePassword(@PathVariable String userId,
                                                           @Valid @RequestBody final UpdatePasswordRequest updatePasswordRequest,
@@ -61,6 +61,6 @@ public class UserController {
         }
 
         userService.updatePassword(userId, updatePasswordRequest);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return ResponseEntity.ok().build();
     }
 }

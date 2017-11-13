@@ -139,7 +139,7 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
             final Authentication user = userTokenConverter.extractAuthentication(map);
             final StringBuilder roleStr = new StringBuilder();
 
-            ((Map) map.get(ROLES)) forEach((key, value) -> {
+            ((Map) map.get(ROLES)).forEach((key, value) -> {
                 roleStr.append(key);
                 roleStr.append(":");
                 roleStr.append(value);

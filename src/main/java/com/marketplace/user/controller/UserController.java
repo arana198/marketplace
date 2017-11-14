@@ -1,17 +1,16 @@
 package com.marketplace.user.controller;
 
-import com.marketplace.common.annotation.IsActive;
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.common.security.UserRole;
+import com.marketplace.user.dto.EmailVerificationRequest;
 import com.marketplace.user.dto.UpdatePasswordRequest;
 import com.marketplace.user.dto.UserRequest;
 import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.service.UserService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,9 +34,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<ResourceSupport> signup(@RequestParam UserType userType,
-                                                  @Valid @RequestBody final UserRequest userRequest,
-                                                  final BindingResult bindingResult)
+    public ResponseEntity<Void> signup(@RequestParam UserType userType,
+                                       @Valid @RequestBody final UserRequest userRequest,
+                                       final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
         log.info("Signup user: {}", userRequest.getEmail());
@@ -49,12 +48,11 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @IsActive
     @RolesAllowed({UserRole.ROLE_BROKER})
     @PutMapping(path = "/{userId}/passwords")
-    public ResponseEntity<ResourceSupport> updatePassword(@PathVariable String userId,
-                                                          @Valid @RequestBody final UpdatePasswordRequest updatePasswordRequest,
-                                                          final BindingResult bindingResult)
+    public ResponseEntity<Void> updatePassword(@PathVariable String userId,
+                                               @Valid @RequestBody final UpdatePasswordRequest updatePasswordRequest,
+                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
         log.info("Update password for user: {}", userId);
@@ -63,6 +61,20 @@ public class UserController {
         }
 
         userService.updatePassword(userId, updatePasswordRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(path = "/verifyemail")
+    public ResponseEntity<Void> verifyEmail(@Valid @RequestBody final EmailVerificationRequest emailVerificationRequest,
+                                            final BindingResult bindingResult)
+            throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
+        log.info("Verify email for token: {}", emailVerificationRequest.getToken());
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Invalid update password request object", bindingResult);
+        }
+
+        userService.verifyEmail(emailVerificationRequest);
         return ResponseEntity.ok().build();
     }
 }

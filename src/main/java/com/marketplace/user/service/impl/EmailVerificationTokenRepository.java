@@ -7,7 +7,7 @@ import java.util.Optional;
 
 interface EmailVerificationTokenRepository extends BaseRepository<EmailVerificationTokenBO, Long> {
 
-    Optional<EmailVerificationTokenBO> findByUserIdAndToken(String userId, String token);
+    Optional<EmailVerificationTokenBO> findByToken(String token);
 
     Optional<EmailVerificationTokenBO> findByUserId(String userId);
 }

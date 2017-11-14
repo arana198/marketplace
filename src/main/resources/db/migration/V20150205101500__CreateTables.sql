@@ -91,7 +91,6 @@ CREATE TABLE IF NOT EXISTS email_verification_tokens (
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   UNIQUE KEY ix_email_verification_tokens_user_id (user_id),
-  INDEX ix_email_verification_tokens_user_id_token (user_id, token),
   INDEX ix_email_verification_tokens_token (token),
   CONSTRAINT fk_email_verification_tokens_user FOREIGN KEY (user_id) REFERENCES users (id)
 );

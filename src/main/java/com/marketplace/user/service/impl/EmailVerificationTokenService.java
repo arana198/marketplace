@@ -1,12 +1,12 @@
 package com.marketplace.user.service.impl;
 
+import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
 import com.marketplace.user.domain.EmailVerificationTokenBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.dto.TokenVerificationResponse;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
-import com.marketplace.user.exception.UserPasswordTokenExpiredException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,17 +41,18 @@ class EmailVerificationTokenService {
         publishService.sendMessage(PublishAction.VERIFY_EMAIL, emailVerificationResponse);
     }
 
-    public void verifyToken(final String userId, final String token) throws EmailVerificationTokenNotFoundException {
-        log.info("Getting a reset password token for user {}", userId);
-        final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByUserIdAndToken(userId, token)
-                .orElseThrow(() -> new EmailVerificationTokenNotFoundException(userId, token));
+    public EmailVerificationTokenBO verifyToken(final String token) throws EmailVerificationTokenNotFoundException {
+        log.info("Getting a reset password token {}", token);
+        final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new EmailVerificationTokenNotFoundException(token));
 
         if (emailVerificationTokenBO.getCreatedTs().compareTo(LocalDateTime.now().minusDays(2)) <= 0) {
-            log.debug("Token generated at {} for user id {} and token {} has expired", emailVerificationTokenBO.getCreatedTs(), userId, token);
-            throw new UserPasswordTokenExpiredException(userId, token, emailVerificationTokenBO.getCreatedTs().plusDays(2));
+            log.debug("Token generated at {} for user id {} and token {} has expired", emailVerificationTokenBO.getCreatedTs(), emailVerificationTokenBO.getUserId(), token);
+            throw new BadRequestException(String.format("Email verification token [ %s ] has expired", token));
         }
 
-        log.info("Removing email verification token {} and token {}", userId, token);
+        log.info("Removing email verification token {}", token);
         emailVerificationTokenRepository.delete(emailVerificationTokenBO);
+        return emailVerificationTokenBO;
     }
 }

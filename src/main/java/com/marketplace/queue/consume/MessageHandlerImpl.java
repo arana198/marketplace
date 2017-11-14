@@ -1,7 +1,7 @@
 package com.marketplace.queue.consume;
 
 import com.google.gson.Gson;
-import com.marketplace.user.dto.UserResponse;
+import com.marketplace.user.dto.TokenVerificationResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
@@ -23,10 +23,10 @@ class MessageHandlerImpl implements MessageHandler {
 
             switch (consumedAction) {
                 case VERIFY_EMAIL:
-                    UserResponse userResponse = gson.fromJson(payload, UserResponse.class);
+                    TokenVerificationResponse tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
                     break;
                 case FORGOTTEN_PASSWORD:
-                    userResponse = gson.fromJson(payload, UserResponse.class);
+                    tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
                     break;
                 default:
                     break;

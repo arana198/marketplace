@@ -32,11 +32,11 @@ public interface UserService {
 
     void verifyEmail(String userId);
 
-    void verifyEmail(String userId, EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException;
+    void verifyEmail(EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException;
 
     void resetPassword(String username);
 
-    void resetPassword(ForgottenPasswordRequest forgottenPasswordRequest) throws UserPasswordTokenNotFoundException, UserPasswordTokenExpiredException, UserNotFoundException;
+    void resetPassword(ForgottenPasswordRequest forgottenPasswordRequest) throws UserPasswordTokenNotFoundException, UserNotFoundException;
 
     void updateUserStatus(String userId, UserRole userRole, UserStatus userStatus) throws UserNotFoundException;
 }

@@ -6,8 +6,8 @@ import com.marketplace.notification.email.domain.EmailNotificationBO;
 import com.marketplace.notification.email.dto.EmailRequest;
 import com.marketplace.notification.email.exception.EmailFailedException;
 import com.marketplace.notification.email.service.EmailService;
+import com.marketplace.user.dto.TokenVerificationResponse;
 import lombok.Data;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,26 +17,32 @@ import java.util.Map;
 @Service
 class EmailServiceImpl implements EmailService {
 
+    private static final String FROM_EMAIL = "accounts@codenest.uk";
+
     private final EmailNotificationRepository emailNotificationRepository;
     private final EmailSenderService emailSenderService;
     private final EmailRequestConverter emailRequestConverter;
     private final MailContentBuilder mailContentBuilder;
 
-    @Scheduled(fixedDelay = 10000)
-    public void brokerEmailVerification() {
-        Map map = new HashMap<>();
-        map.put("message", "http://tokenvalue.com");
-        final String content = mailContentBuilder.build("brokerEmailVerification", map);
-        //this.sendEmail("123", new EmailRequest("accounts@codenest.uk", "accounts@codenest.uk", "Template", content));
-    }
-
-
-    //email verification - broker + admin
-    //reset password
-    //welcome email user
+    //TODO: welcome email user
 
     @Override
-    public void sendEmail(final String sentTo, final EmailRequest emailRequest) {
+    public void sendVerificationEmail(final TokenVerificationResponse tokenVerificationResponse) {
+        final Map map = new HashMap<>();
+        map.put("token", tokenVerificationResponse.getToken());
+        final String content = mailContentBuilder.build("brokerEmailVerification", map);
+        this.sendEmail(tokenVerificationResponse.getEmail(), this.getEmailRequest(FROM_EMAIL, tokenVerificationResponse.getEmail(), "Email Verification", content));
+    }
+
+    @Override
+    public void sendForgottenPasswordToken(final TokenVerificationResponse tokenVerificationResponse) {
+        final Map map = new HashMap<>();
+        map.put("token", tokenVerificationResponse.getToken());
+        final String content = mailContentBuilder.build("forgottenPassword", map);
+        this.sendEmail(tokenVerificationResponse.getEmail(), this.getEmailRequest(FROM_EMAIL, tokenVerificationResponse.getEmail(), "Forgotten Password", content));
+    }
+
+    private void sendEmail(final String sentTo, final EmailRequest emailRequest) {
 
         final EmailNotificationBO emailNotificationBO = new EmailNotificationBO();
         final EmailBO emailBO = emailRequestConverter.convert(emailRequest);
@@ -52,5 +58,9 @@ class EmailServiceImpl implements EmailService {
         }
 
         emailNotificationRepository.save(emailNotificationBO);
+    }
+
+    private EmailRequest getEmailRequest(final String from, final String to, final String subject, final String content) {
+        return new EmailRequest(from, to, subject, content);
     }
 }

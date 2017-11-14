@@ -19,7 +19,6 @@ import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
-import com.marketplace.user.exception.UserPasswordTokenExpiredException;
 import com.marketplace.user.exception.UserPasswordTokenNotFoundException;
 import com.marketplace.user.exception.UsernameNotFoundException;
 import com.marketplace.user.oauth.TokenRevoker;
@@ -114,7 +113,7 @@ class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void resetPassword(final ForgottenPasswordRequest forgottenPasswordRequest)
-            throws UserPasswordTokenNotFoundException, UserPasswordTokenExpiredException, UserNotFoundException {
+            throws UserPasswordTokenNotFoundException, UserNotFoundException {
 
         final String email = forgottenPasswordRequest.getEmail();
         log.info("Resetting password for user: {}", email);
@@ -143,8 +142,11 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyEmail(final String userId, final EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException {
-        emailVerificationTokenService.verifyToken(userId, emailVerificationRequest.getToken());
+    public void verifyEmail(final EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException {
+        final String userId = emailVerificationTokenService.verifyToken(emailVerificationRequest.getToken()).getUserId();
+        userRepository.findById(userId)
+                .map(user -> user.setEmailVerified(true))
+                .ifPresent(userRepository::save);
     }
 
     @Override

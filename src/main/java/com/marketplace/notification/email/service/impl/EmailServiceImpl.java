@@ -1,5 +1,6 @@
 package com.marketplace.notification.email.service.impl;
 
+import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
 import com.marketplace.notification.email.domain.EmailBO;
 import com.marketplace.notification.email.domain.EmailBO.Status;
 import com.marketplace.notification.email.domain.EmailNotificationBO;
@@ -25,6 +26,16 @@ class EmailServiceImpl implements EmailService {
     private final MailContentBuilder mailContentBuilder;
 
     //TODO: welcome email user
+
+    @Override
+    public void sendInviteEmailToBroker(final InviteBrokerTokenVerificationResponse inviteBrokerTokenVerificationResponse) {
+        final Map map = new HashMap<>();
+        map.put("companyId", inviteBrokerTokenVerificationResponse.getCompanyId());
+        map.put("companyName", inviteBrokerTokenVerificationResponse.getCompanyName());
+        map.put("token", inviteBrokerTokenVerificationResponse.getToken());
+        final String content = mailContentBuilder.build("inviteBrokerEmail", map);
+        this.sendEmail(inviteBrokerTokenVerificationResponse.getEmail(), this.getEmailRequest(FROM_EMAIL, inviteBrokerTokenVerificationResponse.getEmail(), "Invitation from " + inviteBrokerTokenVerificationResponse.getCompanyName(), content));
+    }
 
     @Override
     public void sendVerificationEmail(final TokenVerificationResponse tokenVerificationResponse) {

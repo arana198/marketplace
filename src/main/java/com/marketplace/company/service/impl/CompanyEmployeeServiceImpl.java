@@ -10,12 +10,16 @@ import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
 import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
 import com.marketplace.company.dto.CompanyEmployeeRequest;
 import com.marketplace.company.dto.CompanyEmployeeResponse;
+import com.marketplace.company.dto.CompanyResponse;
+import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
 import com.marketplace.company.exception.CompanyAlreadyExistsException;
 import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
 import com.marketplace.company.exception.CompanyEmployeeNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.CompanyEmployeeService;
 import com.marketplace.company.service.CompanyService;
+import com.marketplace.queue.publish.PublishService;
+import com.marketplace.queue.publish.domain.PublishAction;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.service.UserService;
 import lombok.Data;
@@ -37,6 +41,7 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
     private final CompanyEmployeeInviteRepository companyEmployeeInviteRepository;
     private final CompanyService companyService;
     private final UserService userService;
+    private final PublishService publishService;
 
     @Override
     public Page<CompanyEmployeeResponse> findByCompanyId(final String companyId, final Pageable pageable) {
@@ -110,7 +115,7 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
 
     @Override
     public void inviteEmployee(final String companyId, final CompanyEmployeeInviteRequest companyEmployeeInviteRequest) throws CompanyNotFoundException {
-        companyService.findById(companyId)
+        final CompanyResponse companyResponse = companyService.findById(companyId)
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
         this.checkIfCompanyAdmin(companyId);
@@ -123,8 +128,12 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
                         .setEmail(companyEmployeeInviteRequest.getEmail())
                         .setToken(UUID.randomUUID().toString()));
 
-        //TODO: Email the user
         companyEmployeeInviteRepository.save(companyEmployeeInviteBO);
+        publishService.sendMessage(PublishAction.INVITE_BROKER,
+                new InviteBrokerTokenVerificationResponse(companyId,
+                        companyResponse.getName(),
+                        companyEmployeeInviteRequest.getEmail(),
+                        companyEmployeeInviteBO.getToken()));
     }
 
     private void checkIfCompanyAdmin(final String companyId) {

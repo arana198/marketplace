@@ -1,18 +1,23 @@
 package com.marketplace.queue.consume;
 
 import com.google.gson.Gson;
+import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
+import com.marketplace.notification.email.service.EmailService;
 import com.marketplace.user.dto.TokenVerificationResponse;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 
+@Data
 @Slf4j
 @Service
 class MessageHandlerImpl implements MessageHandler {
 
     private final Gson gson = new Gson();
+    private final EmailService emailService;
 
     @Override
     public void handleMessage(final Message<?> message) throws MessagingException {
@@ -24,10 +29,15 @@ class MessageHandlerImpl implements MessageHandler {
             switch (consumedAction) {
                 case VERIFY_EMAIL:
                     TokenVerificationResponse tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
+                    emailService.sendVerificationEmail(tokenVerificationResponse);
                     break;
                 case FORGOTTEN_PASSWORD:
                     tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
+                    emailService.sendForgottenPasswordToken(tokenVerificationResponse);
                     break;
+                case INVITE_BROKER:
+                    InviteBrokerTokenVerificationResponse inviteBrokerTokenVerificationResponse = gson.fromJson(payload, InviteBrokerTokenVerificationResponse.class);
+                    emailService.sendInviteEmailToBroker(inviteBrokerTokenVerificationResponse);
                 default:
                     break;
             }

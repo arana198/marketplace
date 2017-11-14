@@ -2,7 +2,6 @@ package com.marketplace.user.controller;
 
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceNotFoundException;
-import com.marketplace.common.security.UserRole;
 import com.marketplace.user.dto.Oauth;
 import com.marketplace.user.service.UserConnectionService;
 import com.marketplace.user.service.UserService;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
 
-import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashMap;
@@ -51,7 +49,6 @@ public class LoginController {
     private final UserConnectionService userConnectionService;
     private final JdbcTokenStore jdbcTokenStore;
 
-    @RolesAllowed({UserRole.ROLE_USER, UserRole.ROLE_BROKER})
     @DeleteMapping(value = "/logout")
     public ResponseEntity<ResourceSupport> logout(final Principal principal) throws ResourceNotFoundException {
 

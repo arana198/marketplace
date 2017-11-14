@@ -27,7 +27,5 @@ public class SecurityUtils {
         return auth.getOAuth2Request().getRequestParameters();
     }
 
-    //TODO: Decrypt enhanced token
-    //TODO: IsActive annotation per role
     //TODO: Restrict user to its own resource
 }

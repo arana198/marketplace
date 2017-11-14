@@ -26,7 +26,7 @@ class TokenRevokerImpl implements TokenRevoker {
     public void revoke(final String userId) {
         Collection<OAuth2AccessToken> accessTokenList = jdbcTokenStore.findTokensByUserName(userId);
         accessTokenList.stream().forEach(token -> {
-            log.debug("Removing token {} for pending {}", token.getValue(), userId);
+            log.debug("Removing token {} for user {}", token.getValue(), userId);
             jdbcTokenStore.removeAccessToken(token);
             jdbcTokenStore.removeRefreshToken(token.getRefreshToken());
         });

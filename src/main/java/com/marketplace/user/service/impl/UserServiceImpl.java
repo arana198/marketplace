@@ -60,7 +60,7 @@ class UserServiceImpl implements UserService {
 
     @Override
     public void logout(final Principal principal) throws UsernameNotFoundException {
-        log.debug("Logout pending {}", principal.getName());
+        log.debug("Logout user {}", principal.getName());
         userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
 
@@ -128,11 +128,10 @@ class UserServiceImpl implements UserService {
 
     @Override
     public void updatePassword(final String userId, final UpdatePasswordRequest updatePasswordRequest) throws UserNotFoundException {
-        log.info("Update password for pending {}", userId);
+        log.info("Update password for user {}", userId);
         final UserBO userBO = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        log.debug("Updating password for pending {}", userId);
         userBO.setPassword(passwordEncoder.encode(updatePasswordRequest.getPassword()));
         userRepository.save(userBO);
     }
@@ -151,7 +150,7 @@ class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUserStatus(final String userId, final UserRole userRole, final UserStatus userStatus) throws UserNotFoundException {
-        log.debug("Update pending domain for pending {}", userId);
+        log.debug("Update user domain for user {}", userId);
         final UserBO userBO = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 

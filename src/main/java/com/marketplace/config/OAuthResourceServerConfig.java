@@ -1,5 +1,6 @@
 package com.marketplace.config;
 
+import com.marketplace.utils.RolesExtractorUtils;
 import lombok.Data;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -137,24 +138,13 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
             final Map<String, String> parameters = new HashMap<>();
             final Set<String> scope = new LinkedHashSet<>(map.containsKey(SCOPE) ? (Collection<String>) map.get(SCOPE) : Collections.emptySet());
             final Authentication user = userTokenConverter.extractAuthentication(map);
-            final StringBuilder roleStr = new StringBuilder();
-
-            ((Map) map.get(ROLES)).forEach((key, value) -> {
-                roleStr.append(key);
-                roleStr.append(":");
-                roleStr.append(value);
-                roleStr.append(",");
-            });
-
-            roleStr.setLength(roleStr.length() - 1);
 
             String clientId = (String) map.get(CLIENT_ID);
             parameters.put(CLIENT_ID, clientId);
-            parameters.put(ROLES, roleStr.toString());
+            parameters.put(ROLES, RolesExtractorUtils.extract((Map<String, String>) map.get(ROLES)));
             parameters.put(USERNAME, (String) map.get(USERNAME));
             parameters.put(PROFILE_ID, (String) map.get(PROFILE_ID));
             parameters.put(USER_ID, (String) map.get(USER_ID));
-
 
             OAuth2Request request = new OAuth2Request(parameters, clientId, new ArrayList((Set) map.get(AUTHORITIES)), true, scope, null, null, null, null);
             return new OAuth2Authentication(request, user);

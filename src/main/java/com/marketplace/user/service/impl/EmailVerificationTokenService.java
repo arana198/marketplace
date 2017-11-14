@@ -23,7 +23,7 @@ class EmailVerificationTokenService {
     private final PublishService publishService;
 
     public void createToken(final UserBO userBO) {
-        log.info("Generating a reset password token for pending {}", userBO.getId());
+        log.info("Generating a reset password token for user {}", userBO.getId());
         final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByUserId(userBO.getId())
                 .map(upt -> upt.setCreatedTs(LocalDateTime.now()))
                 .map(upt -> upt.setToken(UUID.randomUUID().toString()))
@@ -42,12 +42,12 @@ class EmailVerificationTokenService {
     }
 
     public void verifyToken(final String userId, final String token) throws EmailVerificationTokenNotFoundException {
-        log.info("Getting a reset password token for pending {}", userId);
+        log.info("Getting a reset password token for user {}", userId);
         final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByUserIdAndToken(userId, token)
                 .orElseThrow(() -> new EmailVerificationTokenNotFoundException(userId, token));
 
         if (emailVerificationTokenBO.getCreatedTs().compareTo(LocalDateTime.now().minusDays(2)) <= 0) {
-            log.debug("Token generated at {} for pending id {} and token {} has expired", emailVerificationTokenBO.getCreatedTs(), userId, token);
+            log.debug("Token generated at {} for user id {} and token {} has expired", emailVerificationTokenBO.getCreatedTs(), userId, token);
             throw new UserPasswordTokenExpiredException(userId, token, emailVerificationTokenBO.getCreatedTs().plusDays(2));
         }
 

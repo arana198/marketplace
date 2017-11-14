@@ -3,6 +3,7 @@ package com.marketplace.user.service.impl;
 import com.marketplace.user.domain.RoleBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.domain.UserRoleBO;
+import com.marketplace.user.domain.UserStatusBO.UserStatus;
 import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.exception.UserAuthenticationException;
 import lombok.Data;
@@ -32,9 +33,12 @@ class UserAuthenticationManager implements AuthenticationManager, UserDetailsSer
         Object password = authentication.getCredentials();
 
         return userRepository.findByUsername(username)
-                .filter(user -> user.getRoles()
+                .filter(user -> !user.getRoles()
                         .parallelStream()
                         .anyMatch(ur -> ur.getProvider().equalsIgnoreCase(LoginProvider.LOCAL.getValue())) || passwordEncoder.matches(password.toString(), user.getPassword()))
+                .filter(user -> !user.getRoles()
+                        .parallelStream()
+                        .anyMatch(ur -> ur.getUserStatus().equals(UserStatus.ACTIVE) || ur.getUserStatus().equals(UserStatus.PENDING)))
                 .map(u -> new UsernamePasswordAuthenticationToken(u.getUsername(), u.getPassword(), this.getRoleFromUser(u)))
                 .orElseThrow(() -> new UserAuthenticationException("User authentication failed"));
     }

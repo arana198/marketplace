@@ -1,5 +1,6 @@
 package com.marketplace.user.controller;
 
+import com.marketplace.common.annotation.IsActive;
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
@@ -48,6 +49,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @IsActive
     @RolesAllowed({UserRole.ROLE_BROKER})
     @PutMapping(path = "/{userId}/passwords")
     public ResponseEntity<ResourceSupport> updatePassword(@PathVariable String userId,

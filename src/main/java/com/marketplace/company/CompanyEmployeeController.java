@@ -1,15 +1,16 @@
 package com.marketplace.company;
 
-import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
-import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
-import com.marketplace.company.dto.CompanyEmployeeRequest;
-import com.marketplace.company.dto.CompanyEmployeeResponse;
-import com.marketplace.company.service.CompanyEmployeeService;
+import com.marketplace.common.annotation.IsActive;
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.common.security.UserRole;
+import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
+import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
+import com.marketplace.company.dto.CompanyEmployeeRequest;
+import com.marketplace.company.dto.CompanyEmployeeResponse;
+import com.marketplace.company.service.CompanyEmployeeService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ public class CompanyEmployeeController {
 
     private final CompanyEmployeeService companyEmployeeService;
 
+    @IsActive
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping(path = "/invite")
     public ResponseEntity<CompanyEmployeeResponse> inviteEmployee(@PathVariable final String companyId,
@@ -72,6 +74,7 @@ public class CompanyEmployeeController {
         return ResponseEntity.created(location).build();
     }
 
+    @IsActive
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PutMapping(path = "/{employeeId}")
     public ResponseEntity<Void> updateEmployeeInCompany(@PathVariable final String companyId,
@@ -88,6 +91,7 @@ public class CompanyEmployeeController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @IsActive
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @DeleteMapping(path = "/{employeeId}")
     public ResponseEntity<Void> removeEmployeeFromCompany(@PathVariable final String companyId,

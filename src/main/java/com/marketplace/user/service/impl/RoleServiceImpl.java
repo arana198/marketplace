@@ -24,7 +24,7 @@ class RoleServiceImpl implements RoleService {
     private final RoleRequestConverter roleRequestConverter;
 
     public Optional<RoleList> findActiveRoles() {
-        log.debug("Find all active pending roles");
+        log.debug("Find all active user roles");
         return Optional.ofNullable(new RoleList(roleRepository.findBySelectable(true)
                 .stream()
                 .map(roleResponseConverter::convert)

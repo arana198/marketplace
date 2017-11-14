@@ -23,7 +23,7 @@ class UserPasswordTokenService {
     private final PublishService publishService;
 
     public void createToken(final UserBO userBO) {
-        log.info("Generating a reset password token for pending {}", userBO.getId());
+        log.info("Generating a reset password token for user {}", userBO.getId());
         final UserPasswordTokenBO userPasswordTokenBO = userPasswordTokenRepository.findByUserId(userBO.getId())
                 .map(upt -> upt.setCreatedTs(LocalDateTime.now()))
                 .map(upt -> upt.setToken(UUID.randomUUID().toString()))
@@ -42,12 +42,12 @@ class UserPasswordTokenService {
     }
 
     public void verifyToken(final String userId, final String token) throws UserPasswordTokenNotFoundException {
-        log.info("Getting a reset password token for pending {}", userId);
+        log.info("Getting a reset password token for user {}", userId);
         final UserPasswordTokenBO userPasswordToken = userPasswordTokenRepository.findByUserIdAndToken(userId, token)
                 .orElseThrow(() -> new UserPasswordTokenNotFoundException(userId, token));
 
         if (userPasswordToken.getCreatedTs().compareTo(LocalDateTime.now().minusDays(2)) <= 0) {
-            log.debug("Token generated at {} for pending id {} and token {} has expired", userPasswordToken.getCreatedTs(), userId, token);
+            log.debug("Token generated at {} for user id {} and token {} has expired", userPasswordToken.getCreatedTs(), userId, token);
             throw new UserPasswordTokenExpiredException(userId, token, userPasswordToken.getCreatedTs().plusDays(2));
         }
 

@@ -1,5 +1,4 @@
 apply plugin: "java"
-apply plugin: "idea"
 apply plugin: "org.springframework.boot"
 apply plugin: "io.spring.dependency-management"
 apply plugin: "org.flywaydb.flyway"
@@ -58,15 +57,14 @@ dependencies {
 
     //compile "io.springfox:springfox-swagger2:2.7.0"
     //compile "io.springfox:springfox-swagger-ui:2.7.0"
-    compile "org.projectlombok:lombok:1.16.16"
+    compile "org.projectlombok:lombok:1.16.18"
     runtime "org.mariadb.jdbc:mariadb-java-client:2.2.0"
-    compile "org.apache.commons:commons-lang3:3.4"
+    compile "org.apache.commons:commons-lang3:3.7"
     compile "org.flywaydb:flyway-core:4.2.0"
-    compile "com.google.code.gson:gson:2.8.0"
+    compile "com.google.code.gson:gson:2.8.2"
 
     compile "com.google.guava:guava:22.0"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.2"
-    compile "com.bedatadriven:jackson-datatype-jts:2.4"
 
     compile "org.codehaus.groovy:groovy-all:2.4.12"
     testCompile "org.spockframework:spock-spring:1.1-groovy-2.4"

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Builder
 @Data
 @JsonDeserialize(builder = UserProfileRequest.UserProfileBuilder.class)
-@JsonIgnoreProperties
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserProfileRequest {
 
     @NotBlank(message = "userId is mandatory")
@@ -37,7 +37,7 @@ public class UserProfileRequest {
     @Pattern(regexp = "^(07\\d{9})$", message = "mobileNumber is invalid")
     private final String mobileNumber;
 
-    @NotNull(message = "dateOfBirth is mandatory")
+    @NotNull(message = "postcode is mandatory")
     private final String postcode;
 
     private LocalDate dateOfBirth;

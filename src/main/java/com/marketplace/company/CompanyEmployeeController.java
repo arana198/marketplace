@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.security.RolesAllowed;
@@ -43,7 +44,7 @@ public class CompanyEmployeeController {
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping(path = "/invite")
     public ResponseEntity<CompanyEmployeeResponse> inviteEmployee(@PathVariable final String companyId,
-                                                                  final CompanyEmployeeInviteRequest companyEmployeeInviteRequest,
+                                                                  @RequestBody @Valid final CompanyEmployeeInviteRequest companyEmployeeInviteRequest,
                                                                   final BindingResult bindingResult)
             throws ResourceNotFoundException {
 
@@ -57,7 +58,6 @@ public class CompanyEmployeeController {
         return new ResponseEntity<CompanyEmployeeResponse>(HttpStatus.CREATED);
     }
 
-    @IsActive
     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping

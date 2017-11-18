@@ -1,16 +1,20 @@
 package com.marketplace.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.marketplace.common.dto.BaseResponseDomain;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+@Builder
 @Data
-public class RoleRequest extends BaseResponseDomain {
+@JsonDeserialize(builder = RoleRequest.RoleRequestBuilder.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RoleRequest {
 
     private final String roleId;
 
@@ -24,15 +28,9 @@ public class RoleRequest extends BaseResponseDomain {
     @NotNull(message = "isSelectable is mandatory")
     private final boolean isSelectable;
 
-    @JsonCreator
-    public RoleRequest(@JsonProperty(value = "roleId") final String roleId,
-                       @JsonProperty(value = "name") final UserRole name,
-                       @JsonProperty(value = "description") final String description,
-                       @JsonProperty(value = "isSelectable") boolean isSelectable) {
-        this.roleId = roleId;
-        this.name = name;
-        this.description = description;
-        this.isSelectable = isSelectable;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class RoleRequestBuilder {
     }
 
     public enum UserRole {

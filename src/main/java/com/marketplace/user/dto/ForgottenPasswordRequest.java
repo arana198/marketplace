@@ -1,8 +1,9 @@
 package com.marketplace.user.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Email;
@@ -10,8 +11,10 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Size;
 
+@Builder
 @Data
 @Accessors(chain = true)
+@JsonDeserialize(builder = ForgottenPasswordRequest.ForgottenPasswordRequestBuilder.class)
 public class ForgottenPasswordRequest {
 
     @NotBlank(message = "email is mandatory")
@@ -25,12 +28,7 @@ public class ForgottenPasswordRequest {
     @NotBlank(message = "token is mandatory")
     private final String token;
 
-    @JsonCreator
-    public ForgottenPasswordRequest(@JsonProperty(value = "email") final String email,
-                                    @JsonProperty(value = "password") final String password,
-                                    @JsonProperty(value = "token") String token) {
-        this.email = email;
-        this.password = password;
-        this.token = token;
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class ForgottenPasswordRequestBuilder {
     }
 }

@@ -1,5 +1,6 @@
-package com.marketplace.common.annotation;
+package com.marketplace.common.annotation.handler;
 
+import com.marketplace.common.annotation.IsActive;
 import com.marketplace.common.exception.ResourceForbiddenException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.user.domain.UserStatusBO.UserStatus;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class IsActiveInterceptorHandler extends HandlerInterceptorAdapter {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
         final HandlerMethod handlerMethod = (HandlerMethod) handler;
         final IsActive isActive = handlerMethod.getMethodAnnotation(IsActive.class);
 

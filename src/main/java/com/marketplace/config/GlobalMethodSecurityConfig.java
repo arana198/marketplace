@@ -1,28 +1,44 @@
 package com.marketplace.config;
 
+import com.marketplace.common.security.UserRole;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.access.prepost.PreInvocationAuthorizationAdviceVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleHierarchyVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
 
 import java.util.Arrays;
 
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguration {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_COMPANY_ADMIN> ROLE_BROKER and ROLE_ADMIN > ROLE_USER");
+        roleHierarchy.setHierarchy(String.format("%s > %s and %s > %s and %s > %s",
+                UserRole.ROLE_ADMIN,
+                UserRole.ROLE_COMPANY_ADMIN,
+                UserRole.ROLE_COMPANY_ADMIN,
+                UserRole.ROLE_BROKER,
+                UserRole.ROLE_ADMIN,
+                UserRole.ROLE_USER));
+
         return roleHierarchy;
     }
 
@@ -32,14 +48,18 @@ public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguratio
     }
 
     @Bean
-    @Override
-    protected AccessDecisionManager accessDecisionManager() {
-        return new AffirmativeBased(Arrays.asList(roleVoter()));
+    public AffirmativeBased defaultAccessDecisionManager(RoleHierarchy roleHierarchy){
+        WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
+        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy);
+        webExpressionVoter.setExpressionHandler(expressionHandler);
+        return new AffirmativeBased(Arrays.asList((AccessDecisionVoter) webExpressionVoter));
     }
 
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
-        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        OAuth2MethodSecurityExpressionHandler handler = new OAuth2MethodSecurityExpressionHandler();
+        handler.setApplicationContext(applicationContext);
         handler.setRoleHierarchy(roleHierarchy());
         return handler;
     }

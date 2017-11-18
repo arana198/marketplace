@@ -23,7 +23,7 @@ public final class AuthUser {
         return getUserInfo().get("roles");
     }
 
-    private static Map<String, String> getUserInfo() {
+    public static Map<String, String> getUserInfo() {
         OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
         return auth.getOAuth2Request().getRequestParameters();
     }

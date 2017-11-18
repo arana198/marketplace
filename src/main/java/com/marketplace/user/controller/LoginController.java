@@ -1,7 +1,6 @@
 package com.marketplace.user.controller;
 
 import com.marketplace.common.exception.BadRequestException;
-import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.user.dto.Oauth;
 import com.marketplace.user.service.UserConnectionService;
 import com.marketplace.user.service.UserService;
@@ -50,7 +49,7 @@ public class LoginController {
     private final JdbcTokenStore jdbcTokenStore;
 
     @DeleteMapping(value = "/logout")
-    public ResponseEntity<ResourceSupport> logout(final Principal principal) throws ResourceNotFoundException {
+    public ResponseEntity<ResourceSupport> logout(final Principal principal) {
 
         userService.logout(principal);
         return new ResponseEntity<>(HttpStatus.OK);

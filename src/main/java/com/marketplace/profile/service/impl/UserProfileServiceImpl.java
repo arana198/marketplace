@@ -51,7 +51,7 @@ class UserProfileServiceImpl implements UserProfileService {
             throw new UserProfileAlreadyExistsException(userProfile.getUserId());
         }
 
-        final UserResponse user = userService.findByUsername(userId)
+        final UserResponse user = userService.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         userProfile.setEmail(user.getEmail());

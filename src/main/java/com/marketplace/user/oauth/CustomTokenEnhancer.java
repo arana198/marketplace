@@ -32,8 +32,8 @@ class CustomTokenEnhancer implements TokenEnhancer {
         DefaultOAuth2AccessToken tempResult = (DefaultOAuth2AccessToken) accessToken;
 
         final Map<String, Object> additionalInformation = new HashMap<>();
-        String username = authentication.getName().toString();
-        UserResponse user = userService.findByUsername(username)
+        final String username = authentication.getName().toString();
+        final UserResponse user = userService.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(authentication.getName()));
 
         final Map<String, String> roles = user.getUserRoles()

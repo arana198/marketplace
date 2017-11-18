@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -50,11 +49,9 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(final HttpSecurity http) throws Exception {
         // @formatter:off
-        http.csrf().disable();
+        http.csrf().disable()
+                .logout().disable();
         http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 // For some reason we cant just "permitAll" OPTIONS requests which are needed for CORS support. Spring Security
                 // will respond with an HTTP 401 nonetheless.
                 // So we just put all other requests types under OAuth control and exclude OPTIONS.
@@ -68,7 +65,6 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers("/connect/**").denyAll()
                 .antMatchers("/swagger-ui.js", "/swagger-ui.min.js", "/api-docs", "/fonts/*", "/api-docs/*", "/api-docs/default/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/roles").permitAll()
-                .antMatchers(HttpMethod.GET, "/me").authenticated()
                 .antMatchers(HttpMethod.GET, "/**").access("#oauth2.hasScope('read') or #oauth2.hasScope('all')")
                 .antMatchers(HttpMethod.POST, "/**").access("#oauth2.hasScope('write') or #oauth2.hasScope('all')")
                 .antMatchers(HttpMethod.PATCH, "/**").access("#oauth2.hasScope('write') or #oauth2.hasScope('all')")
@@ -123,14 +119,9 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
         private UserAuthenticationConverter userTokenConverter = new DefaultUserAuthenticationConverter();
 
         private static final String AUTHORITIES = "authorities";
-
-        private static final String USER_ID = "user_id";
-
-        private static final String PROFILE_ID = "profile_id";
-
+        private static final String USER_ID = "userId";
         private static final String ROLES = "roles";
-
-        private static final String USERNAME = "user_name";
+        private static final String USERNAME = "username";
 
         @SuppressWarnings("unchecked")
         @Override
@@ -143,7 +134,6 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
             parameters.put(CLIENT_ID, clientId);
             parameters.put(ROLES, RolesExtractorUtils.extract((Map<String, String>) map.get(ROLES)));
             parameters.put(USERNAME, (String) map.get(USERNAME));
-            parameters.put(PROFILE_ID, (String) map.get(PROFILE_ID));
             parameters.put(USER_ID, (String) map.get(USER_ID));
 
             OAuth2Request request = new OAuth2Request(parameters, clientId, new ArrayList((Set) map.get(AUTHORITIES)), true, scope, null, null, null, null);

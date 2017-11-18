@@ -20,7 +20,6 @@ import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
 import com.marketplace.user.exception.UserPasswordTokenNotFoundException;
-import com.marketplace.user.exception.UsernameNotFoundException;
 import com.marketplace.user.oauth.TokenRevoker;
 import com.marketplace.user.service.RoleService;
 import com.marketplace.user.service.UserService;
@@ -58,11 +57,14 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void logout(final Principal principal) throws UsernameNotFoundException {
-        log.debug("Logout user {}", principal.getName());
-        userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
+    public Optional<UserResponse> findById(final String userId) {
+        return userRepository.findById(userId)
+                .map(userResponseConverter::convert);
+    }
 
+    @Override
+    public void logout(final Principal principal) {
+        log.debug("Logout user {}", principal.getName());
         tokenRevoker.revoke(principal.getName());
     }
 

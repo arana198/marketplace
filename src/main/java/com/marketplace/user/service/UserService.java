@@ -12,9 +12,7 @@ import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
-import com.marketplace.user.exception.UserPasswordTokenExpiredException;
 import com.marketplace.user.exception.UserPasswordTokenNotFoundException;
-import com.marketplace.user.exception.UsernameNotFoundException;
 
 import java.security.Principal;
 import java.util.Optional;
@@ -22,7 +20,9 @@ import java.util.Optional;
 public interface UserService {
     Optional<UserResponse> findByUsername(String username);
 
-    void logout(Principal principal) throws UsernameNotFoundException;
+    Optional<UserResponse> findById(String userId);
+
+    void logout(Principal principal);
 
     void createUser(UserRequest userRequest, UserType userType) throws UserAlreadyExistsException;
 

@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,8 +30,8 @@ import java.util.stream.Stream;
 @ControllerAdvice
 class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({AuthenticationException.class})
-    public ResponseEntity<Object> handleAuthenticationException(final AuthenticationException ex, final WebRequest request) {
+    @ExceptionHandler({AuthenticationException.class, UnauthorizedUserException.class})
+    public ResponseEntity<Object> handleAuthenticationException(final RuntimeException ex, final WebRequest request) {
         ErrorResource error = new ErrorResource(HttpStatus.UNAUTHORIZED.value(), "Authorized", ex.getMessage());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

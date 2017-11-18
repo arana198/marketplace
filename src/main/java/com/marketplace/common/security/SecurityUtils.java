@@ -46,7 +46,7 @@ public class SecurityUtils {
             return true;
         }
 
-        if (roles.contains(UserRole.ROLE_COMPANY_ADMIN) && this.checkIfCompanyAdmin(companyId)) {
+        if ((companyId == null && !roles.contains(UserRole.ROLE_COMPANY_ADMIN)) || roles.contains(UserRole.ROLE_COMPANY_ADMIN) && this.checkIfCompanyAdmin(companyId)) {
             throw new UnauthorizedUserException("Unauthorized user");
         }
 
@@ -66,7 +66,7 @@ public class SecurityUtils {
     }
 
     private boolean checkIfCompanyAdmin(final String companyId) {
-        return !companyEmployeeService.findByCompanyAdmin(companyId)
+        return companyEmployeeService.findByCompanyAdmin(companyId)
                 .parallelStream()
                 .anyMatch(ce -> ce.getUserId().equalsIgnoreCase(AuthUser.getUserId()));
     }

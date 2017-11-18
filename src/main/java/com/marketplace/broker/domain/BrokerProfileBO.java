@@ -8,14 +8,13 @@ import lombok.experimental.Accessors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
 @Table(name = "broker_profile")
-public class BrokerProfileBO extends AbstractAuditEntity implements Serializable {
+public class BrokerProfileBO extends AbstractAuditEntity {
 
     @Column(name = "user_id", nullable = false)
     private String userId;

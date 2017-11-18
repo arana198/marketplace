@@ -82,7 +82,6 @@ class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void updateCompany(final String companyId, final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
-
         companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
 

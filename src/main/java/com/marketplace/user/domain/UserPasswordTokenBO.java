@@ -29,11 +29,10 @@ public class UserPasswordTokenBO implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private String id;
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private UserBO user;
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
     @Column(name = "token", nullable = false)
     private String token;

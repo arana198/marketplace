@@ -2,7 +2,6 @@ package com.marketplace.company.service.impl;
 
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.InternalServerException;
-import com.marketplace.common.exception.ResourceForbiddenException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.company.domain.CompanyEmployeeBO;
 import com.marketplace.company.domain.CompanyEmployeeInviteBO;
@@ -10,12 +9,16 @@ import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
 import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
 import com.marketplace.company.dto.CompanyEmployeeRequest;
 import com.marketplace.company.dto.CompanyEmployeeResponse;
+import com.marketplace.company.dto.CompanyResponse;
+import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
 import com.marketplace.company.exception.CompanyAlreadyExistsException;
 import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
 import com.marketplace.company.exception.CompanyEmployeeNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.CompanyEmployeeService;
 import com.marketplace.company.service.CompanyService;
+import com.marketplace.queue.publish.PublishService;
+import com.marketplace.queue.publish.domain.PublishAction;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.service.UserService;
 import lombok.Data;
@@ -26,7 +29,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Data
@@ -37,6 +42,16 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
     private final CompanyEmployeeInviteRepository companyEmployeeInviteRepository;
     private final CompanyService companyService;
     private final UserService userService;
+    private final CompanyEmployeeResponseConverter companyEmployeeResponseConverter;
+    private final PublishService publishService;
+
+    @Override
+    public List<CompanyEmployeeResponse> findByCompanyAdmin(String companyId) {
+        return companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
+                .parallelStream()
+                .map(companyEmployeeResponseConverter::convert)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public Page<CompanyEmployeeResponse> findByCompanyId(final String companyId, final Pageable pageable) {
@@ -75,7 +90,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
     public void updateEmployeeInCompany(final String companyId, final String employeeId, final CompanyEmployeeRequest companyEmployeeRequest)
             throws CompanyNotFoundException, CompanyAlreadyExistsException, CompanyEmployeeNotFoundException {
 
-        this.checkIfCompanyAdmin(companyId);
         if (!companyEmployeeRequest.isAdmin() && companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
                 .parallelStream()
                 .filter(CompanyEmployeeBO::isAdminPrivilege)
@@ -93,8 +107,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
 
     @Override
     public void removeEmployeeFromCompany(final String companyId, final String employeeId) {
-        this.checkIfCompanyAdmin(companyId);
-
         if (employeeId.equalsIgnoreCase(AuthUser.getUserId()) && companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
                 .parallelStream()
                 .filter(CompanyEmployeeBO::isAdminPrivilege)
@@ -110,10 +122,9 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
 
     @Override
     public void inviteEmployee(final String companyId, final CompanyEmployeeInviteRequest companyEmployeeInviteRequest) throws CompanyNotFoundException {
-        companyService.findById(companyId)
-                .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
-        this.checkIfCompanyAdmin(companyId);
+        final CompanyResponse companyResponse = companyService.findById(companyId)
+                .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
         final CompanyEmployeeInviteBO companyEmployeeInviteBO = companyEmployeeInviteRepository.findByCompanyIdAndEmail(companyId, companyEmployeeInviteRequest.getEmail())
                 .map(cei -> cei.setToken(UUID.randomUUID().toString()))
@@ -125,13 +136,10 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
 
         //TODO: Email the user
         companyEmployeeInviteRepository.save(companyEmployeeInviteBO);
-    }
-
-    private void checkIfCompanyAdmin(final String companyId) {
-        if (!companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
-                .parallelStream()
-                .anyMatch(ce -> ce.getUserId().equalsIgnoreCase(AuthUser.getUserId()))) {
-            throw new ResourceForbiddenException("User not authorized for company " + companyId);
-        }
+        publishService.sendMessage(PublishAction.INVITE_BROKER,
+                new InviteBrokerTokenVerificationResponse(companyId,
+                        companyResponse.getName(),
+                        companyEmployeeInviteRequest.getEmail(),
+                        companyEmployeeInviteBO.getToken()));
     }
 }

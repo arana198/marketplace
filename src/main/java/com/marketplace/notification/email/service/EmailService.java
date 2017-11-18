@@ -1,7 +1,12 @@
 package com.marketplace.notification.email.service;
 
-import com.marketplace.notification.email.dto.EmailRequest;
+import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
+import com.marketplace.user.dto.TokenVerificationResponse;
 
 public interface EmailService {
-    void sendEmail(String sentTo, EmailRequest emailRequest);
+    void sendInviteEmailToBroker(InviteBrokerTokenVerificationResponse inviteBrokerTokenVerificationResponse);
+
+    void sendVerificationEmail(TokenVerificationResponse tokenVerificationResponse);
+
+    void sendForgottenPasswordToken(TokenVerificationResponse tokenVerificationResponse);
 }

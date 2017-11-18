@@ -17,13 +17,13 @@ class UserStatusServiceImpl implements UserStatusService {
 
     @Override
     public Optional<UserStatusBO> findById(final String id) {
-        log.info("Finding pending domain by id {}", id);
+        log.info("Finding user domain by id {}", id);
         return Optional.ofNullable(userStatusRepository.getOne(id));
     }
 
     @Override
     public Optional<UserStatusBO> findByName(final UserStatusBO.UserStatus userStatus) {
-        log.info("Finding pending domain by name {}", userStatus);
+        log.info("Finding user domain by name {}", userStatus);
         return userStatusRepository.findByName(userStatus);
     }
 }

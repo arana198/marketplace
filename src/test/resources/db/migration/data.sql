@@ -3,10 +3,10 @@ SET MODE MySQL;
 INSERT INTO roleResponses(id, name, description, is_selectable) VALUES ('1', 'ROLE_ADMIN', 'Indicates the roleResponse is for site admin', true);
 INSERT INTO roleResponses(id, name, description, is_selectable) VALUES ('2', 'ROLE_USER', 'Indicates the roleResponse is for club admin', true);
 
-INSERT INTO user_status(id, name, description, is_selectable) VALUES ('1', 'ACTIVE', 'Indicates the userId is active', true);
-INSERT INTO user_status(id, name, description, is_selectable) VALUES ('2', 'PENDING', 'Indicates the userId is pending', true);
-INSERT INTO user_status(id, name, description, is_selectable) VALUES ('3', 'SUSPENDED', 'Indicates the userId is suspended', true);
-INSERT INTO user_status(id, name, description, is_selectable) VALUES ('4', 'BLACKLISTED', 'Indicates the userId is blacklisted', true);
+INSERT INTO user_status(id, name, description, is_selectable) VALUES ('1', 'ACTIVE', 'Indicates the user is active', true);
+INSERT INTO user_status(id, name, description, is_selectable) VALUES ('2', 'PENDING', 'Indicates the user is pending', true);
+INSERT INTO user_status(id, name, description, is_selectable) VALUES ('3', 'SUSPENDED', 'Indicates the user is suspended', true);
+INSERT INTO user_status(id, name, description, is_selectable) VALUES ('4', 'BLACKLISTED', 'Indicates the user is blacklisted', true);
 
 --Functional Test admin
 INSERT INTO users(id, username, password, user_status_id, provider, updated_by, updated_ts, version)

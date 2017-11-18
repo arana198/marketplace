@@ -6,8 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.envers.NotAudited;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +20,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, of = {"username"})
 @Entity
 @Table(name = "users")
-public class UserBO extends AbstractAuditEntity implements Serializable {
+public class UserBO extends AbstractAuditEntity {
 
     private static final long serialVersionUID = -5889526109417397633L;
 
@@ -30,4 +34,7 @@ public class UserBO extends AbstractAuditEntity implements Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<UserRoleBO> roles = new HashSet<>();
+
+    @Column(name = "is_email_verified")
+    private boolean emailVerified;
 }

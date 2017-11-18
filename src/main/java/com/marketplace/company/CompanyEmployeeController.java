@@ -1,19 +1,21 @@
 package com.marketplace.company;
 
-import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
-import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
-import com.marketplace.company.dto.CompanyEmployeeRequest;
-import com.marketplace.company.dto.CompanyEmployeeResponse;
-import com.marketplace.company.service.CompanyEmployeeService;
+import com.marketplace.common.annotation.IsActive;
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.common.security.UserRole;
+import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
+import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
+import com.marketplace.company.dto.CompanyEmployeeRequest;
+import com.marketplace.company.dto.CompanyEmployeeResponse;
+import com.marketplace.company.service.CompanyEmployeeService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.security.RolesAllowed;
@@ -36,10 +39,12 @@ public class CompanyEmployeeController {
 
     private final CompanyEmployeeService companyEmployeeService;
 
+    @IsActive
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping(path = "/invite")
     public ResponseEntity<CompanyEmployeeResponse> inviteEmployee(@PathVariable final String companyId,
-                                                                  final CompanyEmployeeInviteRequest companyEmployeeInviteRequest,
+                                                                  @RequestBody @Valid final CompanyEmployeeInviteRequest companyEmployeeInviteRequest,
                                                                   final BindingResult bindingResult)
             throws ResourceNotFoundException {
 
@@ -53,7 +58,8 @@ public class CompanyEmployeeController {
         return new ResponseEntity<CompanyEmployeeResponse>(HttpStatus.CREATED);
     }
 
-    @RolesAllowed({UserRole.ROLE_BROKER})
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+    @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping
     public ResponseEntity<Void> addEmployeeToCompany(@PathVariable final String companyId,
                                                      @RequestBody @Valid final CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest,
@@ -72,6 +78,8 @@ public class CompanyEmployeeController {
         return ResponseEntity.created(location).build();
     }
 
+    @IsActive
+    @PreAuthorize("@securityUtils.isCompanyEmployee(#companyId, #employeeId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PutMapping(path = "/{employeeId}")
     public ResponseEntity<Void> updateEmployeeInCompany(@PathVariable final String companyId,
@@ -88,6 +96,8 @@ public class CompanyEmployeeController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @IsActive
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @DeleteMapping(path = "/{employeeId}")
     public ResponseEntity<Void> removeEmployeeFromCompany(@PathVariable final String companyId,

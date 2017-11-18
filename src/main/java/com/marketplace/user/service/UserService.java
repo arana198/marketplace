@@ -1,17 +1,18 @@
 package com.marketplace.user.service;
 
 import com.marketplace.user.domain.UserStatusBO.UserStatus;
+import com.marketplace.user.dto.EmailVerificationRequest;
+import com.marketplace.user.dto.ForgottenPasswordRequest;
 import com.marketplace.user.dto.RoleRequest.UserRole;
 import com.marketplace.user.dto.SocialUserRequest;
+import com.marketplace.user.dto.UpdatePasswordRequest;
 import com.marketplace.user.dto.UserRequest;
 import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.dto.UserResponse;
-import com.marketplace.user.exception.RoleNotFoundException;
+import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
-import com.marketplace.user.exception.UserPasswordNotFoundTokenException;
-import com.marketplace.user.exception.UserPasswordTokenExpiredException;
-import com.marketplace.user.exception.UsernameNotFoundException;
+import com.marketplace.user.exception.UserPasswordTokenNotFoundException;
 
 import java.security.Principal;
 import java.util.Optional;
@@ -19,17 +20,23 @@ import java.util.Optional;
 public interface UserService {
     Optional<UserResponse> findByUsername(String username);
 
-    void logout(Principal principal) throws UsernameNotFoundException;
+    Optional<UserResponse> findById(String userId);
+
+    void logout(Principal principal);
 
     void createUser(UserRequest userRequest, UserType userType) throws UserAlreadyExistsException;
 
     void createUser(SocialUserRequest userRequest) throws UserAlreadyExistsException;
 
-    void updatePassword(String userId, String password) throws UserNotFoundException;
+    void updatePassword(String userId, UpdatePasswordRequest updatePasswordRequest) throws UserNotFoundException;
 
-    void resetPassword(String username) throws UserNotFoundException;
+    void verifyEmail(String userId);
 
-    void resetPassword(String userId, String token, String password) throws UserPasswordNotFoundTokenException, UserPasswordTokenExpiredException;
+    void verifyEmail(EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException;
+
+    void resetPassword(String username);
+
+    void resetPassword(ForgottenPasswordRequest forgottenPasswordRequest) throws UserPasswordTokenNotFoundException, UserNotFoundException;
 
     void updateUserStatus(String userId, UserRole userRole, UserStatus userStatus) throws UserNotFoundException;
 }

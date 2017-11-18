@@ -13,5 +13,6 @@ public class UserResponse extends BaseResponseDomain {
     private final String userId;
     private final String email;
     private final List<UserRoleResponse> userRoles;
+    private final boolean emailVerified;
     private String profileImageUrl;
 }

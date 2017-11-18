@@ -25,7 +25,7 @@ class UserPasswordTokenServiceImpl implements UserPasswordTokenService {
                 .map(upt -> upt.setCreatedTs(LocalDateTime.now()))
                 .map(upt -> upt.setToken(UUID.randomUUID().toString()))
                 .orElse(new UserPasswordTokenBO()
-                        .setUser(userBO)
+                        .setUserId(userBO.getId())
                         .setToken(UUID.randomUUID().toString())
                         .setCreatedTs(LocalDateTime.now()));
 
@@ -40,7 +40,7 @@ class UserPasswordTokenServiceImpl implements UserPasswordTokenService {
 
     @Override
     public void delete(final UserPasswordTokenBO userPasswordTokenBO) {
-        log.info("Remove reset password token for pending {} and token {}", userPasswordTokenBO.getUser().getId(), userPasswordTokenBO.getToken());
+        log.info("Remove reset password token for pending {} and token {}", userPasswordTokenBO.getUserId(), userPasswordTokenBO.getToken());
         userPasswordTokenRepository.delete(userPasswordTokenBO);
     }
 

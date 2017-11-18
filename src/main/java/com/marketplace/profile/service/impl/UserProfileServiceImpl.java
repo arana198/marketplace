@@ -42,23 +42,23 @@ class UserProfileServiceImpl implements UserProfileService {
             throws UserProfileAlreadyExistsException, MobileNumberAlreadyExistsException, UserNotFoundException {
         log.info("Creating company for user {}", userId);
         if (!userId.equalsIgnoreCase(userProfile.getUserId())) {
-            log.info("UserRequest id [ {} ] does not match body's user id [ {} ]", userId, userProfile.getUserId());
-            throw new BadRequestException("UserRequest id does not match body's user id");
+            log.info("User id [ {} ] does not match body's user id [ {} ]", userId, userProfile.getUserId());
+            throw new BadRequestException("User id does not match body's user id");
         }
 
         if (userProfileRepository.findByUserId(userProfile.getUserId()).isPresent()) {
-            log.info("UserRequest [ {} ] company already exists", userId);
+            log.info("User [ {} ] company already exists", userId);
             throw new UserProfileAlreadyExistsException(userProfile.getUserId());
         }
 
-        final UserResponse user = userService.findByUsername(userId)
-                .orElseThrow(() -> new UserNotFoundException("UserRequest not found"));
+        final UserResponse user = userService.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         userProfile.setEmail(user.getEmail());
         final UserProfileBO userProfileBO = userProfileRequestConverter.convert(userProfile);
 
         userProfileRepository.save(userProfileBO);
-        log.info("UserRequest company created [ {} ]", userId);
+        log.info("User company created [ {} ]", userId);
 
         final UserProfileResponse userProfileResponse = userProfileResponseConverter.convert(userProfileBO);
         publishService.sendMessage(PublishAction.USER_PROFILE_CREATED, userProfileResponse);
@@ -69,8 +69,8 @@ class UserProfileServiceImpl implements UserProfileService {
     public void updateProfile(final String userId, final String profileId, final UserProfileRequest userProfile) throws UserProfileNotFoundException, MobileNumberAlreadyExistsException, UsernameAlreadyExistsException {
         log.info("Updating company for user {}", userId);
         if (!userId.equalsIgnoreCase(userProfile.getUserId())) {
-            log.info("UserRequest id [ {} ] does not match body's user id [ {} ]", userId, userProfile.getUserId());
-            throw new BadRequestException("UserRequest id does not match body's user id");
+            log.info("User id [ {} ] does not match body's user id [ {} ]", userId, userProfile.getUserId());
+            throw new BadRequestException("User id does not match body's user id");
         }
 
         final UserProfileBO existingUserProfile = userProfileRepository.findByIdAndUserId(profileId, userId)

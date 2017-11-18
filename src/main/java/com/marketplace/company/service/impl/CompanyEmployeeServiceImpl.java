@@ -2,7 +2,6 @@ package com.marketplace.company.service.impl;
 
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.InternalServerException;
-import com.marketplace.common.exception.ResourceForbiddenException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.company.domain.CompanyEmployeeBO;
 import com.marketplace.company.domain.CompanyEmployeeInviteBO;
@@ -30,7 +29,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Data
@@ -41,7 +42,16 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
     private final CompanyEmployeeInviteRepository companyEmployeeInviteRepository;
     private final CompanyService companyService;
     private final UserService userService;
+    private final CompanyEmployeeResponseConverter companyEmployeeResponseConverter;
     private final PublishService publishService;
+
+    @Override
+    public List<CompanyEmployeeResponse> findByCompanyAdmin(String companyId) {
+        return companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
+                .parallelStream()
+                .map(companyEmployeeResponseConverter::convert)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public Page<CompanyEmployeeResponse> findByCompanyId(final String companyId, final Pageable pageable) {
@@ -80,7 +90,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
     public void updateEmployeeInCompany(final String companyId, final String employeeId, final CompanyEmployeeRequest companyEmployeeRequest)
             throws CompanyNotFoundException, CompanyAlreadyExistsException, CompanyEmployeeNotFoundException {
 
-        this.checkIfCompanyAdmin(companyId);
         if (!companyEmployeeRequest.isAdmin() && companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
                 .parallelStream()
                 .filter(CompanyEmployeeBO::isAdminPrivilege)
@@ -98,8 +107,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
 
     @Override
     public void removeEmployeeFromCompany(final String companyId, final String employeeId) {
-        this.checkIfCompanyAdmin(companyId);
-
         if (employeeId.equalsIgnoreCase(AuthUser.getUserId()) && companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
                 .parallelStream()
                 .filter(CompanyEmployeeBO::isAdminPrivilege)
@@ -118,8 +125,6 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
         final CompanyResponse companyResponse = companyService.findById(companyId)
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
-        this.checkIfCompanyAdmin(companyId);
-
         final CompanyEmployeeInviteBO companyEmployeeInviteBO = companyEmployeeInviteRepository.findByCompanyIdAndEmail(companyId, companyEmployeeInviteRequest.getEmail())
                 .map(cei -> cei.setToken(UUID.randomUUID().toString()))
                 .map(cei -> (CompanyEmployeeInviteBO) cei.setCreatedAt(LocalDate.now()))
@@ -134,13 +139,5 @@ class CompanyEmployeeServiceImpl implements CompanyEmployeeService {
                         companyResponse.getName(),
                         companyEmployeeInviteRequest.getEmail(),
                         companyEmployeeInviteBO.getToken()));
-    }
-
-    private void checkIfCompanyAdmin(final String companyId) {
-        if (!companyEmployeeRepository.findByCompanyIdAndAdminPrivilege(companyId, true)
-                .parallelStream()
-                .anyMatch(ce -> ce.getUserId().equalsIgnoreCase(AuthUser.getUserId()))) {
-            throw new ResourceForbiddenException("User not authorized for company " + companyId);
-        }
     }
 }

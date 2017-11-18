@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,6 +39,7 @@ public class CompanyEmployeeController {
     private final CompanyEmployeeService companyEmployeeService;
 
     @IsActive
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping(path = "/invite")
     public ResponseEntity<CompanyEmployeeResponse> inviteEmployee(@PathVariable final String companyId,
@@ -55,7 +57,9 @@ public class CompanyEmployeeController {
         return new ResponseEntity<CompanyEmployeeResponse>(HttpStatus.CREATED);
     }
 
-    @RolesAllowed({UserRole.ROLE_BROKER})
+    @IsActive
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+    @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping
     public ResponseEntity<Void> addEmployeeToCompany(@PathVariable final String companyId,
                                                      @RequestBody @Valid final CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest,
@@ -75,6 +79,7 @@ public class CompanyEmployeeController {
     }
 
     @IsActive
+    @PreAuthorize("@securityUtils.isCompanyEmployee(#companyId, #employeeId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PutMapping(path = "/{employeeId}")
     public ResponseEntity<Void> updateEmployeeInCompany(@PathVariable final String companyId,
@@ -92,6 +97,7 @@ public class CompanyEmployeeController {
     }
 
     @IsActive
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @DeleteMapping(path = "/{employeeId}")
     public ResponseEntity<Void> removeEmployeeFromCompany(@PathVariable final String companyId,

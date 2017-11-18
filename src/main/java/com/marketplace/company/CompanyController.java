@@ -1,14 +1,14 @@
 package com.marketplace.company;
 
-import com.marketplace.company.dto.CompanyRequest;
-import com.marketplace.company.dto.CompanyResponse;
-import com.marketplace.company.exception.CompanyNotFoundException;
-import com.marketplace.company.service.CompanyService;
 import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.common.security.UserRole;
+import com.marketplace.company.dto.CompanyRequest;
+import com.marketplace.company.dto.CompanyResponse;
+import com.marketplace.company.exception.CompanyNotFoundException;
+import com.marketplace.company.service.CompanyService;
 import com.marketplace.utils.PagedResourceConverter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,11 +44,12 @@ public class CompanyController {
     @RolesAllowed({UserRole.ROLE_ADMIN})
     @GetMapping
     public PagedResources<CompanyResponse> getCompanies(@RequestParam(value = "name", required = false) final String companyName,
-                                                      final Pageable pageable) {
+                                                        final Pageable pageable) {
         final Page<CompanyResponse> companyResponses = companyService.findAll(companyName, pageable);
         return PagedResourceConverter.convert(companyResponses);
     }
 
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @GetMapping(value = "/{companyId}")
     public ResponseEntity<CompanyResponse> getCompany(@PathVariable final String companyId)
@@ -58,6 +60,7 @@ public class CompanyController {
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
     }
 
+    @PreAuthorize("@securityUtils.isCompanyAdmin(null)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping
     public ResponseEntity<Void> createCompany(@RequestBody @Valid final CompanyRequest companyRequest,
@@ -76,6 +79,7 @@ public class CompanyController {
         return ResponseEntity.created(location).build();
     }
 
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PutMapping(value = "/{companyId}")
     public ResponseEntity<Void> updateCompany(@PathVariable final String companyId,

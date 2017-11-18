@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,7 @@ import java.net.URI;
 @Slf4j
 @Controller
 @RequestMapping("/users/{userId}/profiles")
+@PreAuthorize("@securityUtils.checkIfUserAuthorized(#userId)")
 public class ProfileController {
 
     private final UserProfileService userProfileService;

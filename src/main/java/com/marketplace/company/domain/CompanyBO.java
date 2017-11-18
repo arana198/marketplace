@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "company")
+@Table(name = "companies")
 public class CompanyBO extends AbstractAuditEntity {
 
     @Column(name = "name", nullable = false)

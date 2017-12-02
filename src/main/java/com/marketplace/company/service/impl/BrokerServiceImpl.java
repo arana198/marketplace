@@ -48,6 +48,19 @@ class BrokerServiceImpl implements BrokerService {
     private final PublishService publishService;
 
     @Override
+    public Optional<BrokerProfileResponse> findByUserId(final String userId) {
+        return brokerProfileRepository.findByUserId(userId)
+                .map(brokerProfileResponseConverter::convert);
+    }
+
+    @Override
+    public Optional<BrokerProfileResponse> findByCompanyIdAndBrokerProfileId(final String companyId, String brokerProfileId) {
+        return brokerProfileRepository.findById(brokerProfileId)
+                .filter(bp -> bp.getCompanyId().equalsIgnoreCase(companyId))
+                .map(brokerProfileResponseConverter::convert);
+    }
+
+    @Override
     public List<BrokerProfileResponse> findByCompanyAdmin(final String companyId) {
 
         log.info("Getting admin brokers for a company [ {} ]", companyId);
@@ -118,7 +131,7 @@ class BrokerServiceImpl implements BrokerService {
         brokerProfileRepository.save(newBrokerProfileBO);
     }
 
-    //TODO: Needs more thinking - what happens if broker removed and then added back?
+    //TODO: Add broker back (i.e. activated)
     @Override
     public void removeBrokerFromCompany(final String companyId, final String brokerProfileId) {
 
@@ -137,24 +150,29 @@ class BrokerServiceImpl implements BrokerService {
 
         brokerProfileRepository.findById(brokerProfileId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
-                .ifPresent(brokerProfileRepository::delete);
+                .ifPresent(bp -> {
+                    bp.setActive(false);
+                    brokerProfileRepository.save(bp);
+                    userService.removeAsCompanyAdmin(bp.getUserId());
+                });
     }
 
     @Override
-    public void addAdminBrokerForCompany(String companyId, String brokerProfileId) {
-        log.info("Add broker [ {} ] as an adming for a company [ {} ]", brokerProfileId, companyId);
+    public void addAdminBrokerForCompany(final String companyId, final String brokerProfileId) {
+        log.info("Add broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
         brokerProfileRepository.findById(brokerProfileId)
+                .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
                 .ifPresent(bp -> {
                     bp.setAdmin(true);
                     brokerProfileRepository.save(bp);
+                    userService.addAsCompanyAdmin(bp.getUserId());
                     publishService.sendMessage(PublishAction.BROKER_ADDED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
                 });
     }
 
-    //TODO: Add company admin
+    @Transactional
     @Override
     public void removeAdminBrokerFromCompany(final String companyId, final String brokerProfileId) {
-        //TODO: If employee is made admin, update the user role
 
         log.info("Removing admin privilege for broker [ {} ] from company [ {} ]", brokerProfileId, companyId);
 
@@ -169,13 +187,14 @@ class BrokerServiceImpl implements BrokerService {
             throw new BadRequestException("Cannot remove the only admin associated to the company");
         }
 
-        final Optional<BrokerProfileBO> brokerProfileBO = brokerProfileRepository.findById(brokerProfileId);
-        brokerProfileBO.ifPresent(bp -> {
-            bp.setAdmin(false);
-            brokerProfileRepository.save(bp);
-            //TODO: Call user service to update user role
-            publishService.sendMessage(PublishAction.BROKER_REMOVED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
-        });
+        brokerProfileRepository.findById(brokerProfileId)
+                .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+                .ifPresent(bp -> {
+                    bp.setAdmin(false);
+                    brokerProfileRepository.save(bp);
+                    userService.removeAsCompanyAdmin(bp.getUserId());
+                    publishService.sendMessage(PublishAction.BROKER_REMOVED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
+                });
     }
 
     @Override

@@ -14,4 +14,5 @@ public class BrokerProfileResponse extends ResourceSupport {
     private final String aboutMe;
     private final String imageUrl;
     private final boolean isAdmin;
+    private final boolean isActive;
 }

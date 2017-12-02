@@ -22,6 +22,10 @@ public interface UserService {
 
     Optional<UserResponse> findById(String userId);
 
+    void addAsCompanyAdmin(String userId);
+
+    void removeAsCompanyAdmin(String userId);
+
     void logout(Principal principal);
 
     void createUser(UserRequest userRequest, UserType userType) throws UserAlreadyExistsException;

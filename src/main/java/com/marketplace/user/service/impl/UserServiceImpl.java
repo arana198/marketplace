@@ -63,6 +63,16 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void addAsCompanyAdmin(final String userId) {
+        this.updateUserRole(userId, UserRole.ROLE_BROKER, UserRole.ROLE_COMPANY_ADMIN);
+    }
+
+    @Override
+    public void removeAsCompanyAdmin(final String userId) {
+        this.updateUserRole(userId, UserRole.ROLE_COMPANY_ADMIN, UserRole.ROLE_BROKER);
+    }
+
+    @Override
     public void logout(final Principal principal) {
         log.debug("Logout user {}", principal.getName());
         tokenRevoker.revoke(principal.getName());
@@ -80,7 +90,7 @@ class UserServiceImpl implements UserService {
         }
 
         final UserBO userBO = oldUser.orElse(userRequestConverter.convert(userRequest));
-        this.addUserRoleBO(userBO, role, LoginProvider.LOCAL, null);
+        this.addUserRoleBO(userBO, role, LoginProvider.LOCAL.getValue().toString(), null, UserStatus.PENDING);
         final UserResponse newUser = userResponseConverter.convert(userBO);
 
         PublishAction publishAction = userType == UserType.COMPANY_ADMIN ? PublishAction.COMPANY_ADMIN_USER_CREATED : PublishAction.BROKER_USER_CREATED;
@@ -99,7 +109,7 @@ class UserServiceImpl implements UserService {
         }
 
         final UserBO userBO = oldUser.orElse(socialUserRequestConverter.convert(socialUserRequest));
-        this.addUserRoleBO(userBO, role, socialUserRequest.getLoginProvider(), socialUserRequest.getLoginProviderId());
+        this.addUserRoleBO(userBO, role, socialUserRequest.getLoginProvider().getValue().toString(), socialUserRequest.getLoginProviderId(), UserStatus.PENDING);
         final UserResponse newUser = userResponseConverter.convert(userBO)
                 .setProfileImageUrl(socialUserRequest.getProfileImageUrl());
 
@@ -139,16 +149,21 @@ class UserServiceImpl implements UserService {
 
     @Override
     public void verifyEmail(final String userId) {
+        log.info("Create verification email for user {}", userId);
         userRepository.findById(userId)
                 .ifPresent(emailVerificationTokenService::createToken);
     }
 
     @Override
     public void verifyEmail(final EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException {
+        log.info("Check verification email for token {}", emailVerificationRequest.getToken());
         final String userId = emailVerificationTokenService.verifyToken(emailVerificationRequest.getToken()).getUserId();
         userRepository.findById(userId)
                 .map(user -> user.setEmailVerified(true))
-                .ifPresent(userRepository::save);
+                .ifPresent(user -> {
+                    userRepository.save(user);
+                    publishService.sendMessage(PublishAction.EMAIL_VERIFIED, userResponseConverter.convert(user));
+                });
     }
 
     @Override
@@ -170,6 +185,21 @@ class UserServiceImpl implements UserService {
         publishService.sendMessage(PublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
     }
 
+    private void updateUserRole(final String userId, final UserRole roleToChange, final UserRole roleChangedTo) {
+        userRepository.findById(userId)
+                .ifPresent(user -> {
+                    user.getRoles()
+                            .parallelStream()
+                            .filter(ur -> ur.getRole().getName().equalsIgnoreCase(roleToChange.getValue()))
+                            .findFirst()
+                            .ifPresent(ur -> {
+                                user.getRoles().remove(ur);
+                                final UserStatus userStatus = ur.getUserStatus().getName();
+                                this.addUserRoleBO(user, roleChangedTo, ur.getProvider(), ur.getProviderUserId(), userStatus);
+                            });
+                });
+    }
+
     private boolean doesUserExists(final Optional<UserBO> oldUser, final UserRole role) {
         return oldUser.filter(u -> u.getRoles()
                 .parallelStream()
@@ -178,15 +208,15 @@ class UserServiceImpl implements UserService {
                 .isPresent();
     }
 
-    private void addUserRoleBO(final UserBO userBO, final UserRole role, final LoginProvider loginProvider, final String loginProviderUserId) {
-        final UserStatusBO userStatusBO = userStatusService.findByName(UserStatus.PENDING).get();
+    private void addUserRoleBO(final UserBO userBO, final UserRole role, final String loginProvider, final String loginProviderUserId, final UserStatus userStatus) {
+        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus).get();
         final RoleBO userRole = roleService.findByName(role).get();
 
         final UserRoleBO userRoleBO = new UserRoleBO();
         userRoleBO.setUser(userBO);
         userRoleBO.setRole(userRole);
         userRoleBO.setUserStatus(userStatusBO);
-        userRoleBO.setProvider(loginProvider.getValue().toString());
+        userRoleBO.setProvider(loginProvider);
         userRoleBO.setProviderUserId(loginProviderUserId);
         userBO.getRoles().add(userRoleBO);
         userRepository.save(userBO);

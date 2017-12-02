@@ -122,11 +122,23 @@ public class CompanyEmployeeController {
     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping(path = "/{brokerId}/admins")
-    public ResponseEntity<Void> addAdminBrokerForCompany(@PathVariable final String companyId,
-                                                         @PathVariable final String brokerId)
+    public ResponseEntity<Void> removeAdminBrokerForCompany(@PathVariable final String companyId,
+                                                            @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
         log.info("Removing admin broker {} from company: {}", brokerId, companyId);
         companyEmployeeService.removeAdminBrokerFromCompany(companyId, brokerId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @IsActive
+    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+    @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+    @PostMapping(path = "/{brokerId}/admins")
+    public ResponseEntity<Void> addAdminBrokerForCompany(@PathVariable final String companyId,
+                                                         @PathVariable final String brokerId)
+            throws ResourceNotFoundException, ResourceAlreadyExistsException {
+        log.info("Add admin broker {} for company: {}", brokerId, companyId);
+        companyEmployeeService.addAdminBrokerForCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "broker_profile")
+@Table(name = "broker_profiles")
 public class BrokerProfileBO extends AbstractAuditEntity {
 
     @Column(name = "user_id", nullable = false)
@@ -39,6 +39,9 @@ public class BrokerProfileBO extends AbstractAuditEntity {
 
     @Column(name = "is_admin", nullable = false)
     private boolean admin;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active;
 
     //TODO: Personal details - address?
     //TODO: billing if independant

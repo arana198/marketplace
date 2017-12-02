@@ -19,6 +19,7 @@ class BrokerProfileResponseConverter implements BaseConverter<BrokerProfileBO, B
                 source.getMobileNumber(),
                 source.getAboutMe(),
                 source.getImageUrl(),
-                source.isAdmin());
+                source.isAdmin(),
+                source.isActive());
     }
 }

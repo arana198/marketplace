@@ -1,7 +1,9 @@
 package com.marketplace.company.service.impl;
 
+import com.marketplace.common.exception.BadRequestException;
+import com.marketplace.company.domain.BrokerProfileBO;
 import com.marketplace.company.domain.CompanyBO;
-import com.marketplace.company.domain.CompanyEmployeeBO;
+import com.marketplace.company.dto.CompanyRegistrationRequest;
 import com.marketplace.company.dto.CompanyRequest;
 import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.exception.CompanyAlreadyExistsException;
@@ -9,7 +11,6 @@ import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.CompanyService;
 import com.marketplace.company.validator.CompanyValidator;
 import com.marketplace.company.validator.VATValidator;
-import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
 import lombok.Data;
@@ -27,9 +28,10 @@ import java.util.Optional;
 class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final CompanyEmployeeRepository companyEmployeeRepository;
+    private final BrokerProfileRepository brokerProfileRepository;
     private final CompanyResponseConverter companyResponseConverter;
     private final CompanyRequestConverter companyRequestConverter;
+    private final BrokerProfileRequestConverter brokerProfileRequestConverter;
     private final VATValidator vatValidator;
     private final CompanyValidator companyValidator;
     private final PublishService publishService;
@@ -50,31 +52,31 @@ class CompanyServiceImpl implements CompanyService {
 
     @Transactional
     @Override
-    public CompanyResponse createCompany(final String userId, final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
+    public CompanyResponse createCompany(final String userId, final CompanyRegistrationRequest companyRegistrationRequest)
+            throws CompanyNotFoundException, CompanyAlreadyExistsException {
 
-        if (!companyRepository.findByCompanyNumberOrVatNumber(companyRequest.getCompanyNumber(), companyRequest.getVatNumber()).isEmpty()) {
-            log.info("Company Number [ {} ] or VAT Number [ {} ] already exists", companyRequest.getCompanyNumber(), companyRequest.getVatNumber());
-            throw new CompanyAlreadyExistsException(companyRequest.getCompanyNumber(), companyRequest.getVatNumber());
+        final CompanyRequest company = companyRegistrationRequest.getCompany();
+        if (!companyRepository.findByCompanyNumberOrVatNumber(company.getCompanyNumber(), company.getVatNumber()).isEmpty()) {
+            log.info("Company Number [ {} ] or VAT Number [ {} ] already exists", company.getCompanyNumber(), company.getVatNumber());
+            throw new CompanyAlreadyExistsException(company.getCompanyNumber(), company.getVatNumber());
         }
 
-        if (!vatValidator.validate(companyRequest.getName(), companyRequest.getVatNumber())) {
+        if (!vatValidator.validate(company.getName(), company.getVatNumber())) {
             new BadRequestException("Invalid VAT number");
         }
 
-        if (!companyValidator.validate(companyRequest.getName(), companyRequest.getCompanyNumber())) {
+        if (!companyValidator.validate(company.getName(), company.getCompanyNumber())) {
             new BadRequestException("Invalid company number");
         }
 
-        CompanyBO companyBO = companyRequestConverter.convert(companyRequest);
+        //TODO: FCA Number integration
+        CompanyBO companyBO = companyRequestConverter.convert(company);
         companyBO = companyRepository.save(companyBO);
 
         final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
-        final CompanyEmployeeBO companyEmployeeBO = new CompanyEmployeeBO()
-                .setCompanyId(companyBO.getId())
-                .setUserId(userId)
-                .setAdminPrivilege(true);
 
-        companyEmployeeRepository.save(companyEmployeeBO);
+        final BrokerProfileBO brokerProfileBO = brokerProfileRequestConverter.convert(companyRegistrationRequest.getBrokerProfile());
+        brokerProfileRepository.save(brokerProfileBO);
         publishService.sendMessage(PublishAction.COMPANY_CREATED, companyResponse);
 
         return companyResponse;

@@ -1,4 +1,4 @@
-package com.marketplace.broker.domain;
+package com.marketplace.company.domain;
 
 import com.marketplace.common.domain.AbstractAuditEntity;
 import lombok.Data;
@@ -19,6 +19,9 @@ public class BrokerProfileBO extends AbstractAuditEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
+    @Column(name = "company_id", nullable = false)
+    private String companyId;
+
     @Column(name = "firstname", nullable = false)
     private String firstName;
 
@@ -28,7 +31,15 @@ public class BrokerProfileBO extends AbstractAuditEntity {
     @Column(name = "mobile_number", nullable = false)
     private String mobileNumber;
 
-    //personal details - address
-    //billing if independant
-    //
+    @Column(name = "about_me")
+    private String aboutMe;
+
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
+
+    @Column(name = "is_admin", nullable = false)
+    private boolean admin;
+
+    //TODO: Personal details - address?
+    //TODO: billing if independant
 }

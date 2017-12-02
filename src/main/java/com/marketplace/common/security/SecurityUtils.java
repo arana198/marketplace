@@ -1,6 +1,6 @@
 package com.marketplace.common.security;
 
-import com.marketplace.company.service.CompanyEmployeeService;
+import com.marketplace.company.service.BrokerService;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Component
 public class SecurityUtils {
 
-    private final CompanyEmployeeService companyEmployeeService;
+    private final BrokerService companyEmployeeService;
 
     public boolean checkIfUserAuthorized(final String userId) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

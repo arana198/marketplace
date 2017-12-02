@@ -167,6 +167,7 @@ class BrokerServiceImpl implements BrokerService {
         brokerProfileRepository.findById(brokerProfileId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
                 .ifPresent(bp -> {
+                    log.debug("Removing broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
                     bp.setActive(false);
                     brokerProfileRepository.save(bp);
                     userService.removeAsCompanyAdmin(bp.getUserId());
@@ -179,6 +180,7 @@ class BrokerServiceImpl implements BrokerService {
         brokerProfileRepository.findById(brokerProfileId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
                 .ifPresent(bp -> {
+                    log.debug("Adding broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
                     bp.setAdmin(true);
                     brokerProfileRepository.save(bp);
                     userService.addAsCompanyAdmin(bp.getUserId());
@@ -206,6 +208,7 @@ class BrokerServiceImpl implements BrokerService {
         brokerProfileRepository.findById(brokerProfileId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
                 .ifPresent(bp -> {
+                    log.debug("Removing broker [ {} ] from the company [ {} ]", brokerProfileId, companyId);
                     bp.setAdmin(false);
                     brokerProfileRepository.save(bp);
                     userService.removeAsCompanyAdmin(bp.getUserId());

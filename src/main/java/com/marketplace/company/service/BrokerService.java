@@ -4,7 +4,6 @@ import com.marketplace.company.dto.BrokerProfileRequest;
 import com.marketplace.company.dto.BrokerProfileResponse;
 import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
 import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
-import com.marketplace.company.exception.CompanyAlreadyExistsException;
 import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
 import com.marketplace.company.exception.CompanyEmployeeNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;

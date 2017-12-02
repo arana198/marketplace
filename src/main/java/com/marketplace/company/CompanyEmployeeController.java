@@ -121,7 +121,7 @@ public class CompanyEmployeeController {
     @IsActive
     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-    @PostMapping(path = "/{brokerId}/admins")
+    @DeleteMapping(path = "/{brokerId}/admins")
     public ResponseEntity<Void> removeAdminBrokerForCompany(@PathVariable final String companyId,
                                                             @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {

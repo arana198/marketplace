@@ -1,7 +1,6 @@
 package com.marketplace.company.service.impl;
 
 import com.marketplace.common.exception.BadRequestException;
-import com.marketplace.common.exception.InternalServerException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.company.domain.BrokerProfileBO;
 import com.marketplace.company.domain.CompanyEmployeeInviteBO;
@@ -50,6 +49,9 @@ class BrokerServiceImpl implements BrokerService {
     @Override
     public Optional<BrokerProfileResponse> findByUserId(final String userId) {
         return brokerProfileRepository.findByUserId(userId)
+                .parallelStream()
+                .filter(bp -> bp.isActive())
+                .findFirst()
                 .map(brokerProfileResponseConverter::convert);
     }
 
@@ -95,10 +97,24 @@ class BrokerServiceImpl implements BrokerService {
             throw new BadRequestException("User not authorized");
         }
 
-        companyService.findById(companyId)
-                .orElseThrow(() -> new InternalServerException("Company " + companyId + " not found"));
+        final List<BrokerProfileBO> brokerProfiles = brokerProfileRepository.findByUserId(userResponse.getUserId());
+        if (brokerProfiles
+                .parallelStream()
+                .anyMatch(bp -> bp.isActive())) {
+            throw new BadRequestException("User already part of another company");
+        }
 
         final BrokerProfileBO brokerProfileBO = brokerProfileRequestConverter.convert(companyEmployeeInviteTokenRequest.getBrokerProfile());
+        final Optional<BrokerProfileBO> oldCompanyProfile = brokerProfiles.parallelStream()
+                .filter(bp -> bp.getCompanyId().equalsIgnoreCase(companyId))
+                .filter(bp -> !bp.isActive())
+                .findFirst();
+
+        if (oldCompanyProfile.isPresent()) {
+            brokerProfileBO.setId(oldCompanyProfile.get().getId());
+        }
+
+        brokerProfileBO.setActive(true);
 
         companyEmployeeInviteRepository.delete(companyEmployeeInviteBO);
         brokerProfileRepository.save(brokerProfileBO);
@@ -126,12 +142,12 @@ class BrokerServiceImpl implements BrokerService {
         final BrokerProfileBO newBrokerProfileBO = (BrokerProfileBO) brokerProfileRequestConverter.convert(brokerProfileRequest)
                 .setUserId(oldBrokerProfileBO.getUserId())
                 .setAdmin(oldBrokerProfileBO.isAdmin())
+                .setActive(oldBrokerProfileBO.isActive())
                 .setId(oldBrokerProfileBO.getId());
 
         brokerProfileRepository.save(newBrokerProfileBO);
     }
 
-    //TODO: Add broker back (i.e. activated)
     @Override
     public void removeBrokerFromCompany(final String companyId, final String brokerProfileId) {
 

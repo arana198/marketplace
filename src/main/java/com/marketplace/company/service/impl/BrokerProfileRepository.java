@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 interface BrokerProfileRepository extends BaseRepository<BrokerProfileBO, String> {
 
-    Optional<BrokerProfileBO> findByUserId(String userId);
+    List<BrokerProfileBO> findByUserId(String userId);
 
     Page<BrokerProfileBO> findByCompanyId(String companyId, Pageable pageable);
 

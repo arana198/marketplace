@@ -6,8 +6,6 @@ import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,17 +26,12 @@ public class UserStatusBO implements Serializable {
     @Column(name = "id", nullable = false)
     private String id;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false)
-    private UserStatus name;
+    private String name;
 
     @Column(name = "description", nullable = false)
     private String description;
 
     @Column(name = "is_selectable", nullable = false)
     private boolean selectable;
-
-    public enum UserStatus {
-        ACTIVE, PENDING, SUSPENDED, BLACKLISTED;
-    }
 }

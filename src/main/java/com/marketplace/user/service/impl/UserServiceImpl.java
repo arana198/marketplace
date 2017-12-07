@@ -6,7 +6,6 @@ import com.marketplace.user.domain.RoleBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.domain.UserRoleBO;
 import com.marketplace.user.domain.UserStatusBO;
-import com.marketplace.user.domain.UserStatusBO.UserStatus;
 import com.marketplace.user.dto.EmailVerificationRequest;
 import com.marketplace.user.dto.ForgottenPasswordRequest;
 import com.marketplace.user.dto.RoleRequest.UserRole;
@@ -16,6 +15,7 @@ import com.marketplace.user.dto.UserRequest;
 import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.dto.UserResponse;
+import com.marketplace.user.dto.UserStatusRequest.UserStatus;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
@@ -90,7 +90,7 @@ class UserServiceImpl implements UserService {
         }
 
         final UserBO userBO = oldUser.orElse(userRequestConverter.convert(userRequest));
-        this.addUserRoleBO(userBO, role, LoginProvider.LOCAL.getValue().toString(), null, UserStatus.PENDING);
+        this.addUserRoleBO(userBO, role, LoginProvider.LOCAL.getValue().toString(), null, UserStatus.PENDING.getValue());
         final UserResponse newUser = userResponseConverter.convert(userBO);
 
         PublishAction publishAction = userType == UserType.COMPANY_ADMIN ? PublishAction.COMPANY_ADMIN_USER_CREATED : PublishAction.BROKER_USER_CREATED;
@@ -109,7 +109,7 @@ class UserServiceImpl implements UserService {
         }
 
         final UserBO userBO = oldUser.orElse(socialUserRequestConverter.convert(socialUserRequest));
-        this.addUserRoleBO(userBO, role, socialUserRequest.getLoginProvider().getValue().toString(), socialUserRequest.getLoginProviderId(), UserStatus.PENDING);
+        this.addUserRoleBO(userBO, role, socialUserRequest.getLoginProvider().getValue().toString(), socialUserRequest.getLoginProviderId(), UserStatus.PENDING.getValue());
         final UserResponse newUser = userResponseConverter.convert(userBO)
                 .setProfileImageUrl(socialUserRequest.getProfileImageUrl());
 
@@ -166,14 +166,41 @@ class UserServiceImpl implements UserService {
                 });
     }
 
-    @Override
+    /*
+TODO:
+    if user status PENDING -> admin removes from the company -> user status should change to PENDING_CLOSED
+    if user status ACTIVE -> admin removes from the company -> user status should change to CLOSED
+    if user CLOSED -> admin readds to the company -> user status changed to ACTIVE
+    if user PENDING_CLOSED -> admin readds to the company -> user status changed to PENDING
+    if user status BANNED/BLACKLISTED -> admin removes from the company -> user status should NOT change
+ */
+
+    private void updateUserStatus(final UserBO userBO, final UserRole userRole, final UserStatus userStatus) {
+        userBO.getRoles()
+                .parallelStream()
+                .filter(user -> user.getRole().getName().equalsIgnoreCase(userRole.getValue()))
+                .forEach(oldUserRole -> {
+                    final String oldUserStatus = oldUserRole.getUserStatus().getName();
+                    if (UserStatus.ACTIVE.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.CLOSED ||
+                            UserStatus.PENDING.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE ||
+                            UserStatus.PENDING.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.PENDING_CLOSED ||
+                            UserStatus.CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE ||
+                            UserStatus.PENDING_CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.PENDING_CLOSED) {
+
+                        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus.getValue()).get();
+                        oldUserRole.setUserStatus(userStatusBO);
+                    }
+                });
+    }
+
     @Transactional
+    @Override
     public void updateUserStatus(final String userId, final UserRole userRole, final UserStatus userStatus) throws UserNotFoundException {
-        log.debug("Update user domain for user {}", userId);
+        log.debug("Update user status for user {}", userId);
         final UserBO userBO = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus).get();
+        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus.getValue()).get();
         final Optional<UserRoleBO> userRoleBO = userBO.getRoles()
                 .parallelStream()
                 .filter(ur -> ur.getRole().getName().equalsIgnoreCase(userRole.getValue()))
@@ -194,8 +221,7 @@ class UserServiceImpl implements UserService {
                             .findFirst()
                             .ifPresent(ur -> {
                                 user.getRoles().remove(ur);
-                                final UserStatus userStatus = ur.getUserStatus().getName();
-                                this.addUserRoleBO(user, roleChangedTo, ur.getProvider(), ur.getProviderUserId(), userStatus);
+                                this.addUserRoleBO(user, roleChangedTo, ur.getProvider(), ur.getProviderUserId(), ur.getUserStatus().getName());
                             });
                 });
     }
@@ -208,7 +234,7 @@ class UserServiceImpl implements UserService {
                 .isPresent();
     }
 
-    private void addUserRoleBO(final UserBO userBO, final UserRole role, final String loginProvider, final String loginProviderUserId, final UserStatus userStatus) {
+    private void addUserRoleBO(final UserBO userBO, final UserRole role, final String loginProvider, final String loginProviderUserId, final String userStatus) {
         final UserStatusBO userStatusBO = userStatusService.findByName(userStatus).get();
         final RoleBO userRole = roleService.findByName(role).get();
 

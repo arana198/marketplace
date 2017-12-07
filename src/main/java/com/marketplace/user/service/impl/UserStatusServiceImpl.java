@@ -22,7 +22,7 @@ class UserStatusServiceImpl implements UserStatusService {
     }
 
     @Override
-    public Optional<UserStatusBO> findByName(final UserStatusBO.UserStatus userStatus) {
+    public Optional<UserStatusBO> findByName(final String userStatus) {
         log.info("Finding user domain by name {}", userStatus);
         return userStatusRepository.findByName(userStatus);
     }

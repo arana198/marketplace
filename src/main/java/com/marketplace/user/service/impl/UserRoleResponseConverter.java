@@ -22,7 +22,7 @@ class UserRoleResponseConverter implements BaseConverter<UserRoleBO, UserRoleRes
 
     @Override
     public UserRoleResponse convert(final UserRoleBO source) {
-        return new UserRoleResponse(source.getRole().getName(), source.getUserStatus().getName().name());
+        return new UserRoleResponse(source.getRole().getName(), source.getUserStatus().getName());
     }
 
     public List<UserRoleResponse> convert(final Set<UserRoleBO> source) {

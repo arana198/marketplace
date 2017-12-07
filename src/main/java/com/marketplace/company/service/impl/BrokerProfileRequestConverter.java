@@ -20,6 +20,6 @@ class BrokerProfileRequestConverter implements BaseConverter<BrokerProfileReques
                 .setAboutMe(source.getAboutMe())
                 .setImageUrl(source.getImageUrl())
                 .setAdmin(false)
-                .setActive(false);
+                .setActive(source.isActive());
     }
 }

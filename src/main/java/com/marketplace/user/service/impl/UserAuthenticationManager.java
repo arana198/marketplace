@@ -3,8 +3,9 @@ package com.marketplace.user.service.impl;
 import com.marketplace.user.domain.RoleBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.domain.UserRoleBO;
-import com.marketplace.user.domain.UserStatusBO.UserStatus;
 import com.marketplace.user.dto.UserRequest.LoginProvider;
+import com.marketplace.user.dto.UserStatusRequest;
+import com.marketplace.user.dto.UserStatusRequest.UserStatus;
 import com.marketplace.user.exception.UserAuthenticationException;
 import lombok.Data;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,7 +41,7 @@ class UserAuthenticationManager implements AuthenticationManager, UserDetailsSer
                 .filter(user -> user.getRoles()
                         .parallelStream()
                         .map(UserRoleBO::getUserStatus)
-                        .anyMatch(us -> us.getName().equals(UserStatus.ACTIVE) || us.getName().equals(UserStatus.PENDING)))
+                        .anyMatch(us -> us.getName().equals(UserStatus.ACTIVE.getValue()) || us.getName().equals(UserStatus.PENDING.getValue())))
                 .map(u -> new UsernamePasswordAuthenticationToken(u.getUsername(), u.getPassword(), this.getRoleFromUser(u)))
                 .orElseThrow(() -> new UserAuthenticationException("User authentication failed"));
     }

@@ -11,12 +11,13 @@ import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
 import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
 import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
-import com.marketplace.company.exception.CompanyEmployeeNotFoundException;
+import com.marketplace.company.exception.BrokerNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.BrokerService;
 import com.marketplace.company.service.CompanyService;
 import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
+import com.marketplace.user.dto.RoleRequest.UserRole;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.service.UserService;
 import lombok.Data;
@@ -98,23 +99,12 @@ class BrokerServiceImpl implements BrokerService {
         }
 
         final List<BrokerProfileBO> brokerProfiles = brokerProfileRepository.findByUserId(userResponse.getUserId());
-        if (brokerProfiles
-                .parallelStream()
-                .anyMatch(bp -> bp.isActive())) {
+        if (!brokerProfiles.isEmpty()) {
             throw new BadRequestException("User already part of another company");
         }
 
         final BrokerProfileBO brokerProfileBO = brokerProfileRequestConverter.convert(companyEmployeeInviteTokenRequest.getBrokerProfile());
-        final Optional<BrokerProfileBO> oldCompanyProfile = brokerProfiles.parallelStream()
-                .filter(bp -> bp.getCompanyId().equalsIgnoreCase(companyId))
-                .filter(bp -> !bp.isActive())
-                .findFirst();
-
-        if (oldCompanyProfile.isPresent()) {
-            brokerProfileBO.setId(oldCompanyProfile.get().getId());
-        }
-
-        brokerProfileBO.setActive(true);
+        brokerProfileBO.setActive(false);
 
         companyEmployeeInviteRepository.delete(companyEmployeeInviteBO);
         brokerProfileRepository.save(brokerProfileBO);
@@ -125,13 +115,13 @@ class BrokerServiceImpl implements BrokerService {
 
     @Override
     public void updateBrokerProfile(final String companyId, final String brokerProfileId, final BrokerProfileRequest brokerProfileRequest)
-            throws CompanyNotFoundException, CompanyEmployeeNotFoundException {
+            throws CompanyNotFoundException, BrokerNotFoundException {
 
         log.info("Updating broker [ {} ] for company [ {} ]", brokerProfileId, companyId);
 
         final BrokerProfileBO oldBrokerProfileBO = brokerProfileRepository.findById(brokerProfileId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
-                .orElseThrow(() -> new CompanyEmployeeNotFoundException(companyId, brokerProfileId));
+                .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
 
         if (!companyId.equalsIgnoreCase(brokerProfileRequest.getCompanyId())) {
             log.info("Changing company for broker [ {} ], from: [ {} ] to: [ {} ]", oldBrokerProfileBO.getId(), companyId, brokerProfileRequest.getCompanyId());
@@ -142,12 +132,25 @@ class BrokerServiceImpl implements BrokerService {
         final BrokerProfileBO newBrokerProfileBO = (BrokerProfileBO) brokerProfileRequestConverter.convert(brokerProfileRequest)
                 .setUserId(oldBrokerProfileBO.getUserId())
                 .setAdmin(oldBrokerProfileBO.isAdmin())
-                .setActive(oldBrokerProfileBO.isActive())
                 .setId(oldBrokerProfileBO.getId());
+
+        if (!oldBrokerProfileBO.isActive() &&  newBrokerProfileBO.isActive()) {
+            userService.findById(oldBrokerProfileBO.getUserId())
+                    .map(UserResponse::getUserRoles)
+                    .filter(urStream -> urStream.parallelStream()
+                            .filter(ur -> ur.getRole().equalsIgnoreCase(UserRole.ROLE_BROKER.getValue()) || ur.getRole().equalsIgnoreCase(UserRole.ROLE_COMPANY_ADMIN.getValue()))
+                            .filter(ur -> ur.getUserStatus().equalsIgnoreCase("ACTIVE"))
+                            .count() > 0)
+                    .orElseThrow(() -> new BadRequestException("User not active"));
+        }
 
         brokerProfileRepository.save(newBrokerProfileBO);
     }
 
+    /*
+    TODO; Another idea! The company owner creating profile on our platform should be responsible for checking the compliance of a broker?
+    But at the same time to be safe the platform should force a broker to submit this documents
+     */
     @Override
     public void removeBrokerFromCompany(final String companyId, final String brokerProfileId) {
 
@@ -171,14 +174,18 @@ class BrokerServiceImpl implements BrokerService {
                     bp.setActive(false);
                     brokerProfileRepository.save(bp);
                     userService.removeAsCompanyAdmin(bp.getUserId());
+                    publishService.sendMessage(PublishAction.BROKER_REMOVED_FROM_COMPANY, brokerProfileResponseConverter.convert(bp));
+                    //TODO: should this change the user status to CLOSED?
                 });
     }
 
     @Override
     public void addAdminBrokerForCompany(final String companyId, final String brokerProfileId) {
         log.info("Add broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
+
         brokerProfileRepository.findById(brokerProfileId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+                .filter(BrokerProfileBO::isActive)
                 .ifPresent(bp -> {
                     log.debug("Adding broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
                     bp.setAdmin(true);

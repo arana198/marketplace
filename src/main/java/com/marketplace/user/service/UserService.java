@@ -1,6 +1,5 @@
 package com.marketplace.user.service;
 
-import com.marketplace.user.domain.UserStatusBO.UserStatus;
 import com.marketplace.user.dto.EmailVerificationRequest;
 import com.marketplace.user.dto.ForgottenPasswordRequest;
 import com.marketplace.user.dto.RoleRequest.UserRole;
@@ -9,6 +8,8 @@ import com.marketplace.user.dto.UpdatePasswordRequest;
 import com.marketplace.user.dto.UserRequest;
 import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.dto.UserResponse;
+import com.marketplace.user.dto.UserStatusRequest;
+import com.marketplace.user.dto.UserStatusRequest.UserStatus;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;

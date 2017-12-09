@@ -63,6 +63,7 @@ public class CompanyEmployeeController {
                                                      @RequestBody @Valid final CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest,
                                                      final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
         log.info("Adding broker [ {} ] to company: [ {} ]", AuthUser.getUserId(), companyId);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid company object", bindingResult);
@@ -78,13 +79,15 @@ public class CompanyEmployeeController {
 
     @IsActive
     @PreAuthorize("@securityUtils.isCompanyEmployee(#companyId, #brokerId)")
-    @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+    @RolesAllowed({UserRole.ROLE_BROKER})
     @PutMapping(path = "/{brokerId}")
     public ResponseEntity<Void> updateBrokerInCompany(@PathVariable final String companyId,
                                                       @PathVariable final String brokerId,
                                                       @RequestBody @Valid final BrokerProfileRequest brokerProfileRequest,
                                                       final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
+        //TODO: Needs investigation - unless active the broker cannot call the PUT endpoint
         log.info("Updating broker: {} for comapny: ", brokerId, companyId);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid company object", bindingResult);
@@ -101,6 +104,7 @@ public class CompanyEmployeeController {
     public ResponseEntity<Void> removeBrokerFromCompany(@PathVariable final String companyId,
                                                         @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
         log.info("Removing broker {} from company: {}", brokerId, companyId);
         brokerService.removeBrokerFromCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -113,6 +117,7 @@ public class CompanyEmployeeController {
     public ResponseEntity<Void> removeAdminBrokerFromCompany(@PathVariable final String companyId,
                                                              @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
         log.info("Removing admin broker {} from company: {}", brokerId, companyId);
         brokerService.removeAdminBrokerFromCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -125,6 +130,7 @@ public class CompanyEmployeeController {
     public ResponseEntity<Void> addAdminBrokerForCompany(@PathVariable final String companyId,
                                                          @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
         log.info("Add admin broker {} for company: {}", brokerId, companyId);
         brokerService.addAdminBrokerForCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);

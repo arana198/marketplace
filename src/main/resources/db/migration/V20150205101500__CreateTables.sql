@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   KEY ix_user_id (user_id),
+  UNIQUE KEY ux_user_id_role_id (user_id, role_id),
   CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles (id),
   CONSTRAINT fk_user_roles_users FOREIGN KEY (user_id) REFERENCES users (id),
   CONSTRAINT fk_user_roles_user_status FOREIGN KEY (user_status_id) REFERENCES user_status (id)

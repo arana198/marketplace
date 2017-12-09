@@ -31,10 +31,16 @@ public class UserBO extends AbstractAuditEntity {
     private String password;
 
     @NotAudited
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<UserRoleBO> roles = new HashSet<>();
 
     @Column(name = "is_email_verified")
     private boolean emailVerified;
+
+    public void removeRole(UserRoleBO userRoleBO) {
+        this.roles.remove(userRoleBO);
+        userRoleBO.setUser(null);
+    }
+
 }

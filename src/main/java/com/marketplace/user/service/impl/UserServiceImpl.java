@@ -86,7 +86,7 @@ class UserServiceImpl implements UserService {
         log.debug("Creating user {}", userRequest.getEmail());
         final UserRole role = userType == UserType.COMPANY_ADMIN ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
         final Optional<UserBO> oldUser = userRepository.findByUsername(userRequest.getEmail());
-        if (this.doesUserExists(oldUser, role)) {
+        if (this.doesUserExists(oldUser, UserRole.ROLE_COMPANY_ADMIN) || this.doesUserExists(oldUser, UserRole.ROLE_BROKER)) {
             throw new UserAlreadyExistsException(userRequest.getEmail());
         }
 
@@ -211,8 +211,9 @@ class UserServiceImpl implements UserService {
                             .filter(ur -> ur.getRole().getName().equalsIgnoreCase(roleToChange.getValue()))
                             .findFirst()
                             .ifPresent(ur -> {
-                                user.getRoles().remove(ur);
-                                this.addUserRoleBO(user, roleChangedTo, ur.getProvider(), ur.getProviderUserId(), ur.getUserStatus().getName());
+                                final RoleBO newRole = roleService.findByName(roleChangedTo).get();
+                                ur.setRole(newRole);
+                                userRepository.save(user);
                             });
                 });
     }

@@ -19,7 +19,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -40,11 +40,11 @@ public abstract class AbstractAuditEntity implements Serializable {
     private SecurityContext securityContext = SecurityContextHolder.getContext();
 
     @Column(name = "created_ts", nullable = false)
-    private LocalDate createdTs;
+    private LocalDateTime createdTs;
 
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @Column(name = "updated_ts", nullable = false)
-    private LocalDate updatedTs;
+    private LocalDateTime updatedTs;
 
     @Column(name = "updated_by", nullable = false)
     private String updatedBy;
@@ -56,12 +56,12 @@ public abstract class AbstractAuditEntity implements Serializable {
     @PrePersist
     protected void onCreate() {
         id = UUID.randomUUID().toString();
-        updatedTs = createdTs = LocalDate.now();
+        updatedTs = createdTs = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedTs = LocalDate.now();
+        updatedTs = LocalDateTime.now();
         if (securityContext.getAuthentication() != null) {
             String updateByUserId = securityContext.getAuthentication().getName();
             updatedBy = updateByUserId;

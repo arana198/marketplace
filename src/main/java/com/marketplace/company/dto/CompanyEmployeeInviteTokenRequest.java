@@ -7,6 +7,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @Builder
 @Data
@@ -16,7 +17,7 @@ public class CompanyEmployeeInviteTokenRequest {
     private final String token;
 
     @Valid
-    @NotBlank(message = "brokerProfileRequest is mandatory")
+    @NotNull(message = "brokerProfileRequest is mandatory")
     private final BrokerProfileRequest brokerProfile;
 
     @JsonPOJOBuilder(withPrefix = "")

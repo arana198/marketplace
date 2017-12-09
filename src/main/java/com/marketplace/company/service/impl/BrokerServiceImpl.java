@@ -10,8 +10,8 @@ import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
 import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
 import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
-import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
 import com.marketplace.company.exception.BrokerNotFoundException;
+import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.BrokerService;
 import com.marketplace.company.service.CompanyService;
@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -91,6 +92,10 @@ class BrokerServiceImpl implements BrokerService {
         final CompanyEmployeeInviteBO companyEmployeeInviteBO = companyEmployeeInviteRepository.findByCompanyIdAndToken(companyId, companyEmployeeInviteTokenRequest.getToken())
                 .orElseThrow(() -> new CompanyEmployeeInviteTokenNotFoundException(companyEmployeeInviteTokenRequest.getToken()));
 
+        if (!companyId.equalsIgnoreCase(companyEmployeeInviteTokenRequest.getBrokerProfile().getCompanyId())) {
+            throw new BadRequestException("Invalid companyId in the body");
+        }
+
         final UserResponse userResponse = userService.findByUsername(companyEmployeeInviteBO.getEmail())
                 .orElseThrow(() -> new BadRequestException("User not registered"));
 
@@ -98,18 +103,27 @@ class BrokerServiceImpl implements BrokerService {
             throw new BadRequestException("User not authorized");
         }
 
-        final List<BrokerProfileBO> brokerProfiles = brokerProfileRepository.findByUserId(userResponse.getUserId());
-        if (!brokerProfiles.isEmpty()) {
+        final Supplier<Stream<BrokerProfileBO>> brokerProfileStreamSupplier = () -> brokerProfileRepository.findByUserId(userResponse.getUserId())
+                .parallelStream();
+
+        if (brokerProfileStreamSupplier.get().anyMatch(bp -> bp.isActive())) {
             throw new BadRequestException("User already part of another company");
         }
 
         final BrokerProfileBO brokerProfileBO = brokerProfileRequestConverter.convert(companyEmployeeInviteTokenRequest.getBrokerProfile());
+
+        brokerProfileStreamSupplier.get()
+                .filter(bp -> !bp.isActive())
+                .findFirst()
+                .ifPresent(bp -> brokerProfileBO.update(bp));
+
         brokerProfileBO.setActive(false);
 
         companyEmployeeInviteRepository.delete(companyEmployeeInviteBO);
         brokerProfileRepository.save(brokerProfileBO);
         publishService.sendMessage(PublishAction.BROKER_ADDED_TO_COMPANY, brokerProfileResponseConverter.convert(brokerProfileBO));
 
+        //TODO: Once the event is published need to check user so we know old user was activated or not
         return brokerProfileResponseConverter.convert(brokerProfileBO);
     }
 
@@ -135,7 +149,7 @@ class BrokerServiceImpl implements BrokerService {
 
         newBrokerProfileBO.update(oldBrokerProfileBO);
 
-        if (!oldBrokerProfileBO.isActive() &&  newBrokerProfileBO.isActive()) {
+        if (!oldBrokerProfileBO.isActive() && newBrokerProfileBO.isActive()) {
             userService.findById(oldBrokerProfileBO.getUserId())
                     .map(UserResponse::getUserRoles)
                     .filter(urStream -> urStream.parallelStream()
@@ -157,12 +171,12 @@ class BrokerServiceImpl implements BrokerService {
 
         log.info("Removing broker [ {} ] from company [ {} ]", brokerProfileId, companyId);
 
-        final Stream<BrokerProfileBO> brokerProfileBOStream = brokerProfileRepository.findByCompanyIdAndAdmin(companyId, true)
+        final Supplier<Stream<BrokerProfileBO>> brokerProfileStreamSupplier = () -> brokerProfileRepository.findByCompanyIdAndAdmin(companyId, true)
                 .parallelStream()
                 .filter(BrokerProfileBO::isAdmin);
 
-        if (brokerProfileBOStream.count() == 1
-                && brokerProfileBOStream.anyMatch(brokerProfileBO -> brokerProfileBO.getId().equalsIgnoreCase(brokerProfileId))) {
+        if (brokerProfileStreamSupplier.get().count() == 1
+                && brokerProfileStreamSupplier.get().anyMatch(brokerProfileBO -> brokerProfileBO.getId().equalsIgnoreCase(brokerProfileId))) {
 
             log.info("Company admin [ {} ] trying to remove the only admin (himself)", brokerProfileId);
             throw new BadRequestException("Cannot remove the only admin associated to the company");
@@ -179,6 +193,7 @@ class BrokerServiceImpl implements BrokerService {
                 });
     }
 
+    @Transactional
     @Override
     public void addAdminBrokerForCompany(final String companyId, final String brokerProfileId) {
         log.info("Add broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
@@ -201,12 +216,12 @@ class BrokerServiceImpl implements BrokerService {
 
         log.info("Removing admin privilege for broker [ {} ] from company [ {} ]", brokerProfileId, companyId);
 
-        final Stream<BrokerProfileBO> brokerProfileBOStream = brokerProfileRepository.findByCompanyIdAndAdmin(companyId, true)
+        final Supplier<Stream<BrokerProfileBO>> brokerProfileStreamSupplier = () -> brokerProfileRepository.findByCompanyIdAndAdmin(companyId, true)
                 .parallelStream()
                 .filter(BrokerProfileBO::isAdmin);
 
-        if (brokerProfileBOStream.count() == 1
-                && brokerProfileBOStream.anyMatch(brokerProfileBO -> brokerProfileBO.getId().equalsIgnoreCase(brokerProfileId))) {
+        if (brokerProfileStreamSupplier.get().count() == 1
+                && brokerProfileStreamSupplier.get().anyMatch(brokerProfileBO -> brokerProfileBO.getId().equalsIgnoreCase(brokerProfileId))) {
 
             log.info("Company admin [ {} ] trying to remove the only admin (himself)", brokerProfileId);
             throw new BadRequestException("Cannot remove the only admin associated to the company");

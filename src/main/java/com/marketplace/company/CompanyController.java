@@ -70,11 +70,11 @@ public class CompanyController {
                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-        log.info("Creating company: {}", companyRegistrationRequest.getCompany().getName());
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid company object", bindingResult);
         }
 
+        log.info("Creating company: {}", companyRegistrationRequest.getCompany().getName());
         final CompanyResponse companyResponse = companyService.createCompany(AuthUser.getUserId(), companyRegistrationRequest);
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{companyId}")

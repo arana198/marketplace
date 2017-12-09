@@ -13,12 +13,12 @@ import lombok.Data;
 public class UserStatusRequest {
 
     public enum UserStatus {
-        ACTIVE("ROLE_ADMIN"),
-        PENDING("ROLE_ADMIN"),
-        SUSPENDED("ROLE_ADMIN"),
-        BLACKLISTED("ROLE_ADMIN"),
-        CLOSED("ROLE_ADMIN"),
-        PENDING_CLOSED("ROLE_ADMIN");
+        ACTIVE("ACTIVE"),
+        PENDING("PENDING"),
+        SUSPENDED("SUSPENDED"),
+        BLACKLISTED("BLACKLISTED"),
+        CLOSED("CLOSED"),
+        PENDING_CLOSED("PENDING_CLOSED");
 
         private String value;
 

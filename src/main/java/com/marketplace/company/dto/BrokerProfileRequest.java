@@ -26,13 +26,11 @@ public class BrokerProfileRequest {
     @NotBlank(message = "mobileNumber is mandatory")
     private final String mobileNumber;
 
-    @NotBlank(message = "aboutMe is mandatory")
-    private final String aboutMe;
-
     @NotBlank(message = "imageUrl is mandatory")
     private final String imageUrl;
 
-    @NotBlank(message = "active is mandatory")
+    private String aboutMe;
+
     private final boolean active;
 
     @JsonPOJOBuilder(withPrefix = "")

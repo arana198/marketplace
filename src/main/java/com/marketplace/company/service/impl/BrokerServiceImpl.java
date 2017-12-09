@@ -129,10 +129,11 @@ class BrokerServiceImpl implements BrokerService {
                     .orElseThrow(() -> new CompanyNotFoundException(companyId));
         }
 
-        final BrokerProfileBO newBrokerProfileBO = (BrokerProfileBO) brokerProfileRequestConverter.convert(brokerProfileRequest)
+        final BrokerProfileBO newBrokerProfileBO = brokerProfileRequestConverter.convert(brokerProfileRequest)
                 .setUserId(oldBrokerProfileBO.getUserId())
-                .setAdmin(oldBrokerProfileBO.isAdmin())
-                .setId(oldBrokerProfileBO.getId());
+                .setAdmin(oldBrokerProfileBO.isAdmin());
+
+        newBrokerProfileBO.update(oldBrokerProfileBO);
 
         if (!oldBrokerProfileBO.isActive() &&  newBrokerProfileBO.isActive()) {
             userService.findById(oldBrokerProfileBO.getUserId())
@@ -175,7 +176,6 @@ class BrokerServiceImpl implements BrokerService {
                     brokerProfileRepository.save(bp);
                     userService.removeAsCompanyAdmin(bp.getUserId());
                     publishService.sendMessage(PublishAction.BROKER_REMOVED_FROM_COMPANY, brokerProfileResponseConverter.convert(bp));
-                    //TODO: should this change the user status to CLOSED?
                 });
     }
 

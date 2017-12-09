@@ -36,7 +36,7 @@ import java.net.URI;
 @RequestMapping("/companies/{companyId}/brokers")
 public class CompanyEmployeeController {
 
-    private final BrokerService companyEmployeeService;
+    private final BrokerService brokerService;
 
     @IsActive
     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
@@ -52,7 +52,7 @@ public class CompanyEmployeeController {
             throw new BadRequestException("Invalid company invite object", bindingResult);
         }
 
-        companyEmployeeService.inviteEmployee(companyId, companyEmployeeInviteRequest);
+        brokerService.inviteEmployee(companyId, companyEmployeeInviteRequest);
 
         return new ResponseEntity<BrokerProfileResponse>(HttpStatus.CREATED);
     }
@@ -68,7 +68,7 @@ public class CompanyEmployeeController {
             throw new BadRequestException("Invalid company object", bindingResult);
         }
 
-        final BrokerProfileResponse brokerProfileResponse = companyEmployeeService.addBrokerToCompany(companyId, companyEmployeeInviteTokenRequest);
+        final BrokerProfileResponse brokerProfileResponse = brokerService.addBrokerToCompany(companyId, companyEmployeeInviteTokenRequest);
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{brokerId}")
                 .buildAndExpand(brokerProfileResponse.getBrokerProfileId()).toUri();
@@ -90,7 +90,7 @@ public class CompanyEmployeeController {
             throw new BadRequestException("Invalid company object", bindingResult);
         }
 
-        companyEmployeeService.updateBrokerProfile(companyId, brokerId, brokerProfileRequest);
+        brokerService.updateBrokerProfile(companyId, brokerId, brokerProfileRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -102,7 +102,7 @@ public class CompanyEmployeeController {
                                                         @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
         log.info("Removing broker {} from company: {}", brokerId, companyId);
-        companyEmployeeService.removeBrokerFromCompany(companyId, brokerId);
+        brokerService.removeBrokerFromCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -114,19 +114,7 @@ public class CompanyEmployeeController {
                                                              @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
         log.info("Removing admin broker {} from company: {}", brokerId, companyId);
-        companyEmployeeService.removeAdminBrokerFromCompany(companyId, brokerId);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @IsActive
-    @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-    @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-    @DeleteMapping(path = "/{brokerId}/admins")
-    public ResponseEntity<Void> removeAdminBrokerForCompany(@PathVariable final String companyId,
-                                                            @PathVariable final String brokerId)
-            throws ResourceNotFoundException, ResourceAlreadyExistsException {
-        log.info("Removing admin broker {} from company: {}", brokerId, companyId);
-        companyEmployeeService.removeAdminBrokerFromCompany(companyId, brokerId);
+        brokerService.removeAdminBrokerFromCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -138,7 +126,7 @@ public class CompanyEmployeeController {
                                                          @PathVariable final String brokerId)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
         log.info("Add admin broker {} for company: {}", brokerId, companyId);
-        companyEmployeeService.addAdminBrokerForCompany(companyId, brokerId);
+        brokerService.addAdminBrokerForCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

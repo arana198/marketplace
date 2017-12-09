@@ -1,5 +1,6 @@
 package com.marketplace.user.service.impl;
 
+import com.marketplace.common.exception.InternalServerException;
 import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
 import com.marketplace.user.domain.RoleBO;
@@ -166,33 +167,6 @@ class UserServiceImpl implements UserService {
                 });
     }
 
-    /*
-TODO:
-    if user status PENDING -> admin removes from the company -> user status should change to PENDING_CLOSED
-    if user status ACTIVE -> admin removes from the company -> user status should change to CLOSED
-    if user CLOSED -> admin readds to the company -> user status changed to ACTIVE
-    if user PENDING_CLOSED -> admin readds to the company -> user status changed to PENDING
-    if user status BANNED/BLACKLISTED -> admin removes from the company -> user status should NOT change
- */
-
-    private void updateUserStatus(final UserBO userBO, final UserRole userRole, final UserStatus userStatus) {
-        userBO.getRoles()
-                .parallelStream()
-                .filter(user -> user.getRole().getName().equalsIgnoreCase(userRole.getValue()))
-                .forEach(oldUserRole -> {
-                    final String oldUserStatus = oldUserRole.getUserStatus().getName();
-                    if (UserStatus.ACTIVE.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.CLOSED ||
-                            UserStatus.PENDING.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE ||
-                            UserStatus.PENDING.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.PENDING_CLOSED ||
-                            UserStatus.CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE ||
-                            UserStatus.PENDING_CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.PENDING_CLOSED) {
-
-                        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus.getValue()).get();
-                        oldUserRole.setUserStatus(userStatusBO);
-                    }
-                });
-    }
-
     @Transactional
     @Override
     public void updateUserStatus(final String userId, final UserRole userRole, final UserStatus userStatus) throws UserNotFoundException {
@@ -200,16 +174,33 @@ TODO:
         final UserBO userBO = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus.getValue()).get();
-        final Optional<UserRoleBO> userRoleBO = userBO.getRoles()
+        userBO.getRoles()
                 .parallelStream()
                 .filter(ur -> ur.getRole().getName().equalsIgnoreCase(userRole.getValue()))
-                .findAny();
+                .findAny()
+                .ifPresent(oldUserRole -> {
+                    final String oldUserStatus = oldUserRole.getUserStatus().getName();
+                    final String newUserStatus;
 
-        userRoleBO.ifPresent(ur -> ur.setUserStatus(userStatusBO));
-        userRepository.save(userBO);
-        tokenRevoker.revoke(userId);
-        publishService.sendMessage(PublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
+                    if (UserStatus.ACTIVE.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.CLOSED) {
+                        newUserStatus = UserStatus.CLOSED.getValue();
+                    } else if (UserStatus.PENDING.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.CLOSED) {
+                        newUserStatus = UserStatus.PENDING_CLOSED.getValue();
+                    } else if (UserStatus.PENDING_CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE) {
+                        newUserStatus = UserStatus.PENDING.getValue();
+                    } else if (UserStatus.CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE) {
+                        newUserStatus = UserStatus.ACTIVE.getValue();
+                    } else {
+                        throw new InternalServerException("Incorrect user status");
+                    }
+
+                    final UserStatusBO userStatusBO = userStatusService.findByName(userStatus.getValue()).get();
+                    oldUserRole.setUserStatus(userStatusBO);
+
+                    userRepository.save(userBO);
+                    tokenRevoker.revoke(userId);
+                    publishService.sendMessage(PublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
+                });
     }
 
     private void updateUserRole(final String userId, final UserRole roleToChange, final UserRole roleChangedTo) {

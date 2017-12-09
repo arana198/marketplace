@@ -15,7 +15,9 @@ VALUES
 INSERT INTO user_status
   (id, name, description, is_selectable)
 VALUES
-  ("09d48b3d-b9c4-4f31-a9a1-b6bec8669c5e", "ACTIVE", "Indicates the userId is active", true),
-  ("797b6729-f45a-494a-b525-ff954f9662be", "PENDING", "Indicates the userId is pending", true),
-  ("25fdbc34-029f-49eb-8be8-b1dd8527e2cc", "SUSPENDED", "Indicates the userId is suspended", true),
-  ("18ddf85e-4445-4909-8663-a63467372210", "BLACKLISTED", "Indicates the userId is blacklisted", true);
+  ("09d48b3d-b9c4-4f31-a9a1-b6bec8669c5e", "ACTIVE", "Indicates the user is active", true),
+  ("797b6729-f45a-494a-b525-ff954f9662be", "PENDING", "Indicates the user is pending", true),
+  ("be1ab17e-6e53-4bfb-a8c7-7aea96f41e88", "PENDING_CLOSED", "Indicates the user was in pending status before he was closed", true),
+  ("288628b2-9a35-425f-8ebe-298952507b34", "CLOSED", "Indicates the user is closed", true),
+  ("25fdbc34-029f-49eb-8be8-b1dd8527e2cc", "SUSPENDED", "Indicates the user is suspended", true),
+  ("18ddf85e-4445-4909-8663-a63467372210", "BLACKLISTED", "Indicates the user is blacklisted", true);

@@ -11,4 +11,5 @@ public class CompanyResponse extends ResourceSupport {
     private final String vatNumber;
     private final String logoUrl;
     private final String websiteUrl;
+    private final boolean active;
 }

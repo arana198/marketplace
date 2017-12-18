@@ -28,7 +28,6 @@ public class RoleRequest {
     @NotNull(message = "isSelectable is mandatory")
     private final boolean isSelectable;
 
-
     @JsonPOJOBuilder(withPrefix = "")
     public static class RoleRequestBuilder {
     }

@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   KEY ix_user_id (user_id),
+  UNIQUE KEY ux_user_id_role_id (user_id, role_id),
   CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles (id),
   CONSTRAINT fk_user_roles_users FOREIGN KEY (user_id) REFERENCES users (id),
   CONSTRAINT fk_user_roles_user_status FOREIGN KEY (user_status_id) REFERENCES user_status (id)
@@ -171,11 +172,17 @@ CREATE TABLE IF NOT EXISTS companies (
   FULLTEXT (name)
 );
 
-CREATE TABLE IF NOT EXISTS company_employee (
+CREATE TABLE IF NOT EXISTS broker_profiles (
   id varchar(36) NOT NULL,
-  company_id varchar(36) NOT NULL,
   user_id varchar(36) NOT NULL,
+  company_id varchar(36) NOT NULL,
+  firstname varchar(25) NOT NULL,
+  lastname varchar(40) NOT NULL,
+  mobile_number varchar(15) NOT NULL,
+  about_me TEXT NULL,
+  image_url varchar(500) NULL,
   is_admin bit(1) NOT NULL,
+  is_active bit(1) NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_by varchar(36) NULL,
@@ -183,9 +190,9 @@ CREATE TABLE IF NOT EXISTS company_employee (
   PRIMARY KEY (id),
   INDEX ix_company_id (company_id),
   INDEX ix_user_id (user_id),
+  INDEX ix_user_id_is_active (user_id, is_active),
   INDEX ix_company_id_is_admin (company_id, is_admin),
-  CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (company_id) REFERENCES companies (id),
-  CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (user_id) REFERENCES users (id)
+  CONSTRAINT fk_broker_profiles_companies FOREIGN KEY (company_id) REFERENCES companies (id)
 );
 
 CREATE TABLE IF NOT EXISTS company_employee_invite (

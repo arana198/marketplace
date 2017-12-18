@@ -5,6 +5,7 @@ import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.common.security.UserRole;
+import com.marketplace.company.dto.CompanyRegistrationRequest;
 import com.marketplace.company.dto.CompanyRequest;
 import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.exception.CompanyNotFoundException;
@@ -45,6 +46,7 @@ public class CompanyController {
     @GetMapping
     public PagedResources<CompanyResponse> getCompanies(@RequestParam(value = "name", required = false) final String companyName,
                                                         final Pageable pageable) {
+
         final Page<CompanyResponse> companyResponses = companyService.findAll(companyName, pageable);
         return PagedResourceConverter.convert(companyResponses);
     }
@@ -54,6 +56,7 @@ public class CompanyController {
     @GetMapping(value = "/{companyId}")
     public ResponseEntity<CompanyResponse> getCompany(@PathVariable final String companyId)
             throws ResourceNotFoundException {
+
         log.info("Getting company for id: {}", companyId);
         return companyService.findById(companyId)
                 .map(ResponseEntity::ok)
@@ -63,15 +66,16 @@ public class CompanyController {
     @PreAuthorize("@securityUtils.isCompanyAdmin(null)")
     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
     @PostMapping
-    public ResponseEntity<Void> createCompany(@RequestBody @Valid final CompanyRequest companyRequest,
+    public ResponseEntity<Void> createCompany(@RequestBody @Valid final CompanyRegistrationRequest companyRegistrationRequest,
                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
-        log.info("Creating company: {}", companyRequest.getName());
+
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid company object", bindingResult);
         }
 
-        final CompanyResponse companyResponse = companyService.createCompany(AuthUser.getUserId(), companyRequest);
+        log.info("Creating company: {}", companyRegistrationRequest.getCompany().getName());
+        final CompanyResponse companyResponse = companyService.createCompany(AuthUser.getUserId(), companyRegistrationRequest);
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{companyId}")
                 .buildAndExpand(companyResponse.getCompanyId()).toUri();
@@ -86,6 +90,7 @@ public class CompanyController {
                                               @RequestBody @Valid final CompanyRequest companyRequest,
                                               final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
         log.info("Updating company: {}", companyId);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid company object", bindingResult);

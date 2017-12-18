@@ -1,6 +1,6 @@
 package com.marketplace.common.security;
 
-import com.marketplace.company.service.CompanyEmployeeService;
+import com.marketplace.company.service.BrokerService;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,15 +15,11 @@ import java.util.stream.Collectors;
 @Component
 public class SecurityUtils {
 
-    private final CompanyEmployeeService companyEmployeeService;
+    private final BrokerService brokerService;
 
     public boolean checkIfUserAuthorized(final String userId) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final List<String> roles = authentication.getAuthorities()
-                .parallelStream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
 
+        final List<String> roles = this.getAuthenticatedUserRole();
         if (roles.contains(UserRole.ROLE_ADMIN)) {
             return true;
         }
@@ -36,38 +32,53 @@ public class SecurityUtils {
     }
 
     public boolean isCompanyAdmin(final String companyId) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final List<String> roles = authentication.getAuthorities()
-                .parallelStream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+
+        final List<String> roles = this.getAuthenticatedUserRole();
+        if (roles.contains(UserRole.ROLE_ADMIN)) {
+            return true;
+        }
 
         if (roles.contains(UserRole.ROLE_ADMIN) || (companyId == null && roles.contains(UserRole.ROLE_COMPANY_ADMIN))) {
             return true;
         }
 
-        if ((companyId == null && !roles.contains(UserRole.ROLE_COMPANY_ADMIN)) || roles.contains(UserRole.ROLE_COMPANY_ADMIN) && this.checkIfCompanyAdmin(companyId)) {
+        if (!roles.contains(UserRole.ROLE_COMPANY_ADMIN) || !this.checkIfCompanyAdmin(companyId)) {
             throw new UnauthorizedUserException("Unauthorized user");
         }
 
         return true;
     }
 
-    public boolean isCompanyEmployee(final String companyId, final String employeeId) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final List<String> roles = authentication.getAuthorities()
-                .parallelStream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+    public boolean isCompanyEmployee(final String companyId, final String brokerId) {
 
-        //TODO: CHeck if company admin and employee belongs to the company
+        final List<String> roles = this.getAuthenticatedUserRole();
+        if (roles.contains(UserRole.ROLE_ADMIN)) {
+            return true;
+        }
+
+        if ((roles.contains(UserRole.ROLE_COMPANY_ADMIN) && !this.checkIfCompanyAdmin(companyId)) ||
+                !brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerId)
+                        .filter(bp -> bp.getUserId().equalsIgnoreCase(AuthUser.getUserId()))
+                        .filter(bp -> bp.isActive())
+                        .isPresent()) {
+            throw new UnauthorizedUserException("Unauthorized user");
+        }
 
         return true;
     }
 
     private boolean checkIfCompanyAdmin(final String companyId) {
-        return companyEmployeeService.findByCompanyAdmin(companyId)
+        return brokerService.findByUserId(AuthUser.getUserId())
+                .filter(bp -> bp.getCompanyId().equalsIgnoreCase(companyId))
+                .filter(bp -> bp.isAdmin())
+                .isPresent();
+    }
+
+    private List<String> getAuthenticatedUserRole() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities()
                 .parallelStream()
-                .anyMatch(ce -> ce.getUserId().equalsIgnoreCase(AuthUser.getUserId()));
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
     }
 }

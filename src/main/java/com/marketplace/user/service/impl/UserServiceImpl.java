@@ -1,12 +1,12 @@
 package com.marketplace.user.service.impl;
 
+import com.marketplace.common.exception.InternalServerException;
 import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
 import com.marketplace.user.domain.RoleBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.domain.UserRoleBO;
 import com.marketplace.user.domain.UserStatusBO;
-import com.marketplace.user.domain.UserStatusBO.UserStatus;
 import com.marketplace.user.dto.EmailVerificationRequest;
 import com.marketplace.user.dto.ForgottenPasswordRequest;
 import com.marketplace.user.dto.RoleRequest.UserRole;
@@ -16,6 +16,7 @@ import com.marketplace.user.dto.UserRequest;
 import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.dto.UserRequest.UserType;
 import com.marketplace.user.dto.UserResponse;
+import com.marketplace.user.dto.UserStatusRequest.UserStatus;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.exception.UserNotFoundException;
@@ -63,6 +64,16 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void addAsCompanyAdmin(final String userId) {
+        this.updateUserRole(userId, UserRole.ROLE_BROKER, UserRole.ROLE_COMPANY_ADMIN);
+    }
+
+    @Override
+    public void removeAsCompanyAdmin(final String userId) {
+        this.updateUserRole(userId, UserRole.ROLE_COMPANY_ADMIN, UserRole.ROLE_BROKER);
+    }
+
+    @Override
     public void logout(final Principal principal) {
         log.debug("Logout user {}", principal.getName());
         tokenRevoker.revoke(principal.getName());
@@ -75,12 +86,12 @@ class UserServiceImpl implements UserService {
         log.debug("Creating user {}", userRequest.getEmail());
         final UserRole role = userType == UserType.COMPANY_ADMIN ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
         final Optional<UserBO> oldUser = userRepository.findByUsername(userRequest.getEmail());
-        if (this.doesUserExists(oldUser, role)) {
+        if (this.doesUserExists(oldUser, UserRole.ROLE_COMPANY_ADMIN) || this.doesUserExists(oldUser, UserRole.ROLE_BROKER)) {
             throw new UserAlreadyExistsException(userRequest.getEmail());
         }
 
         final UserBO userBO = oldUser.orElse(userRequestConverter.convert(userRequest));
-        this.addUserRoleBO(userBO, role, LoginProvider.LOCAL, null);
+        this.addUserRoleBO(userBO, role, LoginProvider.LOCAL.getValue().toString(), null, UserStatus.PENDING.getValue());
         final UserResponse newUser = userResponseConverter.convert(userBO);
 
         PublishAction publishAction = userType == UserType.COMPANY_ADMIN ? PublishAction.COMPANY_ADMIN_USER_CREATED : PublishAction.BROKER_USER_CREATED;
@@ -99,7 +110,7 @@ class UserServiceImpl implements UserService {
         }
 
         final UserBO userBO = oldUser.orElse(socialUserRequestConverter.convert(socialUserRequest));
-        this.addUserRoleBO(userBO, role, socialUserRequest.getLoginProvider(), socialUserRequest.getLoginProviderId());
+        this.addUserRoleBO(userBO, role, socialUserRequest.getLoginProvider().getValue().toString(), socialUserRequest.getLoginProviderId(), UserStatus.PENDING.getValue());
         final UserResponse newUser = userResponseConverter.convert(userBO)
                 .setProfileImageUrl(socialUserRequest.getProfileImageUrl());
 
@@ -139,35 +150,72 @@ class UserServiceImpl implements UserService {
 
     @Override
     public void verifyEmail(final String userId) {
+        log.info("Create verification email for user {}", userId);
         userRepository.findById(userId)
                 .ifPresent(emailVerificationTokenService::createToken);
     }
 
     @Override
     public void verifyEmail(final EmailVerificationRequest emailVerificationRequest) throws EmailVerificationTokenNotFoundException {
+        log.info("Check verification email for token {}", emailVerificationRequest.getToken());
         final String userId = emailVerificationTokenService.verifyToken(emailVerificationRequest.getToken()).getUserId();
         userRepository.findById(userId)
                 .map(user -> user.setEmailVerified(true))
-                .ifPresent(userRepository::save);
+                .ifPresent(user -> {
+                    userRepository.save(user);
+                    publishService.sendMessage(PublishAction.EMAIL_VERIFIED, userResponseConverter.convert(user));
+                });
     }
 
-    @Override
     @Transactional
+    @Override
     public void updateUserStatus(final String userId, final UserRole userRole, final UserStatus userStatus) throws UserNotFoundException {
-        log.debug("Update user domain for user {}", userId);
+        log.debug("Update user status for user {}", userId);
         final UserBO userBO = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus).get();
-        final Optional<UserRoleBO> userRoleBO = userBO.getRoles()
+        userBO.getRoles()
                 .parallelStream()
                 .filter(ur -> ur.getRole().getName().equalsIgnoreCase(userRole.getValue()))
-                .findAny();
+                .findAny()
+                .ifPresent(oldUserRole -> {
+                    final String oldUserStatus = oldUserRole.getUserStatus().getName();
+                    final String newUserStatus;
 
-        userRoleBO.ifPresent(ur -> ur.setUserStatus(userStatusBO));
-        userRepository.save(userBO);
-        tokenRevoker.revoke(userId);
-        publishService.sendMessage(PublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
+                    if (UserStatus.ACTIVE.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.CLOSED) {
+                        newUserStatus = UserStatus.CLOSED.getValue();
+                    } else if (UserStatus.PENDING.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.CLOSED) {
+                        newUserStatus = UserStatus.PENDING_CLOSED.getValue();
+                    } else if (UserStatus.PENDING_CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE) {
+                        newUserStatus = UserStatus.PENDING.getValue();
+                    } else if (UserStatus.CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE) {
+                        newUserStatus = UserStatus.ACTIVE.getValue();
+                    } else {
+                        throw new InternalServerException("Incorrect user status");
+                    }
+
+                    final UserStatusBO userStatusBO = userStatusService.findByName(userStatus.getValue()).get();
+                    oldUserRole.setUserStatus(userStatusBO);
+
+                    userRepository.save(userBO);
+                    tokenRevoker.revoke(userId);
+                    publishService.sendMessage(PublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
+                });
+    }
+
+    private void updateUserRole(final String userId, final UserRole roleToChange, final UserRole roleChangedTo) {
+        userRepository.findById(userId)
+                .ifPresent(user -> {
+                    user.getRoles()
+                            .parallelStream()
+                            .filter(ur -> ur.getRole().getName().equalsIgnoreCase(roleToChange.getValue()))
+                            .findFirst()
+                            .ifPresent(ur -> {
+                                final RoleBO newRole = roleService.findByName(roleChangedTo).get();
+                                ur.setRole(newRole);
+                                userRepository.save(user);
+                            });
+                });
     }
 
     private boolean doesUserExists(final Optional<UserBO> oldUser, final UserRole role) {
@@ -178,15 +226,15 @@ class UserServiceImpl implements UserService {
                 .isPresent();
     }
 
-    private void addUserRoleBO(final UserBO userBO, final UserRole role, final LoginProvider loginProvider, final String loginProviderUserId) {
-        final UserStatusBO userStatusBO = userStatusService.findByName(UserStatus.PENDING).get();
+    private void addUserRoleBO(final UserBO userBO, final UserRole role, final String loginProvider, final String loginProviderUserId, final String userStatus) {
+        final UserStatusBO userStatusBO = userStatusService.findByName(userStatus).get();
         final RoleBO userRole = roleService.findByName(role).get();
 
         final UserRoleBO userRoleBO = new UserRoleBO();
         userRoleBO.setUser(userBO);
         userRoleBO.setRole(userRole);
         userRoleBO.setUserStatus(userStatusBO);
-        userRoleBO.setProvider(loginProvider.getValue().toString());
+        userRoleBO.setProvider(loginProvider);
         userRoleBO.setProviderUserId(loginProviderUserId);
         userBO.getRoles().add(userRoleBO);
         userRepository.save(userBO);

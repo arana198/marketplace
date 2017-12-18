@@ -21,7 +21,7 @@ class CompanyValidatorImpl implements CompanyValidator {
     private final RestTemplate restTemplate;
 
     public CompanyValidatorImpl(final ConfigurationService configurationService) {
-        this.API_URL = configurationService.getCompanyValidatorUrlPrefix() + "/GB/";
+        this.API_URL = configurationService.getCompanyValidatorUrlPrefix();
         this.API_KEY = configurationService.getCompanyValidatorApiKey();
         this.restTemplate = new RestTemplate();
     }

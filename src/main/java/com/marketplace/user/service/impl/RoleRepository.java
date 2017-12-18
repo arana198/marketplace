@@ -12,7 +12,7 @@ interface RoleRepository extends BaseRepository<RoleBO, String> {
     @Cacheable("RoleRepository.findById")
     Optional<RoleBO> findById(String id);
 
-    @Cacheable("RoleRepository.findByFulltextName")
+    @Cacheable("RoleRepository.findByName")
     Optional<RoleBO> findByName(String role);
 
     @Cacheable("RoleRepository.findBySelectable")

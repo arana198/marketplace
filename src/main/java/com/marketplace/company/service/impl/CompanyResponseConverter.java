@@ -1,8 +1,8 @@
 package com.marketplace.company.service.impl;
 
+import com.marketplace.common.converter.BaseConverter;
 import com.marketplace.company.domain.CompanyBO;
 import com.marketplace.company.dto.CompanyResponse;
-import com.marketplace.common.converter.BaseConverter;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +15,7 @@ class CompanyResponseConverter implements BaseConverter<CompanyBO, CompanyRespon
                 source.getCompanyNumber(),
                 source.getVatNumber(),
                 source.getLogoUrl(),
-                source.getWebsiteUrl());
+                source.getWebsiteUrl(),
+                source.isActive());
     }
 }

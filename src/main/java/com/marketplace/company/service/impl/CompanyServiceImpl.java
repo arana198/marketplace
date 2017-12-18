@@ -1,15 +1,17 @@
 package com.marketplace.company.service.impl;
 
+import com.marketplace.common.exception.BadRequestException;
+import com.marketplace.company.domain.BrokerProfileBO;
 import com.marketplace.company.domain.CompanyBO;
-import com.marketplace.company.domain.CompanyEmployeeBO;
+import com.marketplace.company.dto.CompanyRegistrationRequest;
 import com.marketplace.company.dto.CompanyRequest;
 import com.marketplace.company.dto.CompanyResponse;
+import com.marketplace.company.exception.BrokerAlreadyRegisteredException;
 import com.marketplace.company.exception.CompanyAlreadyExistsException;
 import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.CompanyService;
 import com.marketplace.company.validator.CompanyValidator;
 import com.marketplace.company.validator.VATValidator;
-import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.queue.publish.PublishService;
 import com.marketplace.queue.publish.domain.PublishAction;
 import lombok.Data;
@@ -27,9 +29,10 @@ import java.util.Optional;
 class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final CompanyEmployeeRepository companyEmployeeRepository;
+    private final BrokerProfileRepository brokerProfileRepository;
     private final CompanyResponseConverter companyResponseConverter;
     private final CompanyRequestConverter companyRequestConverter;
+    private final BrokerProfileRequestConverter brokerProfileRequestConverter;
     private final VATValidator vatValidator;
     private final CompanyValidator companyValidator;
     private final PublishService publishService;
@@ -50,31 +53,42 @@ class CompanyServiceImpl implements CompanyService {
 
     @Transactional
     @Override
-    public CompanyResponse createCompany(final String userId, final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
+    public CompanyResponse createCompany(final String userId, final CompanyRegistrationRequest companyRegistrationRequest)
+            throws CompanyNotFoundException, CompanyAlreadyExistsException, BrokerAlreadyRegisteredException {
 
-        if (!companyRepository.findByCompanyNumberOrVatNumber(companyRequest.getCompanyNumber(), companyRequest.getVatNumber()).isEmpty()) {
-            log.info("Company Number [ {} ] or VAT Number [ {} ] already exists", companyRequest.getCompanyNumber(), companyRequest.getVatNumber());
-            throw new CompanyAlreadyExistsException(companyRequest.getCompanyNumber(), companyRequest.getVatNumber());
+        final CompanyRequest company = companyRegistrationRequest.getCompany();
+        if (!companyRepository.findByCompanyNumberOrVatNumber(company.getCompanyNumber(), company.getVatNumber()).isEmpty()) {
+            log.info("Company Number [ {} ] or VAT Number [ {} ] already exists", company.getCompanyNumber(), company.getVatNumber());
+            throw new CompanyAlreadyExistsException(company.getCompanyNumber(), company.getVatNumber());
         }
 
-        if (!vatValidator.validate(companyRequest.getName(), companyRequest.getVatNumber())) {
-            new BadRequestException("Invalid VAT number");
+        if (!companyRegistrationRequest.getBrokerProfile().getUserId().equalsIgnoreCase(userId)) {
+            throw new BadRequestException("Invalid user id");
         }
 
-        if (!companyValidator.validate(companyRequest.getName(), companyRequest.getCompanyNumber())) {
-            new BadRequestException("Invalid company number");
+        if (!brokerProfileRepository.findByUserId(userId).isEmpty()) {
+            throw new BrokerAlreadyRegisteredException(userId);
         }
 
-        CompanyBO companyBO = companyRequestConverter.convert(companyRequest);
+        if (!vatValidator.validate(company.getName(), company.getVatNumber())) {
+            throw new BadRequestException("Invalid VAT number");
+        }
+
+        if (!companyValidator.validate(company.getName(), company.getCompanyNumber())) {
+            throw new BadRequestException("Invalid company number");
+        }
+
+        //TODO: FCA Number integration
+        CompanyBO companyBO = companyRequestConverter.convert(company);
         companyBO = companyRepository.save(companyBO);
 
         final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
-        final CompanyEmployeeBO companyEmployeeBO = new CompanyEmployeeBO()
-                .setCompanyId(companyBO.getId())
-                .setUserId(userId)
-                .setAdminPrivilege(true);
 
-        companyEmployeeRepository.save(companyEmployeeBO);
+        final BrokerProfileBO brokerProfileBO = brokerProfileRequestConverter.convert(companyRegistrationRequest.getBrokerProfile());
+        brokerProfileBO.setCompanyId(companyBO.getId());
+        brokerProfileBO.setAdmin(true);
+
+        brokerProfileRepository.save(brokerProfileBO);
         publishService.sendMessage(PublishAction.COMPANY_CREATED, companyResponse);
 
         return companyResponse;
@@ -82,7 +96,7 @@ class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void updateCompany(final String companyId, final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
-        companyRepository.findById(companyId)
+        final CompanyBO oldCompany = companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
         if (companyRepository.findByName(companyRequest.getName())
@@ -91,17 +105,18 @@ class CompanyServiceImpl implements CompanyService {
             throw new CompanyAlreadyExistsException(companyRequest.getName());
         }
 
-        if (!vatValidator.validate(companyRequest.getName(), companyRequest.getVatNumber())) {
-            new BadRequestException("Invalid VAT number");
+        if (!oldCompany.getVatNumber().equalsIgnoreCase(companyRequest.getVatNumber()) && !vatValidator.validate(companyRequest.getName(), companyRequest.getVatNumber())) {
+            throw new BadRequestException("Invalid VAT number");
         }
 
-        if (!companyValidator.validate(companyRequest.getName(), companyRequest.getCompanyNumber())) {
-            new BadRequestException("Invalid company number");
+        if (!oldCompany.getCompanyNumber().equalsIgnoreCase(companyRequest.getCompanyNumber()) && !companyValidator.validate(companyRequest.getName(), companyRequest.getCompanyNumber())) {
+            throw new BadRequestException("Invalid company number");
         }
 
-        CompanyBO companyBO = companyRequestConverter.convert(companyRequest);
-        companyBO = companyRepository.save(companyBO);
-        final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
+        CompanyBO newCompanyBO = companyRequestConverter.convert(companyRequest);
+        newCompanyBO.update(oldCompany);
+        newCompanyBO = companyRepository.save(newCompanyBO);
+        final CompanyResponse companyResponse = companyResponseConverter.convert(newCompanyBO);
         publishService.sendMessage(PublishAction.COMPANY_UPDATED, companyResponse);
     }
 }

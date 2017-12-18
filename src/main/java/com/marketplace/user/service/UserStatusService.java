@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface UserStatusService {
     Optional<UserStatusBO> findById(String id);
 
-    Optional<UserStatusBO> findByName(UserStatusBO.UserStatus userStatus);
+    Optional<UserStatusBO> findByName(String userStatus);
 }

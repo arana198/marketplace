@@ -11,6 +11,6 @@ interface UserStatusRepository extends BaseRepository<UserStatusBO, String> {
     @Cacheable("UserStatusRepository.findById")
     Optional<UserStatusBO> findById(String id);
 
-    @Cacheable("UserStatusRepository.findByFulltextName")
-    Optional<UserStatusBO> findByName(UserStatusBO.UserStatus userStatus);
+    @Cacheable("UserStatusRepository.findByName")
+    Optional<UserStatusBO> findByName(String userStatus);
 }

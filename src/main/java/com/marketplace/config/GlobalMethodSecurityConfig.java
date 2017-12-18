@@ -5,24 +5,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.annotation.Jsr250Voter;
+import org.springframework.security.access.expression.method.ExpressionBasedPreInvocationAdvice;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.prepost.PreInvocationAuthorizationAdviceVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleHierarchyVoter;
-import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
+@EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true)
 public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Autowired
@@ -31,7 +36,7 @@ public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguratio
     @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(String.format("%s > %s and %s > %s and %s > %s",
+        roleHierarchy.setHierarchy(String.format("%s > %s %s > %s %s > %s",
                 UserRole.ROLE_ADMIN,
                 UserRole.ROLE_COMPANY_ADMIN,
                 UserRole.ROLE_COMPANY_ADMIN,
@@ -42,18 +47,34 @@ public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguratio
         return roleHierarchy;
     }
 
+    @Primary
     @Bean
-    public RoleVoter roleVoter() {
+    public RoleHierarchyVoter roleVoter() {
         return new RoleHierarchyVoter(roleHierarchy());
     }
 
+    @Primary
     @Bean
-    public AffirmativeBased defaultAccessDecisionManager(RoleHierarchy roleHierarchy){
-        WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
+    protected AffirmativeBased getAccessDecisionManager() {
         DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy);
+        expressionHandler.setRoleHierarchy(this.roleHierarchy());
+
+        WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
         webExpressionVoter.setExpressionHandler(expressionHandler);
-        return new AffirmativeBased(Arrays.asList((AccessDecisionVoter) webExpressionVoter));
+
+        return new AffirmativeBased(Arrays.asList(this.roleVoter(), webExpressionVoter));
+    }
+
+    @Override
+    public AccessDecisionManager accessDecisionManager() {
+        List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
+        ExpressionBasedPreInvocationAdvice expressionAdvice = new ExpressionBasedPreInvocationAdvice();
+        expressionAdvice.setExpressionHandler(getExpressionHandler());
+        decisionVoters.add(new PreInvocationAuthorizationAdviceVoter(expressionAdvice));
+        decisionVoters.add(new Jsr250Voter());
+        decisionVoters.add(this.roleVoter());
+
+        return new AffirmativeBased(decisionVoters);
     }
 
     @Override

@@ -123,7 +123,7 @@ class BrokerServiceImpl implements BrokerService {
         brokerProfileRepository.save(brokerProfileBO);
         publishService.sendMessage(PublishAction.BROKER_ADDED_TO_COMPANY, brokerProfileResponseConverter.convert(brokerProfileBO));
 
-        //TODO: Once the event is published need to check user so we know old user was activated or not
+        //TODO: Once the event is published need to check user so we know old user was activated or not - Validator
         return brokerProfileResponseConverter.convert(brokerProfileBO);
     }
 
@@ -260,4 +260,6 @@ class BrokerServiceImpl implements BrokerService {
                         companyEmployeeInviteRequest.getEmail(),
                         companyEmployeeInviteBO.getToken()));
     }
+
+    //TODO: Need to think about individual brokers who may want to sign up
 }

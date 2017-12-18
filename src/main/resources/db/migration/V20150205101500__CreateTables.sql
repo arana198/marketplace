@@ -220,3 +220,14 @@ CREATE TABLE IF NOT EXISTS email_notifications (
   INDEX ix_toAddress (toAddress),*/
   CHECK (JSON_VALID(email))
 );
+
+CREATE TABLE IF NOT EXISTS file_store (
+  id varchar(36) NOT NULL PRIMARY KEY,
+  name varchar(128) NOT NULL,
+  description TEXT NULL,
+  type varchar(100) NOT NULL,
+  data longblob,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  INDEX ix_name (name)
+)

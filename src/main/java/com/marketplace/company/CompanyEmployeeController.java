@@ -57,6 +57,8 @@ public class CompanyEmployeeController {
         return new ResponseEntity<BrokerProfileResponse>(HttpStatus.CREATED);
     }
 
+    //TODO: Add image - should not be mandatory
+    //TODO: Verified broker flag - this should be used to
     @RolesAllowed({UserRole.ROLE_BROKER})
     @PostMapping
     public ResponseEntity<Void> addEmployeeToCompany(@PathVariable final String companyId,

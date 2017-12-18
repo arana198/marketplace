@@ -239,4 +239,6 @@ class UserServiceImpl implements UserService {
         userBO.getRoles().add(userRoleBO);
         userRepository.save(userBO);
     }
+
+    //TODO: User Status validator
 }

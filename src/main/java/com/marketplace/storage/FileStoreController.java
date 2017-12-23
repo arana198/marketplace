@@ -1,5 +1,6 @@
 package com.marketplace.storage;
 
+import com.marketplace.common.security.AuthUser;
 import com.marketplace.storage.dto.FileResponse;
 import com.marketplace.storage.exception.FileNotFoundException;
 import com.marketplace.storage.service.FileStoreService;
@@ -26,14 +27,14 @@ public class FileStoreController {
     @RequestMapping(value = "/{fileId}", method = RequestMethod.GET)
     public ResponseEntity<FileResponse> downloadDocument(@PathVariable final String fileId) throws IOException, FileNotFoundException {
 
-        final FileResponse document = fileStoreService.findById(fileId)
+        final FileResponse document = fileStoreService.findById(AuthUser.getUserId(), fileId)
                 .orElseThrow(() -> new FileNotFoundException(fileId));
 
         final HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
-        responseHeaders.add(HttpHeaders.CONTENT_TYPE, document.getType());
+        responseHeaders.add(HttpHeaders.CONTENT_TYPE, document.getFormat());
         responseHeaders.add(HttpHeaders.CONTENT_LENGTH, Long.toString(document.getFile().length));
 
         return new ResponseEntity(document.getFile(), responseHeaders, HttpStatus.OK);
-    } //TODO: Need to add access control
+    }
 }

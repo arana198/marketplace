@@ -79,8 +79,8 @@ class UserServiceImpl implements UserService {
         tokenRevoker.revoke(principal.getName());
     }
 
-    @Override
     @Transactional
+    @Override
     public void createUser(final UserRequest userRequest, final UserType userType) throws UserAlreadyExistsException {
 
         log.debug("Creating user {}", userRequest.getEmail());
@@ -99,6 +99,7 @@ class UserServiceImpl implements UserService {
         emailVerificationTokenService.createToken(userBO);
     }
 
+    @Transactional
     @Override
     public void createUser(final SocialUserRequest socialUserRequest) throws UserAlreadyExistsException {
         log.debug("Creating social user {}", socialUserRequest.getEmail());
@@ -123,8 +124,8 @@ class UserServiceImpl implements UserService {
                 .ifPresent(userPasswordTokenService::createToken);
     }
 
-    @Override
     @Transactional
+    @Override
     public void resetPassword(final ForgottenPasswordRequest forgottenPasswordRequest)
             throws UserPasswordTokenNotFoundException, UserNotFoundException {
 

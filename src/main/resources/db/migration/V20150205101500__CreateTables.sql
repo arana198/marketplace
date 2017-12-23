@@ -158,6 +158,7 @@ CREATE TABLE IF NOT EXISTS companies (
   name varchar(255) NOT NULL,
   company_number varchar(15) NOT NULL,
   vat_number varchar(15) NOT NULL,
+  fca_number varchar(15) NOT NULL,
   logo_url varchar(500) NULL,
   website_url varchar(500) NULL,
   is_active bit(1) NOT NULL,
@@ -221,11 +222,13 @@ CREATE TABLE IF NOT EXISTS email_notifications (
   CHECK (JSON_VALID(email))
 );
 
+/*Files*/
 CREATE TABLE IF NOT EXISTS file_store (
   id varchar(36) NOT NULL PRIMARY KEY,
   name varchar(128) NOT NULL,
   description TEXT NULL,
   type varchar(100) NOT NULL,
+  format varchar(100) NOT NULL,
   data longblob,
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_ts TIMESTAMP NOT NULL DEFAULT now(),

@@ -43,8 +43,6 @@ public class BrokerProfileBO extends AbstractAuditEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active;
 
-    //TODO: Personal details - address?
-    //TODO: billing if independant
     //TODO: Documents submission i.e CeMap certificate
     //TODO: ACTIVE user status - billing + certificate 
     //TODO: Making a user status active once everything is provided

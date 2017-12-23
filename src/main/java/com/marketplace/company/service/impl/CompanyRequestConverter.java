@@ -14,6 +14,7 @@ class CompanyRequestConverter implements BaseConverter<CompanyRequest, CompanyBO
                 .setName(source.getName())
                 .setCompanyNumber(source.getCompanyNumber())
                 .setVatNumber(source.getVatNumber())
+                .setFcaNumber(source.getFcaNumber())
                 .setLogoUrl(source.getLogoUrl())
                 .setWebsiteUrl(source.getWebsiteUrl())
                 .setActive(source.isActive());

@@ -260,6 +260,4 @@ class BrokerServiceImpl implements BrokerService {
                         companyEmployeeInviteRequest.getEmail(),
                         companyEmployeeInviteBO.getToken()));
     }
-
-    //TODO: Need to think about individual brokers who may want to sign up
 }

@@ -1,4 +1,4 @@
-package com.marketplace.storage.compress;
+package com.marketplace.storage.utils;
 
 import org.apache.commons.io.IOUtils;
 

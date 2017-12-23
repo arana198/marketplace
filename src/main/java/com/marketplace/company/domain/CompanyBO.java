@@ -25,6 +25,9 @@ public class CompanyBO extends AbstractAuditEntity {
     @Column(name = "vat_number", nullable = false)
     private String vatNumber;
 
+    @Column(name = "fca_number", nullable = false)
+    private String fcaNumber;
+
     @Column(name = "logo_url")
     private String logoUrl;
 

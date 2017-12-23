@@ -25,8 +25,11 @@ public class FileStoreBO extends AbstractEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     private String type;
+
+    @Column(name = "format", nullable = false)
+    private String format;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)

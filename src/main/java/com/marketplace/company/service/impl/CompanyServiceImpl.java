@@ -78,7 +78,7 @@ class CompanyServiceImpl implements CompanyService {
             throw new BadRequestException("Invalid company number");
         }
 
-        //TODO: FCA Number integration
+        //TODO: FCA Number API integration
         CompanyBO companyBO = companyRequestConverter.convert(company);
         companyBO = companyRepository.save(companyBO);
 

@@ -1,7 +1,7 @@
 package com.marketplace.storage.service.impl;
 
 import com.marketplace.common.converter.BaseConverter;
-import com.marketplace.storage.compress.CompressorUtils;
+import com.marketplace.storage.utils.CompressorUtils;
 import com.marketplace.storage.dto.FileResponse;
 import com.marketplace.storage.domain.FileStoreBO;
 import org.springframework.stereotype.Service;
@@ -17,6 +17,7 @@ class FileReponseConverter implements BaseConverter<FileStoreBO, FileResponse> {
                 source.getId(),
                 source.getName(),
                 source.getType(),
+                source.getFormat(),
                 CompressorUtils.decompress(source.getData()));
     }
 }

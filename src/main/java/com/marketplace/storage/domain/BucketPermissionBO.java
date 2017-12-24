@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "file_store_permission")
+@Table(name = "bucket_permissions")
 public class BucketPermissionBO extends AbstractEntity {
 
     @OneToOne

@@ -4,6 +4,7 @@ import com.marketplace.storage.domain.BucketFilesBO;
 import com.marketplace.storage.domain.FileStoreBO;
 import com.marketplace.storage.dto.BucketResponse;
 import com.marketplace.storage.dto.FileRequest;
+import com.marketplace.storage.dto.FileRequest.FileType;
 import com.marketplace.storage.dto.FileResponse;
 import com.marketplace.storage.service.BucketService;
 import com.marketplace.storage.service.FileStoreService;
@@ -30,7 +31,7 @@ class FileStoreServiceImpl implements FileStoreService {
     public FileResponse store(final FileRequest fileRequest, final MultipartFile file) throws IOException {
         final BucketResponse bucketResponse = bucketService.getOrCreate(fileRequest.getBucket());
         final FileStoreBO fileStoreBO = fileRequestConverter.convert(fileRequest, file);
-        final BucketFilesBO bucketFileBO = this.createBucketFileBO(bucketResponse.getBucketId(), fileStoreBO);
+        final BucketFilesBO bucketFileBO = this.createBucketFileBO(bucketResponse.getBucketId(), fileStoreBO, fileRequest.getFileType());
 
         fileStoreRepository.save(fileStoreBO);
         bucketFileRepository.save(bucketFileBO);
@@ -51,19 +52,10 @@ class FileStoreServiceImpl implements FileStoreService {
                 });
     }
 
-    private BucketFilesBO createBucketFileBO(final String bucketId, final FileStoreBO fileStoreBO) {
+    private BucketFilesBO createBucketFileBO(final String bucketId, final FileStoreBO fileStoreBO, final FileType fileType) {
         return new BucketFilesBO()
                 .setBucketId(bucketId)
-                .setFileStore(fileStoreBO);
-
-        //TODO: Need to know how to make public/restricted
-            /*
-    Profile Pictures - visible to everyone
-    mortgage documents - client + broker + company admin
-    broker documents - broker + company admin
-
-
-    bucket -> mortgage application/user/company
-     */
+                .setFileStore(fileStoreBO)
+                .setUnrestricted(fileType.isPublic());
     }
 }

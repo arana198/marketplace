@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS email_notifications (
 );
 
 /*Files*/
-CREATE TABLE IF NOT EXISTS file_store (
+CREATE TABLE IF NOT EXISTS file_stores (
   id varchar(36) NOT NULL PRIMARY KEY,
   name varchar(128) NOT NULL,
   description TEXT NULL,
@@ -233,4 +233,36 @@ CREATE TABLE IF NOT EXISTS file_store (
   created_ts TIMESTAMP NOT NULL DEFAULT now(),
   updated_ts TIMESTAMP NOT NULL DEFAULT now(),
   INDEX ix_name (name)
-)
+);
+
+CREATE TABLE IF NOT EXISTS buckets (
+  id varchar(36) NOT NULL PRIMARY KEY,
+  type varchar(100) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  INDEX ix_name (type)
+);
+
+CREATE TABLE IF NOT EXISTS bucket_permissions (
+  id BIGINT(11) NOT NULL AUTO_INCREMENT,
+  bucket_id varchar(36) NOT NULL,
+  user_id varchar(36) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_bucket_user (bucket_id, user_id),
+  CONSTRAINT fk_buckets_bucket_permissions FOREIGN KEY (bucket_id) REFERENCES buckets (id)
+);
+
+CREATE TABLE IF NOT EXISTS bucket_files (
+  id BIGINT(11) NOT NULL AUTO_INCREMENT,
+  bucket_id varchar(36) NOT NULL,
+  file_store_id varchar(36) NOT NULL,
+  is_public bit(1) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_bucket_id_file_store_id (bucket_id, file_store_id),
+  CONSTRAINT fk_buckets_bucket_permissions FOREIGN KEY (bucket_id) REFERENCES buckets (id),
+  CONSTRAINT fk_buckets_file_stores FOREIGN KEY (file_store_id) REFERENCES file_stores (id)
+);

@@ -19,7 +19,7 @@ import java.util.Set;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "bucket")
+@Table(name = "buckets")
 public class BucketBO extends AbstractEntity {
 
     @Column(name = "type", nullable = false)

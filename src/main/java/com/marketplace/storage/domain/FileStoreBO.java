@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"id"})
 @Entity
-@Table(name = "file_store")
+@Table(name = "file_stores")
 public class FileStoreBO extends AbstractEntity {
 
     @Column(name = "name", nullable = false)

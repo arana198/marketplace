@@ -16,13 +16,16 @@ import javax.validation.constraints.NotNull;
 public class FileRequest {
 
     public enum FileType {
-        PROFILE_IMAGE("PROFILE_IMAGE"),
-        BROKER_CERTIFICATE("BROKER_CERTIFICATE");
+        PROFILE_IMAGE("PROFILE_IMAGE", true),
+        MORTGAGE_APPLICATION_DOCUMENT("MORTGAGE_APPLICATION_DOCUMENT", false),
+        BROKER_CERTIFICATE("BROKER_CERTIFICATE", false);
 
-        private String value;
+        private final String value;
+        private final boolean unrestricted;
 
-        FileType(String value) {
+        FileType(final String value, final boolean unrestricted) {
             this.value = value;
+            this.unrestricted = unrestricted;
         }
 
         public static FileType getRoleFromString(String value) {
@@ -38,6 +41,10 @@ public class FileRequest {
         public String getValue() {
             return this.value;
         }
+
+        public boolean isPublic() {
+            return unrestricted;
+        }
     }
 
     @Valid
@@ -52,8 +59,6 @@ public class FileRequest {
 
     @NotNull(message = "fileType is mandatory")
     private final FileType fileType;
-
-    private final boolean show;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class FileRequestBuilder {

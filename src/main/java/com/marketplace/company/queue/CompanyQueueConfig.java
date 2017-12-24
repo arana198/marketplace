@@ -1,4 +1,4 @@
-package com.marketplace.queue;
+package com.marketplace.company.queue;
 
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Binding;
@@ -24,7 +24,7 @@ import org.springframework.messaging.MessageHandler;
 @Configuration
 @EnableIntegration
 @IntegrationComponentScan
-public class QueueConfig {
+public class CompanyQueueConfig {
 
     @Autowired
     private AmqpTemplate amqpTemplate;
@@ -32,40 +32,41 @@ public class QueueConfig {
     @Value("${exchange.name}")
     private String exchangeName;
 
-    @Value("user-${environment.name}")
+    @Value("company-${environment.name}")
     private String queueName;
 
-    @Bean
+    @Bean("companyQueue")
     public Queue queue() {
         return new Queue(queueName, true);
     }
 
-    @Bean
+    @Bean("companyExchange")
     public FanoutExchange exchange() {
         return new FanoutExchange(exchangeName);
     }
 
-    @Bean
-    public MessageChannel publishSubscribeChannel() {
+    @Bean("companyMessageChannel")
+    public MessageChannel messageChannel() {
         return new PublishSubscribeChannel();
     }
 
-    @Bean(value = "userBinding")
-    public Binding binding(final Queue queue, final FanoutExchange exchange) {
+    @Bean(value = "companyBinding")
+    public Binding binding(@Qualifier("companyQueue") final Queue queue,
+                           @Qualifier("companyExchange") final FanoutExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange);
     }
 
-    @Bean
-    public IntegrationFlow amqpOutboundFlow(final MessageChannel publishSubscribeChannel) {
+    @Bean("companyAmqpOutboundFlow")
+    public IntegrationFlow amqpOutboundFlow(@Qualifier("companyMessageChannel") final MessageChannel publishSubscribeChannel) {
         return IntegrationFlows.from(publishSubscribeChannel)
                 .handleWithAdapter(h -> h.amqp(amqpTemplate).exchangeName(exchangeName))
                 .get();
     }
 
-    @Bean
+    @Bean("companyAmqpInboundFlow")
     public IntegrationFlow amqpInboundFlow(final ConnectionFactory rabbitConnectionFactory,
-                                           final MessageSelector messageSelector,
-                                           @Qualifier("messageHandlerImpl") final MessageHandler messageHandler) {
+                                           @Qualifier("companyQueueFilterImpl") final MessageSelector messageSelector,
+                                           @Qualifier("companyMessageHandlerImpl") final MessageHandler messageHandler) {
         return IntegrationFlows
                 .from(Amqp.inboundAdapter(rabbitConnectionFactory, this.queue()))
                 .filter(messageSelector)

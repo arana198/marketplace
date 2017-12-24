@@ -9,8 +9,8 @@ import com.marketplace.profile.exception.UserProfileAlreadyExistsException;
 import com.marketplace.profile.exception.UserProfileNotFoundException;
 import com.marketplace.profile.exception.UsernameAlreadyExistsException;
 import com.marketplace.profile.service.UserProfileService;
-import com.marketplace.queue.publish.PublishService;
-import com.marketplace.queue.publish.domain.PublishAction;
+import com.marketplace.profile.queue.publish.ProfilePublishService;
+import com.marketplace.profile.queue.publish.domain.ProfilePublishAction;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.exception.UserNotFoundException;
 import com.marketplace.user.service.UserService;
@@ -29,7 +29,7 @@ class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final UserProfileRequestConverter userProfileRequestConverter;
     private final UserService userService;
-    private final PublishService publishService;
+    private final ProfilePublishService publishService;
 
     @Override
     public Optional<UserProfileResponse> findByUserId(final String userId) {
@@ -61,7 +61,7 @@ class UserProfileServiceImpl implements UserProfileService {
         log.info("User company created [ {} ]", userId);
 
         final UserProfileResponse userProfileResponse = userProfileResponseConverter.convert(userProfileBO);
-        publishService.sendMessage(PublishAction.USER_PROFILE_CREATED, userProfileResponse);
+        publishService.sendMessage(ProfilePublishAction.USER_PROFILE_CREATED, userProfileResponse);
         return userProfileResponse;
     }
 
@@ -78,6 +78,6 @@ class UserProfileServiceImpl implements UserProfileService {
 
         final UserProfileBO newUserProfile = userProfileRequestConverter.convert(existingUserProfile, userProfile);
         userProfileRepository.save(newUserProfile);
-        publishService.sendMessage(PublishAction.USER_PROFILE_UPDATED, userProfileResponseConverter.convert(newUserProfile));
+        publishService.sendMessage(ProfilePublishAction.USER_PROFILE_UPDATED, userProfileResponseConverter.convert(newUserProfile));
     }
 }

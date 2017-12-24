@@ -9,11 +9,11 @@ import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.exception.BrokerAlreadyRegisteredException;
 import com.marketplace.company.exception.CompanyAlreadyExistsException;
 import com.marketplace.company.exception.CompanyNotFoundException;
+import com.marketplace.company.queue.publish.CompanyPublishService;
+import com.marketplace.company.queue.publish.domain.CompanyPublishAction;
 import com.marketplace.company.service.CompanyService;
 import com.marketplace.company.validator.CompanyValidator;
 import com.marketplace.company.validator.VATValidator;
-import com.marketplace.queue.publish.PublishService;
-import com.marketplace.queue.publish.domain.PublishAction;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ class CompanyServiceImpl implements CompanyService {
     private final BrokerProfileRequestConverter brokerProfileRequestConverter;
     private final VATValidator vatValidator;
     private final CompanyValidator companyValidator;
-    private final PublishService publishService;
+    private final CompanyPublishService publishService;
 
     @Override
     public Page<CompanyResponse> findAll(final String companyName, final Pageable pageable) {
@@ -89,7 +89,7 @@ class CompanyServiceImpl implements CompanyService {
         brokerProfileBO.setAdmin(true);
 
         brokerProfileRepository.save(brokerProfileBO);
-        publishService.sendMessage(PublishAction.COMPANY_CREATED, companyResponse);
+        publishService.sendMessage(CompanyPublishAction.COMPANY_CREATED, companyResponse);
 
         return companyResponse;
     }
@@ -117,6 +117,6 @@ class CompanyServiceImpl implements CompanyService {
         newCompanyBO.update(oldCompany);
         newCompanyBO = companyRepository.save(newCompanyBO);
         final CompanyResponse companyResponse = companyResponseConverter.convert(newCompanyBO);
-        publishService.sendMessage(PublishAction.COMPANY_UPDATED, companyResponse);
+        publishService.sendMessage(CompanyPublishAction.COMPANY_UPDATED, companyResponse);
     }
 }

@@ -1,7 +1,7 @@
-package com.marketplace.queue.publish;
+package com.marketplace.profile.queue.publish;
 
 import com.google.gson.Gson;
-import com.marketplace.queue.publish.domain.PublishAction;
+import com.marketplace.profile.queue.publish.domain.ProfilePublishAction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.MessageChannel;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-class PublishServiceImpl implements PublishService {
+class ProfilePublishServiceImpl implements ProfilePublishService {
 
     private static final String APPLICATION_NAME = "marketplace";
 
@@ -21,13 +21,15 @@ class PublishServiceImpl implements PublishService {
 
     private final Gson gson;
 
-    PublishServiceImpl(@Qualifier("publishSubscribeChannel") final MessageChannel messageChannel) {
+    ProfilePublishServiceImpl(@Qualifier("profileMessageChannel") final MessageChannel messageChannel,
+                              final Gson gson) {
+
         this.messageChannel = messageChannel;
-        this.gson = new Gson();
+        this.gson = gson;
     }
 
     @Override
-    public void sendMessage(final PublishAction action, final Object object) {
+    public void sendMessage(final ProfilePublishAction action, final Object object) {
         log.info("Publishing with routing key {}", action);
         final String json = gson.toJson(object);
 

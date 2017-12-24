@@ -1,13 +1,13 @@
 package com.marketplace.storage.service.impl;
 
 import com.marketplace.company.dto.BrokerProfileResponse;
-import com.marketplace.queue.publish.PublishService;
-import com.marketplace.queue.publish.domain.PublishAction;
 import com.marketplace.storage.domain.BucketBO;
 import com.marketplace.storage.domain.BucketPermissionBO;
 import com.marketplace.storage.dto.BucketPermissionResponse;
 import com.marketplace.storage.dto.BucketRequest;
 import com.marketplace.storage.dto.BucketResponse;
+import com.marketplace.storage.queue.publish.StoragePublishService;
+import com.marketplace.storage.queue.publish.domain.StoragePublishAction;
 import com.marketplace.storage.service.BucketService;
 import lombok.Data;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ class BucketServiceImpl implements BucketService {
     private final BucketRepository bucketRepository;
     private final BucketRequestConverter bucketRequestConverter;
     private final BucketReponseConverter bucketReponseConverter;
-    private final PublishService publishService;
+    private final StoragePublishService publishService;
 
     @Override
     public BucketResponse getOrCreate(final BucketRequest bucketRequest) {
@@ -30,7 +30,7 @@ class BucketServiceImpl implements BucketService {
                 .orElseGet(() -> {
                     final BucketBO newBucket = bucketRequestConverter.convert(bucketRequest);
                     bucketRepository.save(newBucket);
-                    publishService.sendMessage(PublishAction.BUCKET_CREATED, bucketReponseConverter.convert(newBucket));
+                    publishService.sendMessage(StoragePublishAction.BUCKET_CREATED, bucketReponseConverter.convert(newBucket));
                     return newBucket;
                 });
 

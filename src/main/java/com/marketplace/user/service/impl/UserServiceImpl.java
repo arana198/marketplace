@@ -1,8 +1,8 @@
 package com.marketplace.user.service.impl;
 
 import com.marketplace.common.exception.InternalServerException;
-import com.marketplace.queue.publish.PublishService;
-import com.marketplace.queue.publish.domain.PublishAction;
+import com.marketplace.user.queue.publish.UserPublishService;
+import com.marketplace.user.queue.publish.domain.UserPublishAction;
 import com.marketplace.user.domain.RoleBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.domain.UserRoleBO;
@@ -48,7 +48,7 @@ class UserServiceImpl implements UserService {
     private final UserResponseConverter userResponseConverter;
     private final UserRequestConverter userRequestConverter;
     private final SocialUserRequestConverter socialUserRequestConverter;
-    private final PublishService publishService;
+    private final UserPublishService publishService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -94,7 +94,7 @@ class UserServiceImpl implements UserService {
         this.addUserRoleBO(userBO, role, LoginProvider.LOCAL.getValue().toString(), null, UserStatus.PENDING.getValue());
         final UserResponse newUser = userResponseConverter.convert(userBO);
 
-        PublishAction publishAction = userType == UserType.COMPANY_ADMIN ? PublishAction.COMPANY_ADMIN_USER_CREATED : PublishAction.BROKER_USER_CREATED;
+        UserPublishAction publishAction = userType == UserType.COMPANY_ADMIN ? UserPublishAction.COMPANY_ADMIN_USER_CREATED : UserPublishAction.BROKER_USER_CREATED;
         publishService.sendMessage(publishAction, newUser);
         emailVerificationTokenService.createToken(userBO);
     }
@@ -115,7 +115,7 @@ class UserServiceImpl implements UserService {
         final UserResponse newUser = userResponseConverter.convert(userBO)
                 .setProfileImageUrl(socialUserRequest.getProfileImageUrl());
 
-        publishService.sendMessage(PublishAction.USER_CREATED, newUser);
+        publishService.sendMessage(UserPublishAction.USER_CREATED, newUser);
     }
 
     @Override
@@ -164,7 +164,7 @@ class UserServiceImpl implements UserService {
                 .map(user -> user.setEmailVerified(true))
                 .ifPresent(user -> {
                     userRepository.save(user);
-                    publishService.sendMessage(PublishAction.EMAIL_VERIFIED, userResponseConverter.convert(user));
+                    publishService.sendMessage(UserPublishAction.EMAIL_VERIFIED, userResponseConverter.convert(user));
                 });
     }
 
@@ -200,7 +200,7 @@ class UserServiceImpl implements UserService {
 
                     userRepository.save(userBO);
                     tokenRevoker.revoke(userId);
-                    publishService.sendMessage(PublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
+                    publishService.sendMessage(UserPublishAction.USER_STATUS_UPDATED, userResponseConverter.convert(userBO));
                 });
     }
 

@@ -13,10 +13,10 @@ import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
 import com.marketplace.company.exception.BrokerNotFoundException;
 import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;
+import com.marketplace.company.queue.publish.CompanyPublishService;
 import com.marketplace.company.service.BrokerService;
 import com.marketplace.company.service.CompanyService;
-import com.marketplace.queue.publish.PublishService;
-import com.marketplace.queue.publish.domain.PublishAction;
+import com.marketplace.company.queue.publish.domain.CompanyPublishAction;
 import com.marketplace.user.dto.RoleRequest.UserRole;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.service.UserService;
@@ -46,7 +46,7 @@ class BrokerServiceImpl implements BrokerService {
     private final UserService userService;
     private final BrokerProfileResponseConverter brokerProfileResponseConverter;
     private final BrokerProfileRequestConverter brokerProfileRequestConverter;
-    private final PublishService publishService;
+    private final CompanyPublishService publishService;
 
     @Override
     public Optional<BrokerProfileResponse> findByUserId(final String userId) {
@@ -121,7 +121,7 @@ class BrokerServiceImpl implements BrokerService {
 
         companyEmployeeInviteRepository.delete(companyEmployeeInviteBO);
         brokerProfileRepository.save(brokerProfileBO);
-        publishService.sendMessage(PublishAction.BROKER_ADDED_TO_COMPANY, brokerProfileResponseConverter.convert(brokerProfileBO));
+        publishService.sendMessage(CompanyPublishAction.BROKER_ADDED_TO_COMPANY, brokerProfileResponseConverter.convert(brokerProfileBO));
 
         //TODO: Once the event is published need to check user so we know old user was activated or not - Validator
         return brokerProfileResponseConverter.convert(brokerProfileBO);
@@ -188,8 +188,7 @@ class BrokerServiceImpl implements BrokerService {
                     log.debug("Removing broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
                     bp.setActive(false);
                     brokerProfileRepository.save(bp);
-                    userService.removeAsCompanyAdmin(bp.getUserId());
-                    publishService.sendMessage(PublishAction.BROKER_REMOVED_FROM_COMPANY, brokerProfileResponseConverter.convert(bp));
+                    publishService.sendMessage(CompanyPublishAction.BROKER_REMOVED_FROM_COMPANY, brokerProfileResponseConverter.convert(bp));
                 });
     }
 
@@ -205,8 +204,7 @@ class BrokerServiceImpl implements BrokerService {
                     log.debug("Adding broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
                     bp.setAdmin(true);
                     brokerProfileRepository.save(bp);
-                    userService.addAsCompanyAdmin(bp.getUserId());
-                    publishService.sendMessage(PublishAction.BROKER_ADDED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
+                    publishService.sendMessage(CompanyPublishAction.BROKER_ADDED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
                 });
     }
 
@@ -233,8 +231,7 @@ class BrokerServiceImpl implements BrokerService {
                     log.debug("Removing broker [ {} ] from the company [ {} ]", brokerProfileId, companyId);
                     bp.setAdmin(false);
                     brokerProfileRepository.save(bp);
-                    userService.removeAsCompanyAdmin(bp.getUserId());
-                    publishService.sendMessage(PublishAction.BROKER_REMOVED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
+                    publishService.sendMessage(CompanyPublishAction.BROKER_REMOVED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
                 });
     }
 
@@ -254,7 +251,7 @@ class BrokerServiceImpl implements BrokerService {
                         .setToken(UUID.randomUUID().toString()));
 
         companyEmployeeInviteRepository.save(companyEmployeeInviteBO);
-        publishService.sendMessage(PublishAction.INVITE_BROKER,
+        publishService.sendMessage(CompanyPublishAction.INVITE_BROKER,
                 new InviteBrokerTokenVerificationResponse(companyId,
                         companyResponse.getName(),
                         companyEmployeeInviteRequest.getEmail(),

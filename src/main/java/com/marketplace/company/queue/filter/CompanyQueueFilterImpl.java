@@ -1,4 +1,4 @@
-package com.marketplace.queue.filter;
+package com.marketplace.company.queue.filter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-class QueueFilterImpl implements MessageSelector {
+class CompanyQueueFilterImpl implements MessageSelector {
 
     @ServiceActivator
     @Override

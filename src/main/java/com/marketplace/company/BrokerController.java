@@ -10,31 +10,37 @@ import com.marketplace.company.dto.BrokerProfileRequest;
 import com.marketplace.company.dto.BrokerProfileResponse;
 import com.marketplace.company.dto.CompanyEmployeeInviteRequest;
 import com.marketplace.company.dto.CompanyEmployeeInviteTokenRequest;
+import com.marketplace.company.exception.BrokerNotFoundException;
 import com.marketplace.company.service.BrokerService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 
 @Data
 @Slf4j
 @Controller
 @RequestMapping("/companies/{companyId}/brokers")
-public class CompanyEmployeeController {
+public class BrokerController {
 
     private final BrokerService brokerService;
 
@@ -57,8 +63,19 @@ public class CompanyEmployeeController {
         return new ResponseEntity<BrokerProfileResponse>(HttpStatus.CREATED);
     }
 
-    //TODO: Add image - should not be mandatory
-    //TODO: Verified broker flag - this should be used to
+    @PreAuthorize("@securityUtils.isCompanyEmployee(#companyId, #brokerId)")
+    @RolesAllowed({UserRole.ROLE_BROKER})
+    @GetMapping(path = "/{brokerId}")
+    public ResponseEntity<BrokerProfileResponse> getBrokerProfile(@PathVariable final String companyId,
+                                                                  @PathVariable final String brokerId)
+            throws ResourceNotFoundException {
+
+        BrokerProfileResponse brokerProfileResponse = brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerId)
+                .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerId));
+
+        return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
+    }
+
     @RolesAllowed({UserRole.ROLE_BROKER})
     @PostMapping
     public ResponseEntity<Void> addEmployeeToCompany(@PathVariable final String companyId,
@@ -71,7 +88,7 @@ public class CompanyEmployeeController {
             throw new BadRequestException("Invalid company object", bindingResult);
         }
 
-        final BrokerProfileResponse brokerProfileResponse = brokerService.addBrokerToCompany(companyId, companyEmployeeInviteTokenRequest);
+        final BrokerProfileResponse brokerProfileResponse = brokerService.addBrokerToCompany(AuthUser.getUserId(), companyId, companyEmployeeInviteTokenRequest);
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{brokerId}")
                 .buildAndExpand(brokerProfileResponse.getBrokerProfileId()).toUri();
@@ -79,8 +96,6 @@ public class CompanyEmployeeController {
         return ResponseEntity.created(location).build();
     }
 
-    @IsActive
-    @PreAuthorize("@securityUtils.isCompanyEmployee(#companyId, #brokerId)")
     @RolesAllowed({UserRole.ROLE_BROKER})
     @PutMapping(path = "/{brokerId}")
     public ResponseEntity<Void> updateBrokerInCompany(@PathVariable final String companyId,
@@ -89,13 +104,12 @@ public class CompanyEmployeeController {
                                                       final BindingResult bindingResult)
             throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-        //TODO: Needs investigation - unless active the broker cannot call the PUT endpoint
         log.info("Updating broker: {} for comapny: ", brokerId, companyId);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Invalid company object", bindingResult);
         }
 
-        brokerService.updateBrokerProfile(companyId, brokerId, brokerProfileRequest);
+        brokerService.updateBrokerProfile(AuthUser.getUserId(), companyId, brokerId, brokerProfileRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -136,5 +150,19 @@ public class CompanyEmployeeController {
         log.info("Add admin broker {} for company: {}", brokerId, companyId);
         brokerService.addAdminBrokerForCompany(companyId, brokerId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RolesAllowed({UserRole.ROLE_BROKER})
+    @PutMapping(path = "/{brokerId}/profileimages", consumes = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public ResponseEntity<BrokerProfileResponse> addOrUpdateProfileImage(@PathVariable final String companyId,
+                                                                         @PathVariable final String brokerId,
+                                                                         @RequestPart(name = "file") final MultipartFile multipartFile,
+                                                                         final BindingResult bindingResult)
+            throws ResourceNotFoundException, IOException {
+
+        log.info("Updating broker: {} for company: ", brokerId, companyId);
+
+        BrokerProfileResponse brokerProfileResponse = brokerService.addOrUpdateImage(AuthUser.getUserId(), companyId, brokerId, multipartFile);
+        return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
     }
 }

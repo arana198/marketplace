@@ -191,6 +191,8 @@ class UserServiceImpl implements UserService {
                         newUserStatus = UserStatus.PENDING.getValue();
                     } else if (UserStatus.CLOSED.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE) {
                         newUserStatus = UserStatus.ACTIVE.getValue();
+                    } else if (UserStatus.PENDING.getValue().equalsIgnoreCase(oldUserStatus) && userStatus == UserStatus.ACTIVE) {
+                        newUserStatus = UserStatus.ACTIVE.getValue();
                     } else {
                         throw new InternalServerException("Incorrect user status");
                     }
@@ -240,6 +242,4 @@ class UserServiceImpl implements UserService {
         userBO.getRoles().add(userRoleBO);
         userRepository.save(userBO);
     }
-
-    //TODO: User Status validator
 }

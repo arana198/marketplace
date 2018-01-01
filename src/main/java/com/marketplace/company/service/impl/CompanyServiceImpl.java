@@ -79,7 +79,9 @@ class CompanyServiceImpl implements CompanyService {
         }
 
         //TODO: FCA Number API integration
-        CompanyBO companyBO = companyRequestConverter.convert(company);
+        CompanyBO companyBO = companyRequestConverter.convert(company)
+                .setActive(false);
+
         companyBO = companyRepository.save(companyBO);
 
         final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
@@ -95,7 +97,9 @@ class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void updateCompany(final String companyId, final CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException {
+    public void updateCompany(final String companyId, final CompanyRequest companyRequest)
+            throws CompanyNotFoundException, CompanyAlreadyExistsException {
+
         final CompanyBO oldCompany = companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
@@ -105,18 +109,49 @@ class CompanyServiceImpl implements CompanyService {
             throw new CompanyAlreadyExistsException(companyRequest.getName());
         }
 
-        if (!oldCompany.getVatNumber().equalsIgnoreCase(companyRequest.getVatNumber()) && !vatValidator.validate(companyRequest.getName(), companyRequest.getVatNumber())) {
+        if (!oldCompany.getVatNumber().equalsIgnoreCase(companyRequest.getVatNumber())
+                && !vatValidator.validate(companyRequest.getName(), companyRequest.getVatNumber())) {
+
             throw new BadRequestException("Invalid VAT number");
         }
 
-        if (!oldCompany.getCompanyNumber().equalsIgnoreCase(companyRequest.getCompanyNumber()) && !companyValidator.validate(companyRequest.getName(), companyRequest.getCompanyNumber())) {
+        if (!oldCompany.getCompanyNumber().equalsIgnoreCase(companyRequest.getCompanyNumber())
+                && !companyValidator.validate(companyRequest.getName(), companyRequest.getCompanyNumber())) {
+
             throw new BadRequestException("Invalid company number");
         }
 
         CompanyBO newCompanyBO = companyRequestConverter.convert(companyRequest);
+
+        if (!oldCompany.getFcaNumber().equalsIgnoreCase(companyRequest.getFcaNumber())) {
+            newCompanyBO.setFcaNumberVerified(false);
+            newCompanyBO.setActive(false);
+        } else if (!oldCompany.isFcaNumberVerified() && newCompanyBO.isActive()) {
+            newCompanyBO.setActive(false);
+        }
+
         newCompanyBO.update(oldCompany);
         newCompanyBO = companyRepository.save(newCompanyBO);
         final CompanyResponse companyResponse = companyResponseConverter.convert(newCompanyBO);
+
+        if (oldCompany.isActive() && !newCompanyBO.isActive()) {
+            publishService.sendMessage(CompanyPublishAction.COMPANY_INACTIVATED, companyResponse);
+        }
+
         publishService.sendMessage(CompanyPublishAction.COMPANY_UPDATED, companyResponse);
+    }
+
+    //TODO: If company inactivated then inactivate brokers for that company
+    //TODO: If company activated then activate brokers for that company
+
+    @Override
+    public void verifyCompany(final String companyId) throws CompanyNotFoundException {
+        final CompanyBO companyBO = companyRepository.findById(companyId)
+                .orElseThrow(() -> new CompanyNotFoundException(companyId));
+
+        companyBO.setFcaNumberVerified(true);
+        companyBO.setActive(true);
+        companyRepository.save(companyBO);
+        publishService.sendMessage(CompanyPublishAction.COMPANY_ACTIVATED, companyResponseConverter.convert(companyBO));
     }
 }

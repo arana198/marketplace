@@ -7,7 +7,16 @@ import java.util.stream.Stream;
 
 @Getter
 public enum CompanyConsumeAction {
+
+    //USER
+    USER_STATUS_UPDATED("USER_STATUS_UPDATED"),
+
+    //COMPANY
+    COMPANY_ACTIVATED("COMPANY_ACTIVATED"),
+    COMPANY_INACTIVATED("COMPANY_INACTIVATED"),
+
     //DOCUMENT
+    BROKER_CERTIFICATE_VERIFIED("BROKER_CERTIFICATE_VERIFIED"),
     BUCKET_CREATED("BUCKET_CREATED");
 
     private final String value;

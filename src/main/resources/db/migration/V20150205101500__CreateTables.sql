@@ -159,6 +159,7 @@ CREATE TABLE IF NOT EXISTS companies (
   company_number varchar(15) NOT NULL,
   vat_number varchar(15) NOT NULL,
   fca_number varchar(15) NOT NULL,
+  fca_number_verified bit(1) NOT NULL,
   logo_url varchar(500) NULL,
   website_url varchar(500) NULL,
   is_active bit(1) NOT NULL,

@@ -1,13 +1,18 @@
 package com.marketplace.company.queue.consume;
 
 import com.google.gson.Gson;
+import com.marketplace.company.dto.BrokerDocumentResponse;
 import com.marketplace.company.dto.BrokerProfileResponse;
 import com.marketplace.company.queue.publish.CompanyPublishService;
 import com.marketplace.company.queue.publish.domain.CompanyPublishAction;
 import com.marketplace.company.service.BrokerService;
+import com.marketplace.company.service.BrokerValidatorService;
 import com.marketplace.storage.dto.BucketPermissionResponse;
 import com.marketplace.storage.dto.BucketRequest;
 import com.marketplace.storage.dto.BucketResponse;
+import com.marketplace.user.dto.RoleRequest.UserRole;
+import com.marketplace.user.dto.UserResponse;
+import com.marketplace.user.dto.UserStatusRequest.UserStatus;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +31,7 @@ class CompanyMessageHandlerImpl implements MessageHandler {
 
     private final Gson gson;
     private final BrokerService brokerService;
+    private final BrokerValidatorService brokerValidatorService;
     private final CompanyPublishService publishService;
 
     @Override
@@ -49,7 +55,7 @@ class CompanyMessageHandlerImpl implements MessageHandler {
                             index++;
                         } while (brokerProfiles.hasNext());
 
-                    } else if (BucketRequest.BucketType.USER.getValue().equalsIgnoreCase(bucketResponse.getType())) {
+                    } else if (BucketRequest.BucketType.BROKER.getValue().equalsIgnoreCase(bucketResponse.getType())) {
 
                         brokerService.findByUserId(bucketResponse.getBucketId())
                                 .map(BrokerProfileResponse::getCompanyId)
@@ -60,6 +66,29 @@ class CompanyMessageHandlerImpl implements MessageHandler {
                     } else if (BucketRequest.BucketType.APPLICATION.getValue().equalsIgnoreCase(bucketResponse.getType())) {
                         //TODO mortgage documents - client + broker + company admin
                     }
+
+                    break;
+                case USER_STATUS_UPDATED:
+                    final UserResponse userResponse = gson.fromJson(payload, UserResponse.class);
+                    userResponse.getUserRoles()
+                            .parallelStream()
+                            .filter(userRole -> userRole.getRole().equalsIgnoreCase(UserRole.ROLE_BROKER.getValue()) || userRole.getRole().equalsIgnoreCase(UserRole.ROLE_COMPANY_ADMIN.getValue()))
+                            .forEach(userRole -> {
+                                if (userRole.getUserStatus().equalsIgnoreCase(UserStatus.ACTIVE.getValue())) {
+                                    brokerService.updateBrokerActiveFlag(userResponse.getUserId(), true);
+                                } else {
+                                    brokerService.updateBrokerActiveFlag(userResponse.getUserId(), false);
+                                }
+                            });
+                    break;
+                case BROKER_CERTIFICATE_VERIFIED:
+                    final BrokerDocumentResponse brokerDocumentResponse = gson.fromJson(payload, BrokerDocumentResponse.class);
+                    brokerService.findByBrokerProfileId(brokerDocumentResponse.getBrokerProfileId())
+                            .ifPresent(broker -> brokerValidatorService.certificationVerified(broker.getCompanyId(), broker.getBrokerProfileId()));
+                    break;
+                case COMPANY_ACTIVATED:
+                    break;
+                case COMPANY_INACTIVATED:
 
                     break;
                 default:

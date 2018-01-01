@@ -20,4 +20,7 @@ public interface CompanyService {
     CompanyResponse createCompany(String userId, CompanyRegistrationRequest companyRegistrationRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException, BrokerAlreadyRegisteredException;
 
     void updateCompany(String companyId, CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
+
+    void verifyCompany(String companyId) throws CompanyNotFoundException;
+
 }

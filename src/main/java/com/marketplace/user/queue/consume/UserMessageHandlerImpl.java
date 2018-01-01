@@ -39,12 +39,25 @@ class UserMessageHandlerImpl implements MessageHandler {
                     break;
                 case BROKER_REMOVED_FROM_COMPANY:
                     brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
-                    final UserRole userRole = brokerProfileResponse.isAdmin() ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
+                    UserRole userRole = brokerProfileResponse.isAdmin() ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
+
                     try {
                         userService.updateUserStatus(brokerProfileResponse.getUserId(), userRole, UserStatus.CLOSED);
                     } catch (UserNotFoundException e) {
                         log.error("User {} not found", brokerProfileResponse.getUserId());
                     }
+
+                    break;
+                case BROKER_VERIFIED:
+                    brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
+                    userRole = brokerProfileResponse.isAdmin() ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
+
+                    try {
+                        userService.updateUserStatus(brokerProfileResponse.getUserId(), userRole, UserStatus.ACTIVE);
+                    } catch (UserNotFoundException e) {
+                        log.error("User {} not found", brokerProfileResponse.getUserId());
+                    }
+
                     break;
                 default:
                     break;

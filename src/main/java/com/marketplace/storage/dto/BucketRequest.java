@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 public class BucketRequest {
 
     public enum BucketType {
-        USER("USER"),
+        BROKER("BROKER"),
         COMPANY("COMPANY"),
         APPLICATION("APPLICATION"),
         SYSTEM("SYSTEM");

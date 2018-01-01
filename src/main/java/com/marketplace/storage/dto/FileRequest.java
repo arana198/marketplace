@@ -54,7 +54,6 @@ public class FileRequest {
     @NotNull(message = "name is mandatory")
     private final String name;
 
-    @NotNull(message = "description is mandatory")
     private final String description;
 
     @NotNull(message = "fileType is mandatory")

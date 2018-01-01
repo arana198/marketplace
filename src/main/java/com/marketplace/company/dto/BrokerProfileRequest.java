@@ -26,9 +26,6 @@ public class BrokerProfileRequest {
     @NotBlank(message = "mobileNumber is mandatory")
     private final String mobileNumber;
 
-    @NotBlank(message = "imageUrl is mandatory")
-    private final String imageUrl;
-
     private String aboutMe;
 
     private final boolean active;

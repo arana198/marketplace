@@ -28,6 +28,9 @@ public class CompanyBO extends AbstractAuditEntity {
     @Column(name = "fca_number", nullable = false)
     private String fcaNumber;
 
+    @Column(name = "fca_number_verified", nullable = false)
+    private boolean fcaNumberVerified = false;
+
     @Column(name = "logo_url")
     private String logoUrl;
 
@@ -36,4 +39,6 @@ public class CompanyBO extends AbstractAuditEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean active;
+
+    //TODO: Billing inactive company inactive
 }

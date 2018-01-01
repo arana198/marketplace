@@ -59,7 +59,6 @@ public class SecurityUtils {
         if ((roles.contains(UserRole.ROLE_COMPANY_ADMIN) && !this.checkIfCompanyAdmin(companyId)) ||
                 !brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerId)
                         .filter(bp -> bp.getUserId().equalsIgnoreCase(AuthUser.getUserId()))
-                        .filter(bp -> bp.isActive())
                         .isPresent()) {
             throw new UnauthorizedUserException("Unauthorized user");
         }

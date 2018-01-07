@@ -18,7 +18,6 @@ class BrokerProfileRequestConverter implements BaseConverter<BrokerProfileReques
                 .setLastName(source.getLastName())
                 .setMobileNumber(source.getMobileNumber())
                 .setAboutMe(source.getAboutMe())
-                .setImageUrl(source.getImageUrl())
                 .setAdmin(false)
                 .setActive(source.isActive());
     }

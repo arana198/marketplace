@@ -1,7 +1,6 @@
 package com.marketplace.company.service.impl;
 
 import com.marketplace.common.exception.BadRequestException;
-import com.marketplace.common.security.AuthUser;
 import com.marketplace.company.domain.BrokerProfileBO;
 import com.marketplace.company.domain.CompanyEmployeeInviteBO;
 import com.marketplace.company.dto.BrokerProfileRequest;
@@ -13,10 +12,15 @@ import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
 import com.marketplace.company.exception.BrokerNotFoundException;
 import com.marketplace.company.exception.CompanyEmployeeInviteTokenNotFoundException;
 import com.marketplace.company.exception.CompanyNotFoundException;
+import com.marketplace.company.queue.publish.CompanyPublishService;
+import com.marketplace.company.queue.publish.domain.CompanyPublishAction;
 import com.marketplace.company.service.BrokerService;
+import com.marketplace.company.service.BrokerValidatorService;
 import com.marketplace.company.service.CompanyService;
-import com.marketplace.queue.publish.PublishService;
-import com.marketplace.queue.publish.domain.PublishAction;
+import com.marketplace.storage.dto.FileRequest;
+import com.marketplace.storage.dto.FileRequest.FileType;
+import com.marketplace.storage.dto.FileResponse;
+import com.marketplace.storage.service.FileStoreService;
 import com.marketplace.user.dto.RoleRequest.UserRole;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.service.UserService;
@@ -25,8 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -44,9 +50,12 @@ class BrokerServiceImpl implements BrokerService {
     private final CompanyEmployeeInviteRepository companyEmployeeInviteRepository;
     private final CompanyService companyService;
     private final UserService userService;
+    private final BrokerValidatorService brokerValidatorService;
+    private final FileStoreService fileStoreService;
     private final BrokerProfileResponseConverter brokerProfileResponseConverter;
     private final BrokerProfileRequestConverter brokerProfileRequestConverter;
-    private final PublishService publishService;
+    private final CompanyFileRequestConverter fileRequestConverter;
+    private final CompanyPublishService publishService;
 
     @Override
     public Optional<BrokerProfileResponse> findByUserId(final String userId) {
@@ -58,7 +67,13 @@ class BrokerServiceImpl implements BrokerService {
     }
 
     @Override
-    public Optional<BrokerProfileResponse> findByCompanyIdAndBrokerProfileId(final String companyId, String brokerProfileId) {
+    public Optional<BrokerProfileResponse> findByBrokerProfileId(String brokerProfileId) {
+        return brokerProfileRepository.findById(brokerProfileId)
+                .map(brokerProfileResponseConverter::convert);
+    }
+
+    @Override
+    public Optional<BrokerProfileResponse> findByCompanyIdAndBrokerProfileId(final String companyId, final String brokerProfileId) {
         return brokerProfileRepository.findById(brokerProfileId)
                 .filter(bp -> bp.getCompanyId().equalsIgnoreCase(companyId))
                 .map(brokerProfileResponseConverter::convert);
@@ -84,7 +99,9 @@ class BrokerServiceImpl implements BrokerService {
 
     @Transactional
     @Override
-    public BrokerProfileResponse addBrokerToCompany(final String companyId, final CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest)
+    public BrokerProfileResponse addBrokerToCompany(final String userId,
+                                                    final String companyId,
+                                                    final CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest)
             throws CompanyNotFoundException, CompanyEmployeeInviteTokenNotFoundException {
 
         log.info("Adding broker with token [ {} ] to company [ {} ]", companyEmployeeInviteTokenRequest.getToken(), companyId);
@@ -99,7 +116,7 @@ class BrokerServiceImpl implements BrokerService {
         final UserResponse userResponse = userService.findByUsername(companyEmployeeInviteBO.getEmail())
                 .orElseThrow(() -> new BadRequestException("User not registered"));
 
-        if (!AuthUser.getUserId().equalsIgnoreCase(userResponse.getUserId())) {
+        if (!userId.equalsIgnoreCase(userResponse.getUserId())) {
             throw new BadRequestException("User not authorized");
         }
 
@@ -121,20 +138,23 @@ class BrokerServiceImpl implements BrokerService {
 
         companyEmployeeInviteRepository.delete(companyEmployeeInviteBO);
         brokerProfileRepository.save(brokerProfileBO);
-        publishService.sendMessage(PublishAction.BROKER_ADDED_TO_COMPANY, brokerProfileResponseConverter.convert(brokerProfileBO));
+        publishService.sendMessage(CompanyPublishAction.BROKER_ADDED_TO_COMPANY, brokerProfileResponseConverter.convert(brokerProfileBO));
 
-        //TODO: Once the event is published need to check user so we know old user was activated or not
         return brokerProfileResponseConverter.convert(brokerProfileBO);
     }
 
     @Override
-    public void updateBrokerProfile(final String companyId, final String brokerProfileId, final BrokerProfileRequest brokerProfileRequest)
+    public void updateBrokerProfile(final String userId,
+                                    final String companyId,
+                                    final String brokerProfileId,
+                                    final BrokerProfileRequest brokerProfileRequest)
             throws CompanyNotFoundException, BrokerNotFoundException {
 
         log.info("Updating broker [ {} ] for company [ {} ]", brokerProfileId, companyId);
 
         final BrokerProfileBO oldBrokerProfileBO = brokerProfileRepository.findById(brokerProfileId)
                 .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+                .filter(ce -> ce.getUserId().equalsIgnoreCase(userId))
                 .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
 
         if (!companyId.equalsIgnoreCase(brokerProfileRequest.getCompanyId())) {
@@ -148,24 +168,27 @@ class BrokerServiceImpl implements BrokerService {
                 .setAdmin(oldBrokerProfileBO.isAdmin());
 
         newBrokerProfileBO.update(oldBrokerProfileBO);
-
-        if (!oldBrokerProfileBO.isActive() && newBrokerProfileBO.isActive()) {
-            userService.findById(oldBrokerProfileBO.getUserId())
-                    .map(UserResponse::getUserRoles)
-                    .filter(urStream -> urStream.parallelStream()
-                            .filter(ur -> ur.getRole().equalsIgnoreCase(UserRole.ROLE_BROKER.getValue()) || ur.getRole().equalsIgnoreCase(UserRole.ROLE_COMPANY_ADMIN.getValue()))
-                            .filter(ur -> ur.getUserStatus().equalsIgnoreCase("ACTIVE"))
-                            .count() > 0)
-                    .orElseThrow(() -> new BadRequestException("User not active"));
-        }
+        this.updateBrokerActiveFlag(oldBrokerProfileBO, newBrokerProfileBO);
 
         brokerProfileRepository.save(newBrokerProfileBO);
+        publishService.sendMessage(CompanyPublishAction.BROKER_PROFILE_UPDATED, brokerProfileResponseConverter.convert(newBrokerProfileBO));
     }
 
-    /*
-    TODO; Another idea! The company owner creating profile on our platform should be responsible for checking the compliance of a broker?
-    But at the same time to be safe the platform should force a broker to submit this documents
-     */
+    @Override
+    public void updateBrokerActiveFlag(final String userId, final boolean isActive) {
+
+        log.info("Updating broker with user id [ {} ] active flag to [ {} ]", userId, isActive);
+
+        brokerProfileRepository.findByUserId(userId)
+                .parallelStream()
+                .forEach(oldBrokerProfileBO -> {
+                    BrokerProfileBO newBrokerProfileBO = oldBrokerProfileBO.setActive(isActive);
+                    this.updateBrokerActiveFlag(oldBrokerProfileBO, newBrokerProfileBO);
+                    brokerProfileRepository.save(newBrokerProfileBO);
+                    publishService.sendMessage(CompanyPublishAction.BROKER_PROFILE_UPDATED, brokerProfileResponseConverter.convert(newBrokerProfileBO));
+                });
+    }
+
     @Override
     public void removeBrokerFromCompany(final String companyId, final String brokerProfileId) {
 
@@ -188,8 +211,7 @@ class BrokerServiceImpl implements BrokerService {
                     log.debug("Removing broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
                     bp.setActive(false);
                     brokerProfileRepository.save(bp);
-                    userService.removeAsCompanyAdmin(bp.getUserId());
-                    publishService.sendMessage(PublishAction.BROKER_REMOVED_FROM_COMPANY, brokerProfileResponseConverter.convert(bp));
+                    publishService.sendMessage(CompanyPublishAction.BROKER_REMOVED_FROM_COMPANY, brokerProfileResponseConverter.convert(bp));
                 });
     }
 
@@ -205,8 +227,7 @@ class BrokerServiceImpl implements BrokerService {
                     log.debug("Adding broker [ {} ] as an admin for a company [ {} ]", brokerProfileId, companyId);
                     bp.setAdmin(true);
                     brokerProfileRepository.save(bp);
-                    userService.addAsCompanyAdmin(bp.getUserId());
-                    publishService.sendMessage(PublishAction.BROKER_ADDED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
+                    publishService.sendMessage(CompanyPublishAction.BROKER_ADDED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
                 });
     }
 
@@ -233,9 +254,30 @@ class BrokerServiceImpl implements BrokerService {
                     log.debug("Removing broker [ {} ] from the company [ {} ]", brokerProfileId, companyId);
                     bp.setAdmin(false);
                     brokerProfileRepository.save(bp);
-                    userService.removeAsCompanyAdmin(bp.getUserId());
-                    publishService.sendMessage(PublishAction.BROKER_REMOVED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
+                    publishService.sendMessage(CompanyPublishAction.BROKER_REMOVED_AS_ADMIN, brokerProfileResponseConverter.convert(bp));
                 });
+    }
+
+    @Override
+    public BrokerProfileResponse addOrUpdateImage(final String userId,
+                                                  final String companyId,
+                                                  final String brokerProfileId,
+                                                  final MultipartFile multipartFile)
+            throws BrokerNotFoundException, IOException {
+
+        log.info("Add or updating broker [ {} ] profile image", brokerProfileId);
+
+        final BrokerProfileBO oldBrokerProfileBO = brokerProfileRepository.findById(brokerProfileId)
+                .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+                .filter(ce -> ce.getUserId().equalsIgnoreCase(userId))
+                .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
+
+        final FileRequest fileRequest = fileRequestConverter.getFileRequest(oldBrokerProfileBO.getId(), multipartFile.getOriginalFilename(), "Profile Image", FileType.PROFILE_IMAGE);
+        final FileResponse fileResponse = fileStoreService.store(fileRequest, multipartFile);
+        oldBrokerProfileBO.setImageUrl(fileResponse.getFileId()); //TODO: need to specify uri
+
+        brokerProfileRepository.save(oldBrokerProfileBO);
+        return brokerProfileResponseConverter.convert(oldBrokerProfileBO);
     }
 
     @Override
@@ -254,10 +296,28 @@ class BrokerServiceImpl implements BrokerService {
                         .setToken(UUID.randomUUID().toString()));
 
         companyEmployeeInviteRepository.save(companyEmployeeInviteBO);
-        publishService.sendMessage(PublishAction.INVITE_BROKER,
+        publishService.sendMessage(CompanyPublishAction.INVITE_BROKER,
                 new InviteBrokerTokenVerificationResponse(companyId,
                         companyResponse.getName(),
                         companyEmployeeInviteRequest.getEmail(),
                         companyEmployeeInviteBO.getToken()));
+    }
+
+
+    private void updateBrokerActiveFlag(final BrokerProfileBO oldBrokerProfileBO, final BrokerProfileBO newBrokerProfileBO) {
+        if (!oldBrokerProfileBO.isActive()
+                && newBrokerProfileBO.isActive()
+                && brokerValidatorService.checkIfBrokerVerified(oldBrokerProfileBO.getCompanyId(), oldBrokerProfileBO.getId())) {
+
+            userService.findById(oldBrokerProfileBO.getUserId())
+                    .map(UserResponse::getUserRoles)
+                    .filter(urStream -> urStream.parallelStream()
+                            .filter(ur -> ur.getRole().equalsIgnoreCase(UserRole.ROLE_BROKER.getValue()) || ur.getRole().equalsIgnoreCase(UserRole.ROLE_COMPANY_ADMIN.getValue()))
+                            .filter(ur -> ur.getUserStatus().equalsIgnoreCase("ACTIVE"))
+                            .count() > 0)
+                    .orElseThrow(() -> new BadRequestException("User not active"));
+
+            newBrokerProfileBO.setActive(true);
+        }
     }
 }

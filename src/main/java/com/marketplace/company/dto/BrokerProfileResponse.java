@@ -1,10 +1,11 @@
 package com.marketplace.company.dto;
 
+import com.marketplace.common.dto.BaseResponseDomain;
 import lombok.Data;
 import org.springframework.hateoas.ResourceSupport;
 
 @Data
-public class BrokerProfileResponse extends ResourceSupport {
+public class BrokerProfileResponse extends BaseResponseDomain {
     private final String brokerProfileId;
     private final String userId;
     private final String companyId;

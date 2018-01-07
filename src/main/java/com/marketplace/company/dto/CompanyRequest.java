@@ -33,6 +33,11 @@ public class CompanyRequest {
     @Pattern(regexp = "[0-9]*", message = "vatNumber is invalid")
     private final String vatNumber;
 
+    @Size(min = 9, max = 9, message = "fcaNumber is wrong size")
+    @NotBlank(message = "fcaNumber is mandatory")
+    @Pattern(regexp = "[0-9]*", message = "fcaNumber is invalid")
+    private final String fcaNumber;
+
     @URL(message = "logoUrl is incorrect format")
     private final String logoUrl;
 

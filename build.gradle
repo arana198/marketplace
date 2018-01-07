@@ -61,6 +61,8 @@ dependencies {
     compile "org.projectlombok:lombok:1.16.18"
     runtime "org.mariadb.jdbc:mariadb-java-client:2.2.0"
     compile "org.apache.commons:commons-lang3:3.7"
+    compile "org.apache.commons:commons-compress:1.15"
+    compile "commons-io:commons-io:2.6"
     compile "org.flywaydb:flyway-core:4.2.0"
     compile "com.google.code.gson:gson:2.8.2"
 

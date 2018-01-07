@@ -99,4 +99,13 @@ public class CompanyController {
         companyService.updateCompany(companyId, companyRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @RolesAllowed({UserRole.ROLE_ADMIN})
+    @PutMapping(value = "/{companyId}/verify")
+    public ResponseEntity<Void> verifyCompany(@PathVariable final String companyId)
+            throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
+        companyService.verifyCompany(companyId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

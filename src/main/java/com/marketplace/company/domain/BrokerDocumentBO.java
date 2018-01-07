@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(of = {"brokerProfileId", "fileId"})
 @Entity
 @Table(name = "broker_documents")
 public class BrokerDocumentBO extends AbstractAuditEntity {

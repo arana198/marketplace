@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "broker_profiles")
 public class BrokerProfileBO extends AbstractAuditEntity {

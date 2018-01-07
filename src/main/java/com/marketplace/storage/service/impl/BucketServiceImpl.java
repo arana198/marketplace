@@ -12,6 +12,7 @@ import com.marketplace.storage.service.BucketService;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,7 @@ class BucketServiceImpl implements BucketService {
                 .isPresent();
     }
 
+    @Transactional
     @Override
     public void addPermissions(final BucketPermissionResponse bucketPermissionResponse) {
         bucketRepository.findById(bucketPermissionResponse.getBucketId())

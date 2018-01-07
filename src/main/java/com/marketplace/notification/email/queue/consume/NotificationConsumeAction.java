@@ -20,11 +20,10 @@ public enum NotificationConsumeAction {
         this.value = value;
     }
 
-    public static NotificationConsumeAction getActionFromString(final String value) {
+    public static Optional<NotificationConsumeAction> getActionFromString(final String value) {
         return Stream.of(NotificationConsumeAction.values())
                 .filter(a -> a.getValue().equalsIgnoreCase(value))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public static String getStringFromAction(final NotificationConsumeAction value) {

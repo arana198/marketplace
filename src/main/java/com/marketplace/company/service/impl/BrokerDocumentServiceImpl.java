@@ -30,7 +30,7 @@ class BrokerDocumentServiceImpl implements BrokerDocumentService {
     private final BrokerDocumentRepository brokerDocumentRepository;
     private final BrokerService brokerService;
     private final FileStoreService fileStoreService;
-    private final FileRequestConverter fileRequestConverter;
+    private final CompanyFileRequestConverter fileRequestConverter;
     private final BrokerDocumentResponseConverter brokerDocumentResponseConverter;
     private final CompanyPublishService publishService;
 
@@ -78,22 +78,25 @@ class BrokerDocumentServiceImpl implements BrokerDocumentService {
     }
 
     @Override
-    public void verifyDocument(final String userId,
-                               final String companyId,
+    public void verifyDocument(final String companyId,
                                final String brokerProfileId,
                                final String brokerDocumentId)
             throws BrokerNotFoundException, BrokerDocumentNotFoundException {
 
         log.info("Verifying broker document [ {} ]", brokerProfileId);
 
-        this.verifyBrokerProfile(userId, companyId, brokerProfileId);
+        brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
+                .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+                .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
 
         BrokerDocumentBO brokerDocumentBO = brokerDocumentRepository.findById(brokerDocumentId)
                 .orElseThrow(() -> new BrokerDocumentNotFoundException(brokerDocumentId));
 
-        brokerDocumentBO.setVerified(true);
-        brokerDocumentRepository.save(brokerDocumentBO);
-        publishService.sendMessage(CompanyPublishAction.BROKER_CERTIFICATE_VERIFIED, brokerDocumentResponseConverter.convert(brokerDocumentBO));
+        if (!brokerDocumentBO.isVerified()) {
+            brokerDocumentBO.setVerified(true);
+            brokerDocumentRepository.save(brokerDocumentBO);
+            publishService.sendMessage(CompanyPublishAction.BROKER_CERTIFICATE_VERIFIED, brokerDocumentResponseConverter.convert(brokerDocumentBO));
+        }
     }
 
     private BrokerDocumentBO getBrokerDocumentBO(final BrokerProfileResponse brokerProfile, final FileResponse file) {

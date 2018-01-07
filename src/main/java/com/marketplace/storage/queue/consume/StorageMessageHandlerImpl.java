@@ -25,17 +25,19 @@ class StorageMessageHandlerImpl implements MessageHandler {
     public void handleMessage(final Message<?> message) throws MessagingException {
         log.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
         if (message.getPayload() instanceof String) {
-            final StorageConsumeAction consumedAction = StorageConsumeAction.getActionFromString(message.getHeaders().get("action").toString());
-            final String payload = (String) message.getPayload();
+            StorageConsumeAction.getActionFromString(message.getHeaders().get("action").toString())
+                    .ifPresent(consumedAction -> {
+                        final String payload = (String) message.getPayload();
 
-            switch (consumedAction) {
-                case COMPANY_BROKERS:
-                    BucketPermissionResponse bucketPermissions = gson.fromJson(payload, BucketPermissionResponse.class);
-                    bucketService.addPermissions(bucketPermissions);
-                    break;
-                default:
-                    break;
-            }
+                        switch (consumedAction) {
+                            case COMPANY_BROKERS:
+                                BucketPermissionResponse bucketPermissions = gson.fromJson(payload, BucketPermissionResponse.class);
+                                bucketService.addPermissions(bucketPermissions);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
         }
     }
 

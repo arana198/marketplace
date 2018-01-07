@@ -19,11 +19,10 @@ public enum UserConsumeAction {
         this.value = value;
     }
 
-    public static UserConsumeAction getActionFromString(final String value) {
+    public static Optional<UserConsumeAction> getActionFromString(final String value) {
         return Stream.of(UserConsumeAction.values())
                 .filter(a -> a.getValue().equalsIgnoreCase(value))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public static String getStringFromAction(final UserConsumeAction value) {

@@ -25,43 +25,45 @@ class UserMessageHandlerImpl implements MessageHandler {
     public void handleMessage(final Message<?> message) throws MessagingException {
         log.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
         if (message.getPayload() instanceof String) {
-            final UserConsumeAction consumedAction = UserConsumeAction.getActionFromString(message.getHeaders().get("action").toString());
-            final String payload = (String) message.getPayload();
+            UserConsumeAction.getActionFromString(message.getHeaders().get("action").toString())
+                    .ifPresent(consumedAction -> {
+                        final String payload = (String) message.getPayload();
 
-            switch (consumedAction) {
-                case BROKER_ADDED_AS_ADMIN:
-                    BrokerProfileResponse brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
-                    userService.addAsCompanyAdmin(brokerProfileResponse.getUserId());
-                    break;
-                case BROKER_REMOVED_AS_ADMIN:
-                    brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
-                    userService.removeAsCompanyAdmin(brokerProfileResponse.getUserId());
-                    break;
-                case BROKER_REMOVED_FROM_COMPANY:
-                    brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
-                    UserRole userRole = brokerProfileResponse.isAdmin() ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
+                        switch (consumedAction) {
+                            case BROKER_ADDED_AS_ADMIN:
+                                BrokerProfileResponse brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
+                                userService.addAsCompanyAdmin(brokerProfileResponse.getUserId());
+                                break;
+                            case BROKER_REMOVED_AS_ADMIN:
+                                brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
+                                userService.removeAsCompanyAdmin(brokerProfileResponse.getUserId());
+                                break;
+                            case BROKER_REMOVED_FROM_COMPANY:
+                                brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
+                                UserRole userRole = brokerProfileResponse.isAdmin() ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
 
-                    try {
-                        userService.updateUserStatus(brokerProfileResponse.getUserId(), userRole, UserStatus.CLOSED);
-                    } catch (UserNotFoundException e) {
-                        log.error("User {} not found", brokerProfileResponse.getUserId());
-                    }
+                                try {
+                                    userService.updateUserStatus(brokerProfileResponse.getUserId(), userRole, UserStatus.CLOSED);
+                                } catch (UserNotFoundException e) {
+                                    log.error("User {} not found", brokerProfileResponse.getUserId());
+                                }
 
-                    break;
-                case BROKER_VERIFIED:
-                    brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
-                    userRole = brokerProfileResponse.isAdmin() ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
+                                break;
+                            case BROKER_VERIFIED:
+                                brokerProfileResponse = gson.fromJson(payload, BrokerProfileResponse.class);
+                                userRole = brokerProfileResponse.isAdmin() ? UserRole.ROLE_COMPANY_ADMIN : UserRole.ROLE_BROKER;
 
-                    try {
-                        userService.updateUserStatus(brokerProfileResponse.getUserId(), userRole, UserStatus.ACTIVE);
-                    } catch (UserNotFoundException e) {
-                        log.error("User {} not found", brokerProfileResponse.getUserId());
-                    }
+                                try {
+                                    userService.updateUserStatus(brokerProfileResponse.getUserId(), userRole, UserStatus.ACTIVE);
+                                } catch (UserNotFoundException e) {
+                                    log.error("User {} not found", brokerProfileResponse.getUserId());
+                                }
 
-                    break;
-                default:
-                    break;
-            }
+                                break;
+                            default:
+                                break;
+                        }
+                    });
         }
     }
 }

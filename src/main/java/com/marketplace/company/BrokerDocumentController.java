@@ -63,7 +63,7 @@ public class BrokerDocumentController {
             throws ResourceNotFoundException {
 
         log.info("Verifying broker: {} document {}", brokerId, documentId);
-        brokerDocumentService.verifyDocument(AuthUser.getUserId(), companyId, brokerId, documentId);
+        brokerDocumentService.verifyDocument(companyId, brokerId, documentId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

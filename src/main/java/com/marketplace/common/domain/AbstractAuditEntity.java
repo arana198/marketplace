@@ -1,5 +1,6 @@
 package com.marketplace.common.domain;
 
+import com.marketplace.common.security.AuthUser;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -40,11 +41,11 @@ public abstract class AbstractAuditEntity implements Serializable {
     private SecurityContext securityContext = SecurityContextHolder.getContext();
 
     @Column(name = "created_ts", nullable = false)
-    private LocalDateTime createdTs;
+    private LocalDateTime createdAt;
 
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @Column(name = "updated_ts", nullable = false)
-    private LocalDateTime updatedTs;
+    private LocalDateTime updatedAt;
 
     @Column(name = "updated_by", nullable = false)
     private String updatedBy;
@@ -56,21 +57,20 @@ public abstract class AbstractAuditEntity implements Serializable {
     @PrePersist
     protected void onCreate() {
         id = UUID.randomUUID().toString();
-        updatedTs = createdTs = LocalDateTime.now();
+        updatedAt = createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedTs = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
         if (securityContext.getAuthentication() != null) {
-            String updateByUserId = securityContext.getAuthentication().getName();
-            updatedBy = updateByUserId;
+            updatedBy = AuthUser.getUserId();
         }
     }
 
     public void update(AbstractAuditEntity abstractAuditEntity) {
         this.setId(abstractAuditEntity.getId());
-        this.setCreatedTs(abstractAuditEntity.getCreatedTs());
+        this.setCreatedAt(abstractAuditEntity.getCreatedAt());
         this.setUpdatedBy(abstractAuditEntity.getUpdatedBy());
         this.setUpdatedBy(abstractAuditEntity.getUpdatedBy());
         this.setVersion(abstractAuditEntity.getVersion());

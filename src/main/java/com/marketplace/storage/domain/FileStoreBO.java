@@ -3,6 +3,7 @@ package com.marketplace.storage.domain;
 import com.marketplace.common.domain.AbstractEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.Basic;
@@ -14,7 +15,8 @@ import javax.persistence.Table;
 
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(of = {"id"})
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "file_stores")
 public class FileStoreBO extends AbstractEntity {

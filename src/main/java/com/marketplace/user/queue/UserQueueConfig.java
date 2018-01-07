@@ -6,7 +6,6 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +25,6 @@ import org.springframework.messaging.MessageHandler;
 @IntegrationComponentScan
 public class UserQueueConfig {
 
-    @Autowired
-    private AmqpTemplate amqpTemplate;
-
     @Value("${exchange.name}")
     private String exchangeName;
 
@@ -40,7 +36,7 @@ public class UserQueueConfig {
         return new Queue(queueName, true);
     }
 
-    @Bean("userExchange")
+    @Bean
     public FanoutExchange exchange() {
         return new FanoutExchange(exchangeName);
     }
@@ -52,12 +48,13 @@ public class UserQueueConfig {
 
     @Bean(value = "userBinding")
     public Binding binding(@Qualifier("userQueue") final Queue queue,
-                           @Qualifier("userExchange") final FanoutExchange exchange) {
+                           final FanoutExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange);
     }
 
     @Bean("userAmqpOutboundFlow")
-    public IntegrationFlow amqpOutboundFlow(@Qualifier("userMessageChannel") final MessageChannel publishSubscribeChannel) {
+    public IntegrationFlow amqpOutboundFlow(final AmqpTemplate amqpTemplate,
+                                            @Qualifier("userMessageChannel") final MessageChannel publishSubscribeChannel) {
         return IntegrationFlows.from(publishSubscribeChannel)
                 .handleWithAdapter(h -> h.amqp(amqpTemplate).exchangeName(exchangeName))
                 .get();

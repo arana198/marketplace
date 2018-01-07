@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = {"createdAt", "updatedAt"})
-@ToString(of = {"createdAt", "updatedAt"})
+@ToString(of = {"id"})
 @Accessors(chain = true)
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})

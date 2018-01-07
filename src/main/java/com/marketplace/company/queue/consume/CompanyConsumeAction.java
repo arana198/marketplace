@@ -25,11 +25,10 @@ public enum CompanyConsumeAction {
         this.value = value;
     }
 
-    public static CompanyConsumeAction getActionFromString(final String value) {
+    public static Optional<CompanyConsumeAction> getActionFromString(final String value) {
         return Stream.of(CompanyConsumeAction.values())
                 .filter(a -> a.getValue().equalsIgnoreCase(value))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public static String getStringFromAction(final CompanyConsumeAction value) {

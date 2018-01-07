@@ -3,6 +3,7 @@ package com.marketplace.storage.domain;
 import com.marketplace.common.domain.AbstractEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.CascadeType;
@@ -17,7 +18,8 @@ import java.util.Set;
 
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(callSuper = true, exclude = {"permissions"})
+@ToString(callSuper = true)
 @Entity
 @Table(name = "buckets")
 public class BucketBO extends AbstractEntity {

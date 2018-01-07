@@ -7,12 +7,12 @@ import com.marketplace.company.queue.publish.domain.CompanyPublishAction;
 import com.marketplace.company.service.BrokerService;
 import com.marketplace.company.service.BrokerValidatorService;
 import com.marketplace.company.service.CompanyService;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
-@Data
 @Service
 class BrokerValidatorServiceImpl implements BrokerValidatorService {
 
@@ -20,6 +20,17 @@ class BrokerValidatorServiceImpl implements BrokerValidatorService {
     private final BrokerService brokerService;
     private final CompanyService companyService;
     private final CompanyPublishService publishService;
+
+    @Autowired
+    BrokerValidatorServiceImpl(final BrokerValidatorRepository brokerValidatorRepository,
+                               @Lazy final BrokerService brokerService,
+                               final CompanyService companyService,
+                               final CompanyPublishService publishService) {
+        this.brokerValidatorRepository = brokerValidatorRepository;
+        this.brokerService = brokerService;
+        this.companyService = companyService;
+        this.publishService = publishService;
+    }
 
     @Override
     public void certificationVerified(final String companyId, final String brokerProfileId) {

@@ -153,15 +153,15 @@ public class BrokerController {
     }
 
     @RolesAllowed({UserRole.ROLE_BROKER})
-    @PutMapping(path = "/{brokerId}/profileimages", consumes = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    @PostMapping(path = "/{brokerId}/profileimages")
     public ResponseEntity<BrokerProfileResponse> addOrUpdateProfileImage(@PathVariable final String companyId,
                                                                          @PathVariable final String brokerId,
-                                                                         @RequestPart(name = "file") final MultipartFile multipartFile,
-                                                                         final BindingResult bindingResult)
+                                                                         @RequestPart(name = "file") final MultipartFile multipartFile)
             throws ResourceNotFoundException, IOException {
 
         log.info("Updating broker: {} for company: ", brokerId, companyId);
 
+        //TODO: Check for multipart is image
         BrokerProfileResponse brokerProfileResponse = brokerService.addOrUpdateImage(AuthUser.getUserId(), companyId, brokerId, multipartFile);
         return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
     }

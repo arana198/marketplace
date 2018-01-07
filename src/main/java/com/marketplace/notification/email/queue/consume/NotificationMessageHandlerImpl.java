@@ -23,25 +23,27 @@ class NotificationMessageHandlerImpl implements MessageHandler {
     public void handleMessage(final Message<?> message) throws MessagingException {
         log.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
         if (message.getPayload() instanceof String) {
-            final NotificationConsumeAction consumedAction = NotificationConsumeAction.getActionFromString(message.getHeaders().get("action").toString());
-            final String payload = (String) message.getPayload();
+            NotificationConsumeAction.getActionFromString(message.getHeaders().get("action").toString())
+                    .ifPresent(consumedAction -> {
+                        final String payload = (String) message.getPayload();
 
-            switch (consumedAction) {
-                case VERIFY_EMAIL:
-                    TokenVerificationResponse tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
-                    emailService.sendVerificationEmail(tokenVerificationResponse);
-                    break;
-                case FORGOTTEN_PASSWORD:
-                    tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
-                    emailService.sendForgottenPasswordToken(tokenVerificationResponse);
-                    break;
-                case INVITE_BROKER:
-                    InviteBrokerTokenVerificationResponse inviteBrokerTokenVerificationResponse = gson.fromJson(payload, InviteBrokerTokenVerificationResponse.class);
-                    emailService.sendInviteEmailToBroker(inviteBrokerTokenVerificationResponse);
-                    break;
-                default:
-                    break;
-            }
+                        switch (consumedAction) {
+                            case VERIFY_EMAIL:
+                                TokenVerificationResponse tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
+                                emailService.sendVerificationEmail(tokenVerificationResponse);
+                                break;
+                            case FORGOTTEN_PASSWORD:
+                                tokenVerificationResponse = gson.fromJson(payload, TokenVerificationResponse.class);
+                                emailService.sendForgottenPasswordToken(tokenVerificationResponse);
+                                break;
+                            case INVITE_BROKER:
+                                InviteBrokerTokenVerificationResponse inviteBrokerTokenVerificationResponse = gson.fromJson(payload, InviteBrokerTokenVerificationResponse.class);
+                                emailService.sendInviteEmailToBroker(inviteBrokerTokenVerificationResponse);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
         }
     }
 }

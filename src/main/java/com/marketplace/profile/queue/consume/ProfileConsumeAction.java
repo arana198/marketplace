@@ -25,11 +25,10 @@ public enum ProfileConsumeAction {
         this.value = value;
     }
 
-    public static ProfileConsumeAction getActionFromString(final String value) {
+    public static Optional<ProfileConsumeAction> getActionFromString(final String value) {
         return Stream.of(ProfileConsumeAction.values())
                 .filter(a -> a.getValue().equalsIgnoreCase(value))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public static String getStringFromAction(final ProfileConsumeAction value) {

@@ -54,7 +54,7 @@ class BrokerServiceImpl implements BrokerService {
     private final FileStoreService fileStoreService;
     private final BrokerProfileResponseConverter brokerProfileResponseConverter;
     private final BrokerProfileRequestConverter brokerProfileRequestConverter;
-    private final FileRequestConverter fileRequestConverter;
+    private final CompanyFileRequestConverter fileRequestConverter;
     private final CompanyPublishService publishService;
 
     @Override

@@ -19,13 +19,15 @@ class ProfileMessageHandlerImpl implements MessageHandler {
     public void handleMessage(final Message<?> message) throws MessagingException {
         log.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
         if (message.getPayload() instanceof String) {
-            final ProfileConsumeAction consumedAction = ProfileConsumeAction.getActionFromString(message.getHeaders().get("action").toString());
-            final String payload = (String) message.getPayload();
+            ProfileConsumeAction.getActionFromString(message.getHeaders().get("action").toString())
+                    .ifPresent(consumedAction -> {
+                        final String payload = (String) message.getPayload();
 
-            switch (consumedAction) {
-                default:
-                    break;
-            }
+                        switch (consumedAction) {
+                            default:
+                                break;
+                        }
+                    });
         }
     }
 }

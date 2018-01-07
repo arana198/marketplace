@@ -15,11 +15,10 @@ public enum StorageConsumeAction {
         this.value = value;
     }
 
-    public static StorageConsumeAction getActionFromString(final String value) {
+    public static Optional<StorageConsumeAction> getActionFromString(final String value) {
         return Stream.of(StorageConsumeAction.values())
                 .filter(a -> a.getValue().equalsIgnoreCase(value))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public static String getStringFromAction(final StorageConsumeAction value) {

@@ -6,7 +6,6 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,23 +25,12 @@ import org.springframework.messaging.MessageHandler;
 @IntegrationComponentScan
 public class NotificationQueueConfig {
 
-    @Autowired
-    private AmqpTemplate amqpTemplate;
-
-    @Value("${exchange.name}")
-    private String exchangeName;
-
     @Value("notification-${environment.name}")
     private String queueName;
 
     @Bean("notificationQueue")
     public Queue queue() {
         return new Queue(queueName, true);
-    }
-
-    @Bean("notificationExchange")
-    public FanoutExchange exchange() {
-        return new FanoutExchange(exchangeName);
     }
 
     @Bean("notificationMessageChannel")
@@ -52,14 +40,16 @@ public class NotificationQueueConfig {
 
     @Bean(value = "notificationBinding")
     public Binding binding(@Qualifier("notificationQueue") final Queue queue,
-                           @Qualifier("notificationExchange") final FanoutExchange exchange) {
+                           final FanoutExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange);
     }
 
     @Bean("notificationAmqpOutboundFlow")
-    public IntegrationFlow amqpOutboundFlow(@Qualifier("notificationMessageChannel") final MessageChannel publishSubscribeChannel) {
+    public IntegrationFlow amqpOutboundFlow(final AmqpTemplate amqpTemplate,
+                                            @Qualifier("notificationMessageChannel") final MessageChannel publishSubscribeChannel,
+                                            final FanoutExchange exchange) {
         return IntegrationFlows.from(publishSubscribeChannel)
-                .handleWithAdapter(h -> h.amqp(amqpTemplate).exchangeName(exchangeName))
+                .handleWithAdapter(h -> h.amqp(amqpTemplate).exchangeName(exchange.getName()))
                 .get();
     }
 

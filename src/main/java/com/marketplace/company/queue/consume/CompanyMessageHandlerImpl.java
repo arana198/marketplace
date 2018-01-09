@@ -3,6 +3,7 @@ package com.marketplace.company.queue.consume;
 import com.google.gson.Gson;
 import com.marketplace.company.dto.BrokerDocumentResponse;
 import com.marketplace.company.dto.BrokerProfileResponse;
+import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.queue.publish.CompanyPublishService;
 import com.marketplace.company.queue.publish.domain.CompanyPublishAction;
 import com.marketplace.company.service.BrokerService;
@@ -45,6 +46,7 @@ class CompanyMessageHandlerImpl implements MessageHandler {
 
                         switch (consumedAction) {
                             case BUCKET_CREATED:
+
                                 BucketResponse bucketResponse = gson.fromJson(payload, BucketResponse.class);
                                 if (BucketRequest.BucketType.COMPANY.getValue().equalsIgnoreCase(bucketResponse.getType())) {
 
@@ -75,6 +77,7 @@ class CompanyMessageHandlerImpl implements MessageHandler {
 
                                 break;
                             case USER_STATUS_UPDATED:
+
                                 final UserResponse userResponse = gson.fromJson(payload, UserResponse.class);
                                 userResponse.getUserRoles()
                                         .parallelStream()
@@ -88,14 +91,17 @@ class CompanyMessageHandlerImpl implements MessageHandler {
                                         });
                                 break;
                             case BROKER_CERTIFICATE_VERIFIED:
+
                                 final BrokerDocumentResponse brokerDocumentResponse = gson.fromJson(payload, BrokerDocumentResponse.class);
                                 brokerService.findByBrokerProfileId(brokerDocumentResponse.getBrokerProfileId())
                                         .ifPresent(broker -> brokerValidatorService.certificationVerified(broker.getCompanyId(), broker.getBrokerProfileId()));
                                 break;
                             case COMPANY_ACTIVATED:
-                                break;
                             case COMPANY_INACTIVATED:
 
+                                final boolean isActiveFlag = consumedAction == CompanyConsumeAction.COMPANY_ACTIVATED ? true : false;
+                                final CompanyResponse companyResponse = gson.fromJson(payload, CompanyResponse.class);
+                                brokerService.updateBrokerActiveFlagByCompany(companyResponse.getCompanyId(), isActiveFlag);
                                 break;
                             default:
                                 break;

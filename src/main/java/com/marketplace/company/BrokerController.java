@@ -160,8 +160,12 @@ public class BrokerController {
             throws ResourceNotFoundException, IOException {
 
         log.info("Updating broker: {} for company: ", brokerId, companyId);
+        if(!multipartFile.getContentType().equalsIgnoreCase(MediaType.IMAGE_GIF_VALUE)
+                || !multipartFile.getContentType().equalsIgnoreCase(MediaType.IMAGE_JPEG_VALUE)
+                || !multipartFile.getContentType().equalsIgnoreCase(MediaType.IMAGE_PNG_VALUE)) {
+            throw new BadRequestException("File must of image type");
+        }
 
-        //TODO: Check for multipart is image
         BrokerProfileResponse brokerProfileResponse = brokerService.addOrUpdateImage(AuthUser.getUserId(), companyId, brokerId, multipartFile);
         return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
     }

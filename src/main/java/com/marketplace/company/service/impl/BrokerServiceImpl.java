@@ -27,6 +27,7 @@ import com.marketplace.user.service.UserService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -181,12 +182,33 @@ class BrokerServiceImpl implements BrokerService {
 
         brokerProfileRepository.findByUserId(userId)
                 .parallelStream()
-                .forEach(oldBrokerProfileBO -> {
-                    BrokerProfileBO newBrokerProfileBO = oldBrokerProfileBO.setActive(isActive);
-                    this.updateBrokerActiveFlag(oldBrokerProfileBO, newBrokerProfileBO);
-                    brokerProfileRepository.save(newBrokerProfileBO);
-                    publishService.sendMessage(CompanyPublishAction.BROKER_PROFILE_UPDATED, brokerProfileResponseConverter.convert(newBrokerProfileBO));
-                });
+                .filter(brokerProfileBO -> brokerProfileBO.isActive() != isActive)
+                .forEach(brokerProfile -> this.updateAndPublishBrokerActiveFlag(brokerProfile, isActive));
+    }
+
+    @Override
+    public void updateBrokerActiveFlagByCompany(final String companyId, final boolean isActiveFlag) {
+        log.info("Updating broker for company [ {} ] active flag to [ {} ]", companyId, isActiveFlag);
+
+
+        int index = 0;
+        boolean hasNext;
+
+        do {
+            Page<BrokerProfileBO> brokerProfiles = brokerProfileRepository.findByCompanyId(companyId, new PageRequest(index, 20));
+            hasNext = brokerProfiles.hasNext();
+            brokerProfiles.getContent()
+                    .parallelStream()
+                    .filter(brokerProfileBO -> brokerProfileBO.isActive() != isActiveFlag)
+                    .forEach(brokerProfile -> {
+                        try {
+                            this.updateAndPublishBrokerActiveFlag(brokerProfile, isActiveFlag);
+                        } catch (BadRequestException ex) {
+                            log.debug("User {} inactive", brokerProfile.getUserId());
+                        }
+                    });
+            index++;
+        } while (hasNext);
     }
 
     @Override
@@ -274,7 +296,7 @@ class BrokerServiceImpl implements BrokerService {
 
         final FileRequest fileRequest = fileRequestConverter.getFileRequest(oldBrokerProfileBO.getId(), multipartFile.getOriginalFilename(), "Profile Image", FileType.PROFILE_IMAGE);
         final FileResponse fileResponse = fileStoreService.store(fileRequest, multipartFile);
-        oldBrokerProfileBO.setImageUrl(fileResponse.getFileId()); //TODO: need to specify uri
+        oldBrokerProfileBO.setImageUrl(String.format("/documents/%s", fileResponse.getFileId()));
 
         brokerProfileRepository.save(oldBrokerProfileBO);
         return brokerProfileResponseConverter.convert(oldBrokerProfileBO);
@@ -319,5 +341,12 @@ class BrokerServiceImpl implements BrokerService {
 
             newBrokerProfileBO.setActive(true);
         }
+    }
+
+    private void updateAndPublishBrokerActiveFlag(final BrokerProfileBO oldBrokerProfileBO, final boolean isActiveFlag) {
+        BrokerProfileBO newBrokerProfileBO = oldBrokerProfileBO.setActive(isActiveFlag);
+        this.updateBrokerActiveFlag(oldBrokerProfileBO, newBrokerProfileBO);
+        brokerProfileRepository.save(newBrokerProfileBO);
+        publishService.sendMessage(CompanyPublishAction.BROKER_PROFILE_UPDATED, brokerProfileResponseConverter.convert(newBrokerProfileBO));
     }
 }

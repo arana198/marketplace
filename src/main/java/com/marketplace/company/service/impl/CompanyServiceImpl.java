@@ -136,22 +136,23 @@ class CompanyServiceImpl implements CompanyService {
 
         if (oldCompany.isActive() && !newCompanyBO.isActive()) {
             publishService.sendMessage(CompanyPublishAction.COMPANY_INACTIVATED, companyResponse);
+        } else if (!oldCompany.isActive() && newCompanyBO.isActive()) {
+            publishService.sendMessage(CompanyPublishAction.COMPANY_ACTIVATED, companyResponse);
         }
 
         publishService.sendMessage(CompanyPublishAction.COMPANY_UPDATED, companyResponse);
     }
-
-    //TODO: If company inactivated then inactivate brokers for that company
-    //TODO: If company activated then activate brokers for that company
 
     @Override
     public void verifyCompany(final String companyId) throws CompanyNotFoundException {
         final CompanyBO companyBO = companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
-        companyBO.setFcaNumberVerified(true);
-        companyBO.setActive(true);
-        companyRepository.save(companyBO);
-        publishService.sendMessage(CompanyPublishAction.COMPANY_ACTIVATED, companyResponseConverter.convert(companyBO));
+        if (!companyBO.isFcaNumberVerified()) {
+            companyBO.setFcaNumberVerified(true);
+            companyBO.setActive(true);
+            companyRepository.save(companyBO);
+            publishService.sendMessage(CompanyPublishAction.COMPANY_ACTIVATED, companyResponseConverter.convert(companyBO));
+        }
     }
 }

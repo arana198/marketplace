@@ -33,6 +33,8 @@ public interface BrokerService {
 
     void updateBrokerActiveFlag(String userId, boolean isActive);
 
+    void updateBrokerActiveFlagByCompany(String companyId, boolean isActive);
+
     void removeBrokerFromCompany(String companyId, String brokerProfileId);
 
     void addAdminBrokerForCompany(String companyId, String brokerProfileId);

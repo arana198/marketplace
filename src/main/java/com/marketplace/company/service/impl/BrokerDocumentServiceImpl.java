@@ -35,7 +35,6 @@ class BrokerDocumentServiceImpl implements BrokerDocumentService {
     private final CompanyPublishService publishService;
 
     /* TODO:
-        Broker status to non-active -> isActive flag is false
         Billing no longer valid -> isActive flag is false -> Broker Status Pending
         Publish event -> documentVerified, billingSpecified, isActive, fcaNumberVerified
     */

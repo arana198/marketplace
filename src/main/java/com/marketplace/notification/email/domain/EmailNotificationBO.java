@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "email_notifications")
 public class EmailNotificationBO extends AbstractEntity {

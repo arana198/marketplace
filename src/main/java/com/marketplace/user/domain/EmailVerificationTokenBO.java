@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode(of = {"user"})
+@EqualsAndHashCode(of = {"userId"})
 @ToString(of = {"id"})
 @Accessors(chain = true)
 @Entity

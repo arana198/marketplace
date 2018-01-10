@@ -3,14 +3,15 @@ version: '2'
 services:
   db:
     image: mariadb
-    container_name: sbmysql
+    container_name: mysql
     ports:
       - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=studyit
-      - MYSQL_USER=studyit
-      - MYSQL_PASSWORD=studyit
+      - MYSQL_DATABASE=marketplace
+      - MYSQL_USER=marketplace
+      - MYSQL_PASSWORD=marketplace
+
   rabbitmq:
       image: rabbitmq:management-alpine
       container_name: rabbitmq
@@ -19,28 +20,5 @@ services:
         - "5672:5672"
         - "15672:15672"
       environment:
-        - RABBITMQ_DEFAULT_USER=studyit
-        - RABBITMQ_DEFAULT_PASS=password
-  studyit:
-      image: arana198/test
-      container_name: studyit
-      ports:
-        - "8080:8001"
-      environment:
-        - SERVER_PORT=8001
-        - OAUTH_SERVER_HOST=localhost:8001
-        - DB_HOST=db:3306
-        - DB_SCHEMA=studyit
-        - DB_USERNAME=studyit
-        - DB_PASSWORD=studyit
-        - QUEUE_EXCHANGE_NAME=dev
-        - RABBITMQ_HOST=rabbitmq
-        - RABBITMQ_PORT=5672
-        - RABBITMQ_USERNAME=studyit
-        - RABBITMQ_PASSWORD=password
-      links:
-        - db
-        - rabbitmq
-
-
-
+        - RABBITMQ_DEFAULT_USER=marketplace
+        - RABBITMQ_DEFAULT_PASS=marketplace

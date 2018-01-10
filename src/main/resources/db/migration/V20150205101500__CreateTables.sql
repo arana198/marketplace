@@ -158,6 +158,8 @@ CREATE TABLE IF NOT EXISTS companies (
   name varchar(255) NOT NULL,
   company_number varchar(15) NOT NULL,
   vat_number varchar(15) NOT NULL,
+  fca_number varchar(15) NOT NULL,
+  fca_number_verified bit(1) NOT NULL,
   logo_url varchar(500) NULL,
   website_url varchar(500) NULL,
   is_active bit(1) NOT NULL,
@@ -207,6 +209,34 @@ CREATE TABLE IF NOT EXISTS company_employee_invite (
   CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (company_id) REFERENCES companies (id)
 );
 
+CREATE TABLE IF NOT EXISTS broker_documents (
+  id varchar(36) NOT NULL,
+  broker_profile_id varchar(36) NOT NULL,
+  file_id varchar(36) NOT NULL,
+  is_verified bit(1) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_by varchar(36) NULL,
+  version int(11) DEFAULT 0,
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_file_store_id (file_id),
+  UNIQUE KEY ux_bucket_id_file_store_id (broker_profile_id, file_id),
+  CONSTRAINT fk_broker_profiles_broker_documents FOREIGN KEY (broker_profile_id) REFERENCES broker_profiles (id)
+);
+
+CREATE TABLE IF NOT EXISTS broker_validators (
+  id varchar(36) NOT NULL,
+  broker_profile_id varchar(36) NOT NULL,
+  certificate_verified bit(1) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_by varchar(36) NULL,
+  version int(11) DEFAULT 0,
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_broker_profile_id (broker_profile_id),
+  CONSTRAINT fk_broker_profiles_broker_documents FOREIGN KEY (broker_profile_id) REFERENCES broker_profiles (id)
+);
+
 CREATE TABLE IF NOT EXISTS email_notifications (
   id varchar(36) NOT NULL PRIMARY KEY,
   sent_to varchar(36) NULL,
@@ -219,4 +249,53 @@ CREATE TABLE IF NOT EXISTS email_notifications (
   /*INDEX ix_sent_to_status (sent_to, status),
   INDEX ix_toAddress (toAddress),*/
   CHECK (JSON_VALID(email))
+);
+
+/*Files*/
+CREATE TABLE IF NOT EXISTS file_stores (
+  id varchar(36) NOT NULL PRIMARY KEY,
+  name varchar(128) NOT NULL,
+  description TEXT NULL,
+  type varchar(100) NOT NULL,
+  format varchar(100) NOT NULL,
+  data longblob,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  INDEX ix_name (name)
+);
+
+CREATE TABLE IF NOT EXISTS buckets (
+  id varchar(36) NOT NULL PRIMARY KEY,
+  type varchar(100) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  INDEX ix_name (type)
+);
+
+CREATE TABLE IF NOT EXISTS bucket_permissions (
+  id varchar(36) NOT NULL,
+  bucket_id varchar(36) NOT NULL,
+  user_id varchar(36) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_by varchar(36) NULL,
+  version int(11) DEFAULT 0,
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_bucket_user (bucket_id, user_id),
+  CONSTRAINT fk_buckets_bucket_permissions FOREIGN KEY (bucket_id) REFERENCES buckets (id)
+);
+
+CREATE TABLE IF NOT EXISTS bucket_files (
+  id varchar(36) NOT NULL,
+  bucket_id varchar(36) NOT NULL,
+  file_store_id varchar(36) NOT NULL,
+  is_public bit(1) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_by varchar(36) NULL,
+  version int(11) DEFAULT 0,
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_bucket_id_file_store_id (bucket_id, file_store_id),
+  CONSTRAINT fk_buckets_bucket_files FOREIGN KEY (bucket_id) REFERENCES buckets (id),
+  CONSTRAINT fk_buckets_file_stores FOREIGN KEY (file_store_id) REFERENCES file_stores (id)
 );

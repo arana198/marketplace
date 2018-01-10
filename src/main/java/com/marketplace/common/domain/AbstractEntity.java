@@ -6,14 +6,19 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = {"createdAt", "updatedAt"})
-@ToString(of = {"createdAt", "updatedAt"})
+@ToString(of = {"id"})
 @Accessors(chain = true)
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
@@ -33,7 +38,10 @@ public abstract class AbstractEntity implements Serializable {
 
     @PrePersist
     protected void onCreate() {
-        id = UUID.randomUUID().toString();
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+
         updatedAt = createdAt = LocalDate.now();
     }
 

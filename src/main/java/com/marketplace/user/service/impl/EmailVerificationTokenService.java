@@ -1,12 +1,12 @@
 package com.marketplace.user.service.impl;
 
 import com.marketplace.common.exception.BadRequestException;
-import com.marketplace.queue.publish.PublishService;
-import com.marketplace.queue.publish.domain.PublishAction;
 import com.marketplace.user.domain.EmailVerificationTokenBO;
 import com.marketplace.user.domain.UserBO;
 import com.marketplace.user.dto.TokenVerificationResponse;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
+import com.marketplace.user.queue.publish.UserPublishService;
+import com.marketplace.user.queue.publish.domain.UserPublishAction;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.UUID;
 class EmailVerificationTokenService {
 
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
-    private final PublishService publishService;
+    private final UserPublishService publishService;
 
     public void createToken(final UserBO userBO) {
         log.info("Generating a reset password token for user {}", userBO.getId());
@@ -38,7 +38,7 @@ class EmailVerificationTokenService {
                 emailVerificationTokenBO.getToken(),
                 emailVerificationTokenBO.getCreatedTs());
 
-        publishService.sendMessage(PublishAction.VERIFY_EMAIL, emailVerificationResponse);
+        publishService.sendMessage(UserPublishAction.VERIFY_EMAIL, emailVerificationResponse);
     }
 
     public EmailVerificationTokenBO verifyToken(final String token) throws EmailVerificationTokenNotFoundException {

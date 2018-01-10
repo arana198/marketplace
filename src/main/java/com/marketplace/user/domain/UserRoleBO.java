@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode(of = {"user_id", "role_id"})
+@EqualsAndHashCode(of = {"user", "role"})
 @Entity
 @Table(name = "user_roles")
 public class UserRoleBO implements Serializable {

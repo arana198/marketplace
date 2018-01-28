@@ -38,6 +38,6 @@ public class UserProfileBO extends AbstractAuditEntity {
     @Column(name = "dob", nullable = false)
     private LocalDate dateOfBirth;
 
-    @Column(name = "postcode")
+    @Column(name = "location")
     private String postcode;
 }

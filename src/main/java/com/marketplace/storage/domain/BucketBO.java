@@ -1,6 +1,6 @@
 package com.marketplace.storage.domain;
 
-import com.marketplace.common.domain.AbstractEntity;
+import com.marketplace.common.domain.AbstractTimestampEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,7 +22,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "buckets")
-public class BucketBO extends AbstractEntity {
+public class BucketBO extends AbstractTimestampEntity {
 
     @Column(name = "type", nullable = false)
     private String type;

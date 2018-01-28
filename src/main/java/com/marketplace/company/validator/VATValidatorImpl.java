@@ -24,7 +24,8 @@ class VATValidatorImpl implements VATValidator {
 
         try {
             final VATVerificationResponse vatVerificationResponse = this.restTemplate.getForObject(url, VATVerificationResponse.class);
-            return vatVerificationResponse.isValid() && companyName.trim().equalsIgnoreCase(vatVerificationResponse.getName().getName().trim());
+            return vatVerificationResponse.isValid()
+                    && companyName.replaceAll(" ", "").equalsIgnoreCase(vatVerificationResponse.getName().getName().replaceAll(" ", ""));
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
                 throw ex;

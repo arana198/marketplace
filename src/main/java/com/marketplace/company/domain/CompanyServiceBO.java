@@ -1,6 +1,6 @@
 package com.marketplace.company.domain;
 
-import com.marketplace.common.domain.AbstractEntity;
+import com.marketplace.common.domain.AbstractTimestampEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode(of = {"companyId", "serviceId"})
 @Entity
 @Table(name = "company_services")
-public class CompanyServiceBO extends AbstractEntity {
+public class CompanyServiceBO extends AbstractTimestampEntity {
 
     @Column(name = "company_id", nullable = false)
     private String companyId;

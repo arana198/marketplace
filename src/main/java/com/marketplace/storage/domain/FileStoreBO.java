@@ -1,6 +1,6 @@
 package com.marketplace.storage.domain;
 
-import com.marketplace.common.domain.AbstractEntity;
+import com.marketplace.common.domain.AbstractTimestampEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "file_stores")
-public class FileStoreBO extends AbstractEntity {
+public class FileStoreBO extends AbstractTimestampEntity {
 
     @Column(name = "name", nullable = false)
     private String name;

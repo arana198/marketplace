@@ -1,6 +1,6 @@
 package com.marketplace.company.domain;
 
-import com.marketplace.common.domain.AbstractEntity;
+import com.marketplace.common.domain.AbstractTimestampEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Accessors(chain = true)
 @Entity
 @Table(name = "services")
-public class ServiceBO extends AbstractEntity {
+public class ServiceBO extends AbstractTimestampEntity {
 
     @Column(name = "name", nullable = false)
     private String name;

@@ -37,7 +37,7 @@ public class UserProfileRequest {
     @Pattern(regexp = "^(07\\d{9})$", message = "mobileNumber is invalid")
     private final String mobileNumber;
 
-    @NotNull(message = "postcode is mandatory")
+    @NotNull(message = "location is mandatory")
     private final String postcode;
 
     private LocalDate dateOfBirth;

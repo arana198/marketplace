@@ -5,20 +5,27 @@ Company setup and verification
 Broker profile
 Basic notifications setup
 Storage
+Company services
+Postcode DB
 
 Remaining:
-Postcode DB + validation
+Postcode validation
 Company address
-Company Services
+Company/Broker fees
+
 Mortgage application form
-Mortgage document submission + approval
-Matching - including accept/reject functionality
+Mortgage document submission
+Mortgage documents approval by brokers
+
+Matching - including accept/reject choice
 Billing
-Payment integration
+Payment integration (Stripe)
+Rating and feedback
+
 Notification
-Rating
-Admin
-Discounts/offers/promotion
+Admin functionality
+Discounts/Offers promotion
+Loan Calculator - How much I can borrow?
 
 Future:
 Mortgage sourcing integration

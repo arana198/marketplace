@@ -1,7 +1,7 @@
 package com.marketplace.notification.email.domain;
 
 import com.marketplace.common.converter.JpaJsonConverter;
-import com.marketplace.common.domain.AbstractEntity;
+import com.marketplace.common.domain.AbstractTimestampEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "email_notifications")
-public class EmailNotificationBO extends AbstractEntity {
+public class EmailNotificationBO extends AbstractTimestampEntity {
 
     @Column(name = "sent_to", nullable = false)
     private String sentTo;

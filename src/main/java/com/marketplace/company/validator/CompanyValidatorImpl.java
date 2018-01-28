@@ -35,7 +35,7 @@ class CompanyValidatorImpl implements CompanyValidator {
 
         try {
             final CompanyVerificationResponse companyVerificationResponse = this.restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>(headers), CompanyVerificationResponse.class, new HashMap<>()).getBody();
-            return companyName.trim().equalsIgnoreCase(companyVerificationResponse.getName().trim());
+            return companyName.replaceAll(" ", "").equalsIgnoreCase(companyVerificationResponse.getName().replaceAll(" ", ""));
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
                 throw ex;

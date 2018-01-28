@@ -1,6 +1,5 @@
 package com.marketplace.user.domain;
 
-import com.marketplace.common.domain.AbstractEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

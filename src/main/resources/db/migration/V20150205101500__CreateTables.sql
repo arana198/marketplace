@@ -209,6 +209,30 @@ CREATE TABLE IF NOT EXISTS company_employee_invite (
   CONSTRAINT fk_company_employee_invite_users FOREIGN KEY (company_id) REFERENCES companies (id)
 );
 
+CREATE TABLE IF NOT EXISTS services (
+  id varchar(36) NOT NULL PRIMARY KEY ,
+  name varchar(255) NOT NULL,
+  display_name varchar(255) NOT NULL,
+  description text,
+  parent_id varchar(36),
+  is_active bit(1) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  UNIQUE KEY ux_services_name (name),
+  CONSTRAINT fk_services FOREIGN KEY (parent_id) REFERENCES services (id)
+);
+
+CREATE TABLE IF NOT EXISTS company_services (
+  id varchar(36) NOT NULL PRIMARY KEY ,
+  company_id varchar(36) NOT NULL,
+  service_id varchar(36) NOT NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  UNIQUE KEY ux_company_services (company_id, service_id),
+  CONSTRAINT fk_company_services_company FOREIGN KEY (company_id) REFERENCES companies (id),
+  CONSTRAINT fk_company_services_services FOREIGN KEY (service_id) REFERENCES services (id)
+);
+
 CREATE TABLE IF NOT EXISTS broker_documents (
   id varchar(36) NOT NULL,
   broker_profile_id varchar(36) NOT NULL,

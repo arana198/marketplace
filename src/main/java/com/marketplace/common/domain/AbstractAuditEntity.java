@@ -71,7 +71,7 @@ public abstract class AbstractAuditEntity implements Serializable {
     public void update(AbstractAuditEntity abstractAuditEntity) {
         this.setId(abstractAuditEntity.getId());
         this.setCreatedAt(abstractAuditEntity.getCreatedAt());
-        this.setUpdatedBy(abstractAuditEntity.getUpdatedBy());
+        this.setUpdatedAt(abstractAuditEntity.getUpdatedAt());
         this.setUpdatedBy(abstractAuditEntity.getUpdatedBy());
         this.setVersion(abstractAuditEntity.getVersion());
     }

@@ -49,4 +49,10 @@ public abstract class AbstractEntity implements Serializable {
     protected void onUpdate() {
         updatedAt = LocalDate.now();
     }
+
+    public void update(AbstractEntity abstractEntity) {
+        this.setId(abstractEntity.getId());
+        this.setCreatedAt(abstractEntity.getCreatedAt());
+        this.setUpdatedAt(abstractEntity.getUpdatedAt());
+    }
 }

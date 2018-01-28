@@ -40,5 +40,7 @@ public class CompanyBO extends AbstractAuditEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active;
 
+    //TODO: Add fees
+    //TODO: Advice method
     //TODO: Billing inactive company inactive
 }

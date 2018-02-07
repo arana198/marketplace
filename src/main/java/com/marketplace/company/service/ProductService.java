@@ -8,7 +8,7 @@ import com.marketplace.company.exception.ServiceNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-public interface AdviceService {
+public interface ProductService {
 
     List<ServiceResponse> findParentByIsActive(boolean isActive);
 

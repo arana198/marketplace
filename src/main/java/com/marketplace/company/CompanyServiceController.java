@@ -4,7 +4,7 @@ import com.marketplace.common.exception.ResourceAlreadyExistsException;
 import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.common.security.UserRole;
 import com.marketplace.company.dto.CompanyServiceResponse;
-import com.marketplace.company.service.CompanyAdviceService;
+import com.marketplace.company.service.CompanyProductService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,11 +25,11 @@ import javax.annotation.security.RolesAllowed;
 @RequestMapping("/companies/{companyId}/services")
 public class CompanyServiceController {
 
-    private final CompanyAdviceService companyAdviceService;
+    private final CompanyProductService companyProductService;
 
     @GetMapping
     public ResponseEntity<CompanyServiceResponse> getCompanyServices(@PathVariable final String companyId) {
-        CompanyServiceResponse services = companyAdviceService.getCompanyServices(companyId);
+        CompanyServiceResponse services = companyProductService.getCompanyServices(companyId);
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
 
@@ -42,7 +42,7 @@ public class CompanyServiceController {
 
         log.info("Adding service [ {} ] to the company [ {} ]", serviceId, companyId);
 
-        companyAdviceService.addCompanyServices(companyId, serviceId);
+        companyProductService.addCompanyService(companyId, serviceId);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -54,7 +54,7 @@ public class CompanyServiceController {
                                                      @PathVariable final String serviceId) {
 
         log.info("Removing service: {} from company [ {} ]", serviceId, companyId);
-        companyAdviceService.removeCompanyServices(companyId, serviceId);
+        companyProductService.removeCompanyService(companyId, serviceId);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

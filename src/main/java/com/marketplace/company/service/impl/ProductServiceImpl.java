@@ -5,7 +5,7 @@ import com.marketplace.company.dto.ServiceRequest;
 import com.marketplace.company.dto.ServiceResponse;
 import com.marketplace.company.exception.ServiceAlreadyExistsException;
 import com.marketplace.company.exception.ServiceNotFoundException;
-import com.marketplace.company.service.AdviceService;
+import com.marketplace.company.service.ProductService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Data
 @Service
-class AdviceServiceImpl implements AdviceService {
+class ProductServiceImpl implements ProductService {
 
     private final ServiceRepository serviceRepository;
     private final ServiceResponseConverter serviceResponseConverter;

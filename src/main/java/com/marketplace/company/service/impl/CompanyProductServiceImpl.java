@@ -1,14 +1,12 @@
 package com.marketplace.company.service.impl;
 
-import com.marketplace.common.exception.ResourceAlreadyExistsException;
-import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.company.domain.CompanyServiceBO;
 import com.marketplace.company.dto.CompanyServiceResponse;
 import com.marketplace.company.dto.ServiceResponse;
 import com.marketplace.company.exception.CompanyServiceAlreadyExistsException;
 import com.marketplace.company.exception.ServiceNotFoundException;
-import com.marketplace.company.service.AdviceService;
-import com.marketplace.company.service.CompanyAdviceService;
+import com.marketplace.company.service.CompanyProductService;
+import com.marketplace.company.service.ProductService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,10 +18,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Data
 @Service
-class CompanyAdviceServiceImpl implements CompanyAdviceService {
+class CompanyProductServiceImpl implements CompanyProductService {
 
     private final CompanyServiceRepository companyServiceRepository;
-    private final AdviceService adviceService;
+    private final ProductService productService;
 
     @Override
     public CompanyServiceResponse getCompanyServices(final String companyId) {
@@ -37,15 +35,15 @@ class CompanyAdviceServiceImpl implements CompanyAdviceService {
     }
 
     @Override
-    public void addCompanyServices(final String companyId, final String serviceId)
-            throws ResourceNotFoundException, ResourceAlreadyExistsException {
+    public void addCompanyService(final String companyId, final String serviceId)
+            throws CompanyServiceAlreadyExistsException, ServiceNotFoundException {
 
-        log.debug("Adding services to company [ {} ]", companyId);
+        log.debug("Adding product services to company [ {} ]", companyId);
         if (companyServiceRepository.findByCompanyIdAndServiceId(companyId, serviceId).isPresent()) {
             throw new CompanyServiceAlreadyExistsException(serviceId);
         }
 
-        Optional<ServiceResponse> serviceOptional = adviceService.findByServiceId(serviceId);
+        Optional<ServiceResponse> serviceOptional = productService.findByServiceId(serviceId);
         serviceOptional
                 .filter(service -> service.getParentId() != null)
                 .orElseThrow(() -> new ServiceNotFoundException(serviceId));
@@ -55,10 +53,11 @@ class CompanyAdviceServiceImpl implements CompanyAdviceService {
                 .setServiceId(serviceId);
 
         companyServiceRepository.save(companyServiceBO);
+        //TODO: Publish company added service
     }
 
     @Override
-    public void removeCompanyServices(final String companyId, final String serviceId) {
+    public void removeCompanyService(final String companyId, final String serviceId) {
         log.debug("Removing service [ {} ] from the company [ {} ]", serviceId, companyId);
         companyServiceRepository.findByCompanyIdAndServiceId(companyId, serviceId)
                 .ifPresent(companyServiceRepository::delete);

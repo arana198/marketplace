@@ -41,6 +41,6 @@ public class CompanyBO extends AbstractAuditEntity {
     private boolean active;
 
     //TODO: Add fees
-    //TODO: Advice method
+    //TODO: Company address
     //TODO: Billing inactive company inactive
 }

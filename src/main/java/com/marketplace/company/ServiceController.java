@@ -8,7 +8,7 @@ import com.marketplace.company.dto.ServiceRequest;
 import com.marketplace.company.dto.ServiceResponse;
 import com.marketplace.company.exception.ServiceNotFoundException;
 import com.marketplace.company.facade.ServiceFacade;
-import com.marketplace.company.service.AdviceService;
+import com.marketplace.company.service.ProductService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ import java.util.List;
 @RequestMapping("/services")
 public class ServiceController {
 
-    private final AdviceService adviceService;
+    private final ProductService productService;
     private final ServiceFacade serviceFacade;
 
     @GetMapping
@@ -57,7 +57,7 @@ public class ServiceController {
             throw new BadRequestException("Invalid service object", bindingResult);
         }
 
-        final ServiceResponse serviceResponse = adviceService.addService(serviceRequest);
+        final ServiceResponse serviceResponse = productService.addService(serviceRequest);
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{serviceId}")
                 .buildAndExpand(serviceResponse.getId()).toUri();
@@ -77,7 +77,7 @@ public class ServiceController {
             throw new BadRequestException("Invalid service object", bindingResult);
         }
 
-        adviceService.updateService(serviceId, serviceRequest);
+        productService.updateService(serviceId, serviceRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

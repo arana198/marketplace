@@ -2,7 +2,7 @@ package com.marketplace.company.facade;
 
 import com.marketplace.company.dto.ServiceResponse;
 import com.marketplace.company.exception.ServiceNotFoundException;
-import com.marketplace.company.service.AdviceService;
+import com.marketplace.company.service.ProductService;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +12,15 @@ import java.util.List;
 @Service
 class ServiceFacadeImpl implements ServiceFacade {
 
-    private final AdviceService adviceService;
+    private final ProductService productService;
 
     public List<ServiceResponse> findByParentIdAndIsActive(final String parentId, final boolean isActive) throws ServiceNotFoundException {
         List<ServiceResponse> serviceResponses;
 
         if (parentId == null) {
-            serviceResponses = adviceService.findParentByIsActive(isActive);
+            serviceResponses = productService.findParentByIsActive(isActive);
         } else {
-            return adviceService.findByParentIdAndIsActive(parentId, isActive);
+            return productService.findByParentIdAndIsActive(parentId, isActive);
         }
 
         return serviceResponses;

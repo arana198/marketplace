@@ -13,15 +13,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = {"createdAt", "updatedBy", "updatedAt"})
@@ -29,13 +26,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
-public abstract class AbstractAuditEntity implements Serializable {
-
-    private static final long serialVersionUID = 6384069660089559035L;
-
-    @Id
-    @Column(name = "id", nullable = false)
-    private String id;
+public abstract class AbstractAuditEntity extends AbstractEntity {
 
     @Transient
     private SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -56,7 +47,7 @@ public abstract class AbstractAuditEntity implements Serializable {
 
     @PrePersist
     protected void onCreate() {
-        id = UUID.randomUUID().toString();
+        super.onCreate();
         updatedAt = createdAt = LocalDateTime.now();
     }
 

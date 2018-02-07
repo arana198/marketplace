@@ -16,6 +16,6 @@ interface AddressRepository extends BaseRepository<AddressBO, String> {
     List<AddressBO> findByPostcode(PostcodeBO postcode);
 
     @Query("SELECT a FROM AddressBO a WHERE a.postcode.postcode = :postcode")
-    List<AddressBO> findByPostcode(@Param("location") String postcode);
+    List<AddressBO> findByPostcode(@Param("postcode") String postcode);
 
 }

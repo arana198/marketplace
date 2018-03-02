@@ -21,6 +21,6 @@ public interface CompanyService {
 
     void updateCompany(String companyId, CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
 
-    void verifyCompany(String companyId) throws CompanyNotFoundException;
+    void activateOrInactiveCompany(String companyId, boolean activate) throws CompanyNotFoundException;
 
 }

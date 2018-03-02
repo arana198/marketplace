@@ -6,9 +6,9 @@ import com.marketplace.location.exception.OutcodeNotFoundException;
 import com.marketplace.location.exception.PostcodeNotFoundException;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 public interface AddressService {
 
-    Optional<AddressResponse> getAddressByPostcode(final String postcode) throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException;
+    List<AddressResponse> getAddressByPostcode(final String postcode) throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException;
 }

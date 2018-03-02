@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,7 +38,7 @@ class AddressServiceImpl implements AddressService {
     private final AddressConverter addressConverter;
 
     @Override
-    public Optional<AddressResponse> getAddressByPostcode(final String postcode)
+    public List<AddressResponse> getAddressByPostcode(final String postcode)
             throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException {
 
         log.info("Getting address for location {}", postcode);

@@ -14,13 +14,13 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 
 @Service
-class CompanyValidatorImpl implements CompanyValidator {
+class CompanyNumberValidatorImpl implements CompanyNumberValidator {
 
     private final String API_URL;
     private final String API_KEY;
     private final RestTemplate restTemplate;
 
-    public CompanyValidatorImpl(final ConfigurationService configurationService) {
+    public CompanyNumberValidatorImpl(final ConfigurationService configurationService) {
         this.API_URL = configurationService.getCompanyValidatorUrlPrefix();
         this.API_KEY = configurationService.getCompanyValidatorApiKey();
         this.restTemplate = new RestTemplate();

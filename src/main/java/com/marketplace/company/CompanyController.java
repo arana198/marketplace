@@ -10,6 +10,7 @@ import com.marketplace.company.dto.CompanyRequest;
 import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.service.CompanyService;
+import com.marketplace.company.service.CompanyValidatorService;
 import com.marketplace.utils.PagedResourceConverter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +43,7 @@ import java.net.URI;
 public class CompanyController {
 
     private final CompanyService companyService;
+    private final CompanyValidatorService companyValidatorService;
 
     @RolesAllowed({UserRole.ROLE_ADMIN})
     @GetMapping
@@ -101,11 +104,18 @@ public class CompanyController {
     }
 
     @RolesAllowed({UserRole.ROLE_ADMIN})
-    @PutMapping(value = "/{companyId}/verify")
-    public ResponseEntity<Void> verifyCompany(@PathVariable final String companyId)
-            throws ResourceNotFoundException, ResourceAlreadyExistsException {
+    @PutMapping(value = "/{companyId}/fcaNumber/verify")
+    public ResponseEntity<Void> verifyCompany(@PathVariable final String companyId) {
 
-        companyService.verifyCompany(companyId);
+        companyValidatorService.fcaNumberVerified(companyId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @RolesAllowed({UserRole.ROLE_ADMIN})
+    @DeleteMapping(value = "/{companyId}/fcaNumber/unverify")
+    public ResponseEntity<Void> unverifyCompany(@PathVariable final String companyId) throws CompanyNotFoundException {
+
+        companyValidatorService.fcaNumberUnverified(companyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -23,6 +23,6 @@ CREATE TABLE IF NOT EXISTS company_advice_methods (
 INSERT INTO advice_methods
 (id, name, display_name, description, is_active)
 VALUES
-  ("c23b7fe1-ad91-41f8-959c-a9bc746ee39e", "ONLINE", "Online", "Indicates the advisor can advice via online methods", true),
+  ("c23b7fe1-ad91-41f8-959c-a9bc746ee39e", "ONLINE", "Online (Live chat, video, email)", "Indicates the advisor can advice via online methods", true),
   ("30eabd19-60df-479e-9ed2-6d2f4558af35", "TELEPHONE", "Telephone", "Indicates the advisor can advice via telephone method", true),
   ("b3dbfd94-4be3-4719-91da-8051b0324302", "FACE_TO_FACE", "Face to Face", "Indicates the advisor can advice through face to face meeting", true);

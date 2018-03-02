@@ -12,7 +12,8 @@ import com.marketplace.company.exception.CompanyNotFoundException;
 import com.marketplace.company.queue.publish.CompanyPublishService;
 import com.marketplace.company.queue.publish.domain.CompanyPublishAction;
 import com.marketplace.company.service.CompanyService;
-import com.marketplace.company.validator.CompanyValidator;
+import com.marketplace.company.service.CompanyValidatorService;
+import com.marketplace.company.validator.CompanyNumberValidator;
 import com.marketplace.company.validator.VATValidator;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +31,12 @@ class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final BrokerProfileRepository brokerProfileRepository;
+    private final CompanyValidatorService companyValidatorService;
     private final CompanyResponseConverter companyResponseConverter;
     private final CompanyRequestConverter companyRequestConverter;
     private final BrokerProfileRequestConverter brokerProfileRequestConverter;
     private final VATValidator vatValidator;
-    private final CompanyValidator companyValidator;
+    private final CompanyNumberValidator companyValidator;
     private final CompanyPublishService publishService;
 
     @Override
@@ -124,9 +126,8 @@ class CompanyServiceImpl implements CompanyService {
         CompanyBO newCompanyBO = companyRequestConverter.convert(companyRequest);
 
         if (!oldCompany.getFcaNumber().equalsIgnoreCase(companyRequest.getFcaNumber())) {
-            newCompanyBO.setFcaNumberVerified(false);
-            newCompanyBO.setActive(false);
-        } else if (!oldCompany.isFcaNumberVerified() && newCompanyBO.isActive()) {
+            companyValidatorService.fcaNumberUnverified(companyId);
+        } else if (!companyValidatorService.checkIfCompanyVerified(companyId) && newCompanyBO.isActive()) {
             newCompanyBO.setActive(false);
         }
 
@@ -144,15 +145,19 @@ class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void verifyCompany(final String companyId) throws CompanyNotFoundException {
+    public void activateOrInactiveCompany(final String companyId, final boolean activate) throws CompanyNotFoundException {
         final CompanyBO companyBO = companyRepository.findById(companyId)
+                .map(company -> company.setActive(activate))
                 .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
-        if (!companyBO.isFcaNumberVerified()) {
-            companyBO.setFcaNumberVerified(true);
-            companyBO.setActive(true);
-            companyRepository.save(companyBO);
-            publishService.sendMessage(CompanyPublishAction.COMPANY_ACTIVATED, companyResponseConverter.convert(companyBO));
+        companyRepository.save(companyBO);
+
+        final CompanyResponse companyResponse = companyResponseConverter.convert(companyBO);
+
+        if (activate) {
+            publishService.sendMessage(CompanyPublishAction.COMPANY_ACTIVATED, companyResponse);
+        } else {
+            publishService.sendMessage(CompanyPublishAction.COMPANY_INACTIVATED, companyResponse);
         }
     }
 }

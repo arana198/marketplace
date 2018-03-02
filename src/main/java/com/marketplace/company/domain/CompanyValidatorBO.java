@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @EqualsAndHashCode(of = {"brokerProfileId"})
 @Entity
-@Table(name = "broker_validators")
+@Table(name = "company_validators")
 public class CompanyValidatorBO extends AbstractAuditEntity {
 
     @Column(name = "company_id", nullable = false)

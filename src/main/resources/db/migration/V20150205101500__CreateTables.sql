@@ -159,8 +159,6 @@ CREATE TABLE IF NOT EXISTS companies (
   company_number varchar(15) NOT NULL,
   vat_number varchar(15) NOT NULL,
   fca_number varchar(15) NOT NULL,
-  fca_number_verified bit(1) NOT NULL,
-  fca_number_verified_ts TIMESTAMP NULL,
   logo_url varchar(500) NULL,
   website_url varchar(500) NULL,
   is_active bit(1) NOT NULL,
@@ -173,6 +171,21 @@ CREATE TABLE IF NOT EXISTS companies (
   UNIQUE KEY ux_vat_number (vat_number),
   INDEX ix_company_number_vat_number (company_number, vat_number),
   FULLTEXT (name)
+);
+
+CREATE TABLE IF NOT EXISTS company_validators (
+  id varchar(36) NOT NULL,
+  company_id varchar(36) NOT NULL,
+  fca_number_verified bit(1) NOT NULL,
+  billing_active bit(1) NOT NULL,
+  fca_number_verified_ts TIMESTAMP NULL,
+  created_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_ts TIMESTAMP NOT NULL DEFAULT now(),
+  updated_by varchar(36) NULL,
+  version int(11) DEFAULT 0,
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_company_id (company_id),
+  CONSTRAINT fk_company_validators_companies FOREIGN KEY (company_id) REFERENCES companies (id)
 );
 
 CREATE TABLE IF NOT EXISTS broker_profiles (

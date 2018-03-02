@@ -41,10 +41,6 @@ public abstract class AbstractAuditEntity extends AbstractEntity {
     @Column(name = "updated_by", nullable = false)
     private String updatedBy;
 
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
-
     @PrePersist
     protected void onCreate() {
         super.onCreate();

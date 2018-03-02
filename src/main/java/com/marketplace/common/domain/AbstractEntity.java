@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
+import javax.persistence.Version;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -24,6 +25,10 @@ public abstract class AbstractEntity implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
     private String id;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 
     @PrePersist
     protected void onCreate() {

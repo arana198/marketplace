@@ -67,7 +67,7 @@ class AddressServiceImpl implements AddressService {
                         })
                         .collect(Collectors.toList());
 
-                addressRepository.save(addressList);
+                addressRepository.saveAll(addressList);
             }
         }
 

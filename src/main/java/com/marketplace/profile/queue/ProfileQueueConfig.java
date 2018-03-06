@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.core.MessageSelector;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.amqp.Amqp;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
@@ -49,7 +49,7 @@ public class ProfileQueueConfig {
                                             @Qualifier("profileMessageChannel") final MessageChannel publishSubscribeChannel,
                                             final FanoutExchange exchange) {
         return IntegrationFlows.from(publishSubscribeChannel)
-                .handleWithAdapter(h -> h.amqp(amqpTemplate).exchangeName(exchange.getName()))
+                .handle(Amqp.outboundGateway(amqpTemplate).exchangeName(exchange.getName()))
                 .get();
     }
 

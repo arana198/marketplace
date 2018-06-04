@@ -9,7 +9,7 @@ import com.marketplace.company.dto.ServiceResponse;
 import com.marketplace.company.exception.ServiceNotFoundException;
 import com.marketplace.company.facade.ServiceFacade;
 import com.marketplace.company.service.ProductService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,55 +29,55 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
-@Data
 @Slf4j
+@AllArgsConstructor
 @Controller
 @RequestMapping("/services")
 public class ServiceController {
 
-    private final ProductService productService;
-    private final ServiceFacade serviceFacade;
+  private final ProductService productService;
+  private final ServiceFacade serviceFacade;
 
-    @GetMapping
-    public ResponseEntity<List<ServiceResponse>> getActiveServices(@RequestParam(name = "parentId", required = false) String parentId)
-            throws ServiceNotFoundException {
+  @GetMapping
+  public ResponseEntity<List<ServiceResponse>> getActiveServices(@RequestParam(name = "parentId", required = false) final String parentId)
+      throws ServiceNotFoundException {
 
-        List<ServiceResponse> services = serviceFacade.findByParentIdAndIsActive(parentId, true);
-        return new ResponseEntity<>(services, HttpStatus.OK);
+    List<ServiceResponse> services = serviceFacade.findByParentIdAndIsActive(parentId, true);
+    return new ResponseEntity<>(services, HttpStatus.OK);
+  }
+
+  @RolesAllowed({UserRole.ROLE_ADMIN})
+  @PostMapping
+  public ResponseEntity<Void> addService(@RequestBody @Valid final ServiceRequest serviceRequest,
+                                         final BindingResult bindingResult)
+      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
+    LOGGER.info("Adding service [ {} ]", serviceRequest.getName());
+    if (bindingResult.hasErrors()) {
+      throw new BadRequestException("Invalid service object", bindingResult);
     }
 
-    @RolesAllowed({UserRole.ROLE_ADMIN})
-    @PostMapping
-    public ResponseEntity<Void> addService(@RequestBody @Valid final ServiceRequest serviceRequest,
-                                           final BindingResult bindingResult)
-            throws ResourceNotFoundException, ResourceAlreadyExistsException {
+    final ServiceResponse serviceResponse = productService.addService(serviceRequest);
+    final URI location = ServletUriComponentsBuilder
+        .fromCurrentRequest().path("/{serviceId}")
+        .buildAndExpand(serviceResponse.getId()).toUri();
 
-        log.info("Adding service [ {} ]", serviceRequest.getName());
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Invalid service object", bindingResult);
-        }
+    return ResponseEntity.created(location).build();
+  }
 
-        final ServiceResponse serviceResponse = productService.addService(serviceRequest);
-        final URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{serviceId}")
-                .buildAndExpand(serviceResponse.getId()).toUri();
+  @RolesAllowed({UserRole.ROLE_ADMIN})
+  @PutMapping(path = "/{serviceId}")
+  public ResponseEntity<Void> updateService(@PathVariable final String serviceId,
+                                            @RequestBody @Valid final ServiceRequest serviceRequest,
+                                            final BindingResult bindingResult)
+      throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-        return ResponseEntity.created(location).build();
+    LOGGER.info("Updating service: {}", serviceId);
+    if (bindingResult.hasErrors()) {
+      throw new BadRequestException("Invalid service object", bindingResult);
     }
 
-    @RolesAllowed({UserRole.ROLE_ADMIN})
-    @PutMapping(path = "/{serviceId}")
-    public ResponseEntity<Void> updateService(@PathVariable final String serviceId,
-                                              @RequestBody @Valid final ServiceRequest serviceRequest,
-                                              final BindingResult bindingResult)
-            throws ResourceNotFoundException, ResourceAlreadyExistsException {
-
-        log.info("Updating service: {}", serviceId);
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Invalid service object", bindingResult);
-        }
-
-        productService.updateService(serviceId, serviceRequest);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    productService.updateService(serviceId, serviceRequest);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 }

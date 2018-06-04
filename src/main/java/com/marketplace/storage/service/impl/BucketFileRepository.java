@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 interface BucketFileRepository extends BaseRepository<BucketFilesBO, String> {
 
-    @Query("select bf from BucketFilesBO bf where bf.fileStore.id = :fileId")
-    Optional<BucketFilesBO> findByFileId(@Param("fileId") String fileId);
+  @Query("select bf from BucketFilesBO bf where bf.fileStore.id = :fileId")
+  Optional<BucketFilesBO> findByFileId(@Param("fileId") String fileId);
 }

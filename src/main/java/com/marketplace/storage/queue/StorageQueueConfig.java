@@ -25,42 +25,42 @@ import org.springframework.messaging.MessageHandler;
 @IntegrationComponentScan
 public class StorageQueueConfig {
 
-    @Value("storage-${environment.name}")
-    private String queueName;
+  @Value("storage-${environment.name}")
+  private String queueName;
 
-    @Bean("storageQueue")
-    public Queue queue() {
-        return new Queue(queueName, true);
-    }
+  @Bean("storageQueue")
+  public Queue queue() {
+    return new Queue(queueName, true);
+  }
 
-    @Bean("storageMessageChannel")
-    public MessageChannel messageChannel() {
-        return new PublishSubscribeChannel();
-    }
+  @Bean("storageMessageChannel")
+  public MessageChannel messageChannel() {
+    return new PublishSubscribeChannel();
+  }
 
-    @Bean(value = "storageBinding")
-    public Binding binding(@Qualifier("storageQueue") final Queue queue,
-                           final FanoutExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange);
-    }
+  @Bean(value = "storageBinding")
+  public Binding binding(@Qualifier("storageQueue") final Queue queue,
+                         final FanoutExchange exchange) {
+    return BindingBuilder.bind(queue).to(exchange);
+  }
 
-    @Bean("storageAmqpOutboundFlow")
-    public IntegrationFlow amqpOutboundFlow(final AmqpTemplate amqpTemplate,
-                                            @Qualifier("storageMessageChannel") final MessageChannel publishSubscribeChannel,
-                                            final FanoutExchange exchange) {
-        return IntegrationFlows.from(publishSubscribeChannel)
-                .handle(Amqp.outboundGateway(amqpTemplate).exchangeName(exchange.getName()))
-                .get();
-    }
+  @Bean("storageAmqpOutboundFlow")
+  public IntegrationFlow amqpOutboundFlow(final AmqpTemplate amqpTemplate,
+                                          @Qualifier("storageMessageChannel") final MessageChannel publishSubscribeChannel,
+                                          final FanoutExchange exchange) {
+    return IntegrationFlows.from(publishSubscribeChannel)
+        .handle(Amqp.outboundGateway(amqpTemplate).exchangeName(exchange.getName()))
+        .get();
+  }
 
-    @Bean("storageAmqpInboundFlow")
-    public IntegrationFlow amqpInboundFlow(final ConnectionFactory rabbitConnectionFactory,
-                                           @Qualifier("storageQueueFilterImpl") final MessageSelector messageSelector,
-                                           @Qualifier("storageMessageHandlerImpl") final MessageHandler messageHandler) {
-        return IntegrationFlows
-                .from(Amqp.inboundAdapter(rabbitConnectionFactory, this.queue()))
-                .filter(messageSelector)
-                .handle(messageHandler)
-                .get();
-    }
+  @Bean("storageAmqpInboundFlow")
+  public IntegrationFlow amqpInboundFlow(final ConnectionFactory rabbitConnectionFactory,
+                                         @Qualifier("storageQueueFilterImpl") final MessageSelector messageSelector,
+                                         @Qualifier("storageMessageHandlerImpl") final MessageHandler messageHandler) {
+    return IntegrationFlows
+        .from(Amqp.inboundAdapter(rabbitConnectionFactory, this.queue()))
+        .filter(messageSelector)
+        .handle(messageHandler)
+        .get();
+  }
 }

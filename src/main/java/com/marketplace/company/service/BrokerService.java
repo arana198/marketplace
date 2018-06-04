@@ -17,31 +17,33 @@ import java.util.Optional;
 
 public interface BrokerService {
 
-    Optional<BrokerProfileResponse> findByUserId(String userId);
+  Optional<BrokerProfileResponse> findByUserId(String userId);
 
-    Optional<BrokerProfileResponse> findByBrokerProfileId(String brokerProfileId);
+  Optional<BrokerProfileResponse> findByBrokerProfileId(String brokerProfileId);
 
-    Optional<BrokerProfileResponse> findByCompanyIdAndBrokerProfileId(String companyId, String brokerProfileId);
+  Optional<BrokerProfileResponse> findByCompanyIdAndBrokerProfileId(String companyId, String brokerProfileId);
 
-    List<BrokerProfileResponse> findByCompanyAdmin(String companyId);
+  List<BrokerProfileResponse> findByCompanyAdmin(String companyId);
 
-    Page<BrokerProfileResponse> findByCompanyId(String companyId, Pageable pageable);
+  Page<BrokerProfileResponse> findByCompanyId(String companyId, Pageable pageable);
 
-    BrokerProfileResponse addBrokerToCompany(String userId, String companyId, CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest) throws CompanyNotFoundException, CompanyEmployeeInviteTokenNotFoundException;
+  BrokerProfileResponse addBrokerToCompany(String userId, String companyId, CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest)
+      throws CompanyNotFoundException, CompanyEmployeeInviteTokenNotFoundException;
 
-    void updateBrokerProfile(String userId, String companyId, String brokerProfileId, BrokerProfileRequest brokerProfileRequest) throws CompanyNotFoundException, BrokerNotFoundException;
+  void updateBrokerProfile(String userId, String companyId, String brokerProfileId, BrokerProfileRequest brokerProfileRequest)
+      throws CompanyNotFoundException, BrokerNotFoundException;
 
-    void updateBrokerActiveFlag(String userId, boolean isActive);
+  void updateBrokerActiveFlag(String userId, boolean isActive);
 
-    void updateBrokerActiveFlagByCompany(String companyId, boolean isActive);
+  void updateBrokerActiveFlagByCompany(String companyId, boolean isActive);
 
-    void removeBrokerFromCompany(String companyId, String brokerProfileId);
+  void removeBrokerFromCompany(String companyId, String brokerProfileId);
 
-    void addAdminBrokerForCompany(String companyId, String brokerProfileId);
+  void addAdminBrokerForCompany(String companyId, String brokerProfileId);
 
-    void removeAdminBrokerFromCompany(String companyId, String brokerProfileId);
+  void removeAdminBrokerFromCompany(String companyId, String brokerProfileId);
 
-    BrokerProfileResponse addOrUpdateImage(String userId, String companyId, String brokerProfileId, MultipartFile multipartFile) throws BrokerNotFoundException, IOException;
+  BrokerProfileResponse addOrUpdateImage(String userId, String companyId, String brokerProfileId, MultipartFile multipartFile) throws BrokerNotFoundException, IOException;
 
-    void inviteEmployee(String companyId, CompanyEmployeeInviteRequest companyEmployeeInviteRequest) throws CompanyNotFoundException;
+  void inviteEmployee(String companyId, CompanyEmployeeInviteRequest companyEmployeeInviteRequest) throws CompanyNotFoundException;
 }

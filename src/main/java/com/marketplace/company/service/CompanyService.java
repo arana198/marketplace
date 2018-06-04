@@ -13,14 +13,15 @@ import java.util.Optional;
 
 public interface CompanyService {
 
-    Page<CompanyResponse> findAll(String companyName, Pageable pageable);
+  Page<CompanyResponse> findAll(String companyName, Pageable pageable);
 
-    Optional<CompanyResponse> findById(String companyId);
+  Optional<CompanyResponse> findById(String companyId);
 
-    CompanyResponse createCompany(String userId, CompanyRegistrationRequest companyRegistrationRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException, BrokerAlreadyRegisteredException;
+  CompanyResponse createCompany(String userId, CompanyRegistrationRequest companyRegistrationRequest)
+      throws CompanyNotFoundException, CompanyAlreadyExistsException, BrokerAlreadyRegisteredException;
 
-    void updateCompany(String companyId, CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
+  void updateCompany(String companyId, CompanyRequest companyRequest) throws CompanyNotFoundException, CompanyAlreadyExistsException;
 
-    void activateOrInactiveCompany(String companyId, boolean activate) throws CompanyNotFoundException;
+  void activateOrInactiveCompany(String companyId, boolean activate) throws CompanyNotFoundException;
 
 }

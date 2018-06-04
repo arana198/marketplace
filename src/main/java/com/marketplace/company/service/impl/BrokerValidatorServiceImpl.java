@@ -16,59 +16,59 @@ import org.springframework.stereotype.Service;
 @Service
 class BrokerValidatorServiceImpl implements BrokerValidatorService {
 
-    private final BrokerValidatorRepository brokerValidatorRepository;
-    private final BrokerService brokerService;
-    private final CompanyService companyService;
-    private final CompanyPublishService publishService;
+  private final BrokerValidatorRepository brokerValidatorRepository;
+  private final BrokerService brokerService;
+  private final CompanyService companyService;
+  private final CompanyPublishService publishService;
 
-    @Autowired
-    BrokerValidatorServiceImpl(final BrokerValidatorRepository brokerValidatorRepository,
-                               @Lazy final BrokerService brokerService,
-                               final CompanyService companyService,
-                               final CompanyPublishService publishService) {
-        this.brokerValidatorRepository = brokerValidatorRepository;
-        this.brokerService = brokerService;
-        this.companyService = companyService;
-        this.publishService = publishService;
+  @Autowired
+  BrokerValidatorServiceImpl(final BrokerValidatorRepository brokerValidatorRepository,
+                             @Lazy final BrokerService brokerService,
+                             final CompanyService companyService,
+                             final CompanyPublishService publishService) {
+    this.brokerValidatorRepository = brokerValidatorRepository;
+    this.brokerService = brokerService;
+    this.companyService = companyService;
+    this.publishService = publishService;
+  }
+
+  @Override
+  public void certificationVerified(final String companyId, final String brokerProfileId) {
+    LOGGER.info("Verifying certificate for broker [ {} ]", brokerProfileId);
+    try {
+      BrokerValidatorBO brokerValidatorBO = this.getOrCreateBrokerValidatorBO(companyId, brokerProfileId)
+          .setCertificateVerified(true);
+
+      brokerValidatorRepository.save(brokerValidatorBO);
+      if (companyService.findById(companyId).filter(company -> company.isActive()).isPresent()) {
+        publishService.sendMessage(CompanyPublishAction.BROKER_VERIFIED, brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId).orElse(null));
+      }
+    } catch (BrokerNotFoundException e) {
+      LOGGER.warn("Broker {} not found", brokerProfileId);
+    }
+  }
+
+  @Override
+  public boolean checkIfBrokerVerified(final String companyId, final String brokerProfileId) {
+    if (brokerValidatorRepository.findByBrokerProfileId(brokerProfileId).map(BrokerValidatorBO::isCertificateVerified).orElse(false)
+        && companyService.findById(companyId).filter(company -> company.isActive()).isPresent()) {
+
+      return true;
     }
 
-    @Override
-    public void certificationVerified(final String companyId, final String brokerProfileId) {
-        log.info("Verifying certificate for broker [ {} ]", brokerProfileId);
-        try {
-            BrokerValidatorBO brokerValidatorBO = this.getOrCreateBrokerValidatorBO(companyId, brokerProfileId)
-                    .setCertificateVerified(true);
+    return false;
+  }
 
-            brokerValidatorRepository.save(brokerValidatorBO);
-            if (companyService.findById(companyId).filter(company -> company.isActive()).isPresent()) {
-                publishService.sendMessage(CompanyPublishAction.BROKER_VERIFIED, brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId).orElse(null));
-            }
-        } catch (BrokerNotFoundException e) {
-            log.warn("Broker {} not found", brokerProfileId);
-        }
-    }
+  private BrokerValidatorBO getOrCreateBrokerValidatorBO(final String companyId, final String brokerProfileId) throws BrokerNotFoundException {
+    brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
+        .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
 
-    @Override
-    public boolean checkIfBrokerVerified(final String companyId, final String brokerProfileId) {
-        if (brokerValidatorRepository.findByBrokerProfileId(brokerProfileId).map(BrokerValidatorBO::isCertificateVerified).orElse(false)
-                && companyService.findById(companyId).filter(company -> company.isActive()).isPresent()) {
+    return brokerValidatorRepository.findByBrokerProfileId(brokerProfileId)
+        .orElse(this.createBrokerValidatorBO(brokerProfileId));
+  }
 
-            return true;
-        }
-
-        return false;
-    }
-
-    private BrokerValidatorBO getOrCreateBrokerValidatorBO(final String companyId, final String brokerProfileId) throws BrokerNotFoundException {
-        brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
-                .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
-
-        return brokerValidatorRepository.findByBrokerProfileId(brokerProfileId)
-                .orElse(this.createBrokerValidatorBO(brokerProfileId));
-    }
-
-    private BrokerValidatorBO createBrokerValidatorBO(final String brokerProfileId) {
-        return new BrokerValidatorBO()
-                .setBrokerProfileId(brokerProfileId);
-    }
+  private BrokerValidatorBO createBrokerValidatorBO(final String brokerProfileId) {
+    return new BrokerValidatorBO()
+        .setBrokerProfileId(brokerProfileId);
+  }
 }

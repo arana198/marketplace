@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 class UserResponseConverter implements BaseConverter<UserBO, UserResponse> {
 
-    private final UserRoleResponseConverter userRoleResponseConverter;
+  private final UserRoleResponseConverter userRoleResponseConverter;
 
-    @Override
-    public UserResponse convert(final UserBO source) {
-        return new UserResponse(
-                source.getId(),
-                source.getUsername(),
-                userRoleResponseConverter.convert(source.getRoles()),
-                source.isEmailVerified());
-    }
+  @Override
+  public UserResponse convert(final UserBO source) {
+    return new UserResponse(
+        source.getId(),
+        source.getUsername(),
+        userRoleResponseConverter.convert(source.getRoles()),
+        source.isEmailVerified());
+  }
 }

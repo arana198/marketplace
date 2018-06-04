@@ -25,28 +25,28 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SessionAttributes("authorizationRequest")
 class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
-    @Override
-    public void configureContentNegotiation(final ContentNegotiationConfigurer c) {
-        c.defaultContentType(MediaType.APPLICATION_JSON);
-    }
+  @Override
+  public void configureContentNegotiation(final ContentNegotiationConfigurer c) {
+    c.defaultContentType(MediaType.APPLICATION_JSON);
+  }
 
-    @Override
-    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-    }
+  @Override
+  public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("swagger-ui.html")
+        .addResourceLocations("classpath:/META-INF/resources/");
+  }
 
-    @Override
-    public void addInterceptors(final InterceptorRegistry registry) {
-        registry.addInterceptor(new IsActiveInterceptorHandler());
-    }
+  @Override
+  public void addInterceptors(final InterceptorRegistry registry) {
+    registry.addInterceptor(new IsActiveInterceptorHandler());
+  }
 
-    @Bean
-    @Primary
-    public ObjectMapper objectMapper(final ObjectMapper objectMapper) {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        return objectMapper;
-    }
+  @Bean
+  @Primary
+  public ObjectMapper objectMapper(final ObjectMapper objectMapper) {
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    return objectMapper;
+  }
 }

@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class CompanyVerificationResponse {
-    @JsonProperty("company_name")
-    private final String name;
+  @JsonProperty("company_name")
+  private final String name;
 }

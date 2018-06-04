@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 class BrokerDocumentResponseConverter implements BaseConverter<BrokerDocumentBO, BrokerDocumentResponse> {
 
-    @Override
-    public BrokerDocumentResponse convert(final BrokerDocumentBO source) {
-        return new BrokerDocumentResponse(
-                source.getId(),
-                source.getBrokerProfileId(),
-                source.getFileId(),
-                source.isVerified());
-    }
+  @Override
+  public BrokerDocumentResponse convert(final BrokerDocumentBO source) {
+    return new BrokerDocumentResponse(
+        source.getId(),
+        source.getBrokerProfileId(),
+        source.getFileId(),
+        source.isVerified());
+  }
 }

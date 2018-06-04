@@ -17,15 +17,15 @@ import java.time.LocalDateTime;
 @Table(name = "company_validators")
 public class CompanyValidatorBO extends AbstractAuditEntity {
 
-    @Column(name = "company_id", nullable = false)
-    private String companyId;
+  @Column(name = "company_id", nullable = false)
+  private String companyId;
 
-    @Column(name = "fca_number_verified", nullable = false)
-    private boolean fcaNumberVerified = false;
+  @Column(name = "fca_number_verified", nullable = false)
+  private boolean fcaNumberVerified = false;
 
-    @Column(name = "billing_active", nullable = false)
-    private boolean billingActive = false;
+  @Column(name = "billing_active", nullable = false)
+  private boolean billingActive = false;
 
-    @Column(name = "fca_number_verified_ts", nullable = false)
-    private LocalDateTime fcaNumberVerifiedAt;
+  @Column(name = "fca_number_verified_ts", nullable = false)
+  private LocalDateTime fcaNumberVerifiedAt;
 }

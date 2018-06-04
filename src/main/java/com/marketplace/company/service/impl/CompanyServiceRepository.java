@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 interface CompanyServiceRepository extends BaseRepository<CompanyServiceBO, String> {
 
-    List<CompanyServiceBO> findByCompanyId(String companyId);
+  List<CompanyServiceBO> findByCompanyId(String companyId);
 
-    Optional<CompanyServiceBO> findByCompanyIdAndServiceId(String companyId, String serviceId);
+  Optional<CompanyServiceBO> findByCompanyIdAndServiceId(String companyId, String serviceId);
 }

@@ -20,10 +20,10 @@ import javax.persistence.Table;
 @Table(name = "bucket_permissions")
 public class BucketPermissionBO extends AbstractAuditEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "bucket_id", referencedColumnName = "id", nullable = false)
-    private BucketBO bucketBO;
+  @ManyToOne
+  @JoinColumn(name = "bucket_id", referencedColumnName = "id", nullable = false)
+  private BucketBO bucketBO;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+  @Column(name = "user_id", nullable = false)
+  private String userId;
 }

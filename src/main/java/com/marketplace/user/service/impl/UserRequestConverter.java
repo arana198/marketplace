@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 class UserRequestConverter implements BaseConverter<UserRequest, UserBO> {
 
-    private final PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public UserBO convert(final UserRequest source) {
-        return new UserBO()
-                .setUsername(source.getEmail())
-                .setPassword(passwordEncoder.encode(source.getPassword()));
-    }
+  @Override
+  public UserBO convert(final UserRequest source) {
+    return new UserBO()
+        .setUsername(source.getEmail())
+        .setPassword(passwordEncoder.encode(source.getPassword()));
+  }
 }

@@ -23,33 +23,33 @@ import java.util.stream.Collectors;
 @Service
 class CustomTokenEnhancer implements TokenEnhancer {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    private List<TokenEnhancer> delegates = Collections.emptyList();
+  private List<TokenEnhancer> delegates = Collections.emptyList();
 
-    @Override
-    public OAuth2AccessToken enhance(final OAuth2AccessToken accessToken, final OAuth2Authentication authentication) {
-        DefaultOAuth2AccessToken tempResult = (DefaultOAuth2AccessToken) accessToken;
+  @Override
+  public OAuth2AccessToken enhance(final OAuth2AccessToken accessToken, final OAuth2Authentication authentication) {
+    DefaultOAuth2AccessToken tempResult = (DefaultOAuth2AccessToken) accessToken;
 
-        final Map<String, Object> additionalInformation = new HashMap<>();
-        final String username = authentication.getName().toString();
-        final UserResponse user = userService.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(authentication.getName()));
+    final Map<String, Object> additionalInformation = new HashMap<>();
+    final String username = authentication.getName().toString();
+    final UserResponse user = userService.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException(authentication.getName()));
 
-        final Map<String, String> roles = user.getUserRoles()
-                .parallelStream()
-                .collect(Collectors.toMap(UserRoleResponse::getRole, UserRoleResponse::getUserStatus));
+    final Map<String, String> roles = user.getUserRoles()
+        .parallelStream()
+        .collect(Collectors.toMap(UserRoleResponse::getRole, UserRoleResponse::getUserStatus));
 
-        additionalInformation.put("userId", user.getUserId());
-        additionalInformation.put("username", username);
-        additionalInformation.put("roles", roles);
-        tempResult.setAdditionalInformation(additionalInformation);
+    additionalInformation.put("userId", user.getUserId());
+    additionalInformation.put("username", username);
+    additionalInformation.put("roles", roles);
+    tempResult.setAdditionalInformation(additionalInformation);
 
-        OAuth2AccessToken result = tempResult;
-        for (TokenEnhancer enhancer : delegates) {
-            result = enhancer.enhance(result, authentication);
-        }
-        return result;
+    OAuth2AccessToken result = tempResult;
+    for (TokenEnhancer enhancer : delegates) {
+      result = enhancer.enhance(result, authentication);
     }
+    return result;
+  }
 }
 

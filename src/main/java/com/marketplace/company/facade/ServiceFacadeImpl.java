@@ -12,17 +12,17 @@ import java.util.List;
 @Service
 class ServiceFacadeImpl implements ServiceFacade {
 
-    private final ProductService productService;
+  private final ProductService productService;
 
-    public List<ServiceResponse> findByParentIdAndIsActive(final String parentId, final boolean isActive) throws ServiceNotFoundException {
-        List<ServiceResponse> serviceResponses;
+  public List<ServiceResponse> findByParentIdAndIsActive(final String parentId, final boolean isActive) throws ServiceNotFoundException {
+    List<ServiceResponse> serviceResponses;
 
-        if (parentId == null) {
-            serviceResponses = productService.findParentByIsActive(isActive);
-        } else {
-            return productService.findByParentIdAndIsActive(parentId, isActive);
-        }
-
-        return serviceResponses;
+    if (parentId == null) {
+      serviceResponses = productService.findParentByIsActive(isActive);
+    } else {
+      return productService.findByParentIdAndIsActive(parentId, isActive);
     }
+
+    return serviceResponses;
+  }
 }

@@ -30,58 +30,58 @@ import java.util.List;
 @EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true)
 public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+  @Autowired
+  private ApplicationContext applicationContext;
 
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(String.format("%s > %s %s > %s %s > %s",
-                UserRole.ROLE_ADMIN,
-                UserRole.ROLE_COMPANY_ADMIN,
-                UserRole.ROLE_COMPANY_ADMIN,
-                UserRole.ROLE_BROKER,
-                UserRole.ROLE_ADMIN,
-                UserRole.ROLE_USER));
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+    roleHierarchy.setHierarchy(String.format("%s > %s %s > %s %s > %s",
+        UserRole.ROLE_ADMIN,
+        UserRole.ROLE_COMPANY_ADMIN,
+        UserRole.ROLE_COMPANY_ADMIN,
+        UserRole.ROLE_BROKER,
+        UserRole.ROLE_ADMIN,
+        UserRole.ROLE_USER));
 
-        return roleHierarchy;
-    }
+    return roleHierarchy;
+  }
 
-    @Primary
-    @Bean
-    public RoleHierarchyVoter roleVoter() {
-        return new RoleHierarchyVoter(roleHierarchy());
-    }
+  @Primary
+  @Bean
+  public RoleHierarchyVoter roleVoter() {
+    return new RoleHierarchyVoter(roleHierarchy());
+  }
 
-    @Primary
-    @Bean
-    protected AffirmativeBased getAccessDecisionManager() {
-        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(this.roleHierarchy());
+  @Primary
+  @Bean
+  protected AffirmativeBased getAccessDecisionManager() {
+    DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+    expressionHandler.setRoleHierarchy(this.roleHierarchy());
 
-        WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
-        webExpressionVoter.setExpressionHandler(expressionHandler);
+    WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
+    webExpressionVoter.setExpressionHandler(expressionHandler);
 
-        return new AffirmativeBased(Arrays.asList(this.roleVoter(), webExpressionVoter));
-    }
+    return new AffirmativeBased(Arrays.asList(this.roleVoter(), webExpressionVoter));
+  }
 
-    @Override
-    public AccessDecisionManager accessDecisionManager() {
-        List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
-        ExpressionBasedPreInvocationAdvice expressionAdvice = new ExpressionBasedPreInvocationAdvice();
-        expressionAdvice.setExpressionHandler(getExpressionHandler());
-        decisionVoters.add(new PreInvocationAuthorizationAdviceVoter(expressionAdvice));
-        decisionVoters.add(new Jsr250Voter());
-        decisionVoters.add(this.roleVoter());
+  @Override
+  public AccessDecisionManager accessDecisionManager() {
+    List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
+    ExpressionBasedPreInvocationAdvice expressionAdvice = new ExpressionBasedPreInvocationAdvice();
+    expressionAdvice.setExpressionHandler(getExpressionHandler());
+    decisionVoters.add(new PreInvocationAuthorizationAdviceVoter(expressionAdvice));
+    decisionVoters.add(new Jsr250Voter());
+    decisionVoters.add(this.roleVoter());
 
-        return new AffirmativeBased(decisionVoters);
-    }
+    return new AffirmativeBased(decisionVoters);
+  }
 
-    @Override
-    protected MethodSecurityExpressionHandler createExpressionHandler() {
-        OAuth2MethodSecurityExpressionHandler handler = new OAuth2MethodSecurityExpressionHandler();
-        handler.setApplicationContext(applicationContext);
-        handler.setRoleHierarchy(roleHierarchy());
-        return handler;
-    }
+  @Override
+  protected MethodSecurityExpressionHandler createExpressionHandler() {
+    OAuth2MethodSecurityExpressionHandler handler = new OAuth2MethodSecurityExpressionHandler();
+    handler.setApplicationContext(applicationContext);
+    handler.setRoleHierarchy(roleHierarchy());
+    return handler;
+  }
 }

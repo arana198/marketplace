@@ -7,5 +7,5 @@ import java.util.List;
 
 @Data
 public class CompanyServiceResponse extends BaseResponseDomain {
-    private final List<String> serviceIds;
+  private final List<String> serviceIds;
 }

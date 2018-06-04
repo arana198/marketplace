@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 class AdviceMethodResponseConverter implements BaseConverter<AdviceMethodBO, AdviceResponse> {
 
-    @Override
-    public AdviceResponse convert(final AdviceMethodBO source) {
-        return new AdviceResponse(
-                source.getId(),
-                source.getDisplayName(),
-                source.getDescription()
-        );
-    }
+  @Override
+  public AdviceResponse convert(final AdviceMethodBO source) {
+    return new AdviceResponse(
+        source.getId(),
+        source.getDisplayName(),
+        source.getDescription()
+    );
+  }
 }

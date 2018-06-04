@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 class BucketRequestConverter implements BaseConverter<BucketRequest, BucketBO> {
 
-    @Override
-    public BucketBO convert(final BucketRequest source) {
-        return (BucketBO) new BucketBO()
-                .setType(source.getBucketType().getValue())
-                .setId(source.getBucketId());
-    }
+  @Override
+  public BucketBO convert(final BucketRequest source) {
+    return (BucketBO) new BucketBO()
+        .setType(source.getBucketType().getValue())
+        .setId(source.getBucketId());
+  }
 }

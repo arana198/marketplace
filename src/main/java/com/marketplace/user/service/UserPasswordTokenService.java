@@ -6,9 +6,9 @@ import com.marketplace.user.domain.UserPasswordTokenBO;
 import java.util.Optional;
 
 public interface UserPasswordTokenService {
-    void createToken(UserBO userBO);
+  void createToken(UserBO userBO);
 
-    void delete(UserPasswordTokenBO userPasswordTokenBO);
+  void delete(UserPasswordTokenBO userPasswordTokenBO);
 
-    Optional<UserPasswordTokenBO> findByUserIdAndToken(String userId, String token);
+  Optional<UserPasswordTokenBO> findByUserIdAndToken(String userId, String token);
 }

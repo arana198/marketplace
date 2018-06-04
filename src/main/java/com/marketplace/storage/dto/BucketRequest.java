@@ -14,41 +14,41 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties
 public class BucketRequest {
 
-    public enum BucketType {
-        BROKER("BROKER"),
-        COMPANY("COMPANY"),
-        APPLICATION("APPLICATION"),
-        SYSTEM("SYSTEM");
+  @NotNull(message = "bucketId is mandatory")
+  private final String bucketId;
 
-        private String value;
-        private boolean unrestricted;
+  @NotNull(message = "bucketType is mandatory")
+  private final BucketType bucketType;
 
-        BucketType(String value) {
-            this.value = value;
-        }
+  public enum BucketType {
+    BROKER("BROKER"),
+    COMPANY("COMPANY"),
+    APPLICATION("APPLICATION"),
+    SYSTEM("SYSTEM");
 
-        public static BucketType getRoleFromString(String value) {
-            for (BucketType bucketType : BucketType.values()) {
-                if (bucketType.getValue().equalsIgnoreCase(value)) {
-                    return bucketType;
-                }
-            }
+    private String value;
+    private boolean unrestricted;
 
-            return null;
-        }
-
-        public String getValue() {
-            return this.value;
-        }
+    BucketType(final String value) {
+      this.value = value;
     }
 
-    @NotNull(message = "bucketId is mandatory")
-    private final String bucketId;
+    public static BucketType getRoleFromString(final String value) {
+      for (BucketType bucketType : BucketType.values()) {
+        if (bucketType.getValue().equalsIgnoreCase(value)) {
+          return bucketType;
+        }
+      }
 
-    @NotNull(message = "bucketType is mandatory")
-    private final BucketType bucketType;
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class BucketRequestBuilder {
+      return null;
     }
+
+    public String getValue() {
+      return this.value;
+    }
+  }
+
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class BucketRequestBuilder {
+  }
 }

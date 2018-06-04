@@ -20,20 +20,20 @@ import java.time.LocalDate;
 @Table(name = "company_employee_invite")
 public class CompanyEmployeeInviteBO implements Serializable {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id", nullable = false)
-    private Long id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @Column(name = "id", nullable = false)
+  private Long id;
 
-    @Column(name = "company_id", nullable = false)
-    private String companyId;
+  @Column(name = "company_id", nullable = false)
+  private String companyId;
 
-    @Column(name = "email", nullable = false)
-    private String email;
+  @Column(name = "email", nullable = false)
+  private String email;
 
-    @Column(name = "token", nullable = false)
-    private String token;
+  @Column(name = "token", nullable = false)
+  private String token;
 
-    @Column(name = "created_ts", nullable = false)
-    private LocalDate createdAt;
+  @Column(name = "created_ts", nullable = false)
+  private LocalDate createdAt;
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 interface ServiceRepository extends BaseRepository<ServiceBO, String> {
 
-    List<ServiceBO> findByParentAndActive(ServiceBO serviceBO, boolean active);
+  List<ServiceBO> findByParentAndActive(ServiceBO serviceBO, boolean active);
 
-    Optional<ServiceBO> findByName(String name);
+  Optional<ServiceBO> findByName(String name);
 }

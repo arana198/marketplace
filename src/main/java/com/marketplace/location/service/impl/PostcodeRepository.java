@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 interface PostcodeRepository extends BaseRepository<PostcodeBO, String> {
 
-    Optional<PostcodeBO> findByPostcode(String postcode);
+  Optional<PostcodeBO> findByPostcode(String postcode);
 }

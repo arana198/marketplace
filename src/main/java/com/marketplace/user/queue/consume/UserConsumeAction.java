@@ -7,27 +7,27 @@ import java.util.stream.Stream;
 
 @Getter
 public enum UserConsumeAction {
-    //BROKER
-    BROKER_REMOVED_FROM_COMPANY("BROKER_REMOVED_FROM_COMPANY"),
-    BROKER_REMOVED_AS_ADMIN("BROKER_REMOVED_AS_ADMIN"),
-    BROKER_ADDED_AS_ADMIN("BROKER_ADDED_AS_ADMIN"),
-    BROKER_VERIFIED("BROKER_VERIFIED");
+  //BROKER
+  BROKER_REMOVED_FROM_COMPANY("BROKER_REMOVED_FROM_COMPANY"),
+  BROKER_REMOVED_AS_ADMIN("BROKER_REMOVED_AS_ADMIN"),
+  BROKER_ADDED_AS_ADMIN("BROKER_ADDED_AS_ADMIN"),
+  BROKER_VERIFIED("BROKER_VERIFIED");
 
-    private final String value;
+  private final String value;
 
-    UserConsumeAction(final String value) {
-        this.value = value;
-    }
+  UserConsumeAction(final String value) {
+    this.value = value;
+  }
 
-    public static Optional<UserConsumeAction> getActionFromString(final String value) {
-        return Stream.of(UserConsumeAction.values())
-                .filter(a -> a.getValue().equalsIgnoreCase(value))
-                .findAny();
-    }
+  public static Optional<UserConsumeAction> getActionFromString(final String value) {
+    return Stream.of(UserConsumeAction.values())
+        .filter(a -> a.getValue().equalsIgnoreCase(value))
+        .findAny();
+  }
 
-    public static String getStringFromAction(final UserConsumeAction value) {
-        return Optional.ofNullable(value)
-                .map(UserConsumeAction::getValue)
-                .orElse(null);
-    }
+  public static String getStringFromAction(final UserConsumeAction value) {
+    return Optional.ofNullable(value)
+        .map(UserConsumeAction::getValue)
+        .orElse(null);
+  }
 }

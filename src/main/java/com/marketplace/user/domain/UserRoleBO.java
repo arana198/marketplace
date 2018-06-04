@@ -21,31 +21,31 @@ import java.time.LocalDateTime;
 @Table(name = "user_roles")
 public class UserRoleBO implements Serializable {
 
-    private static final long serialVersionUID = -5889526109417397633L;
+  private static final long serialVersionUID = -5889526109417397633L;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id", nullable = false)
-    private Long id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @Column(name = "id", nullable = false)
+  private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private UserBO user;
+  @ManyToOne
+  @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+  private UserBO user;
 
-    @OneToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
-    private RoleBO role;
+  @OneToOne
+  @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
+  private RoleBO role;
 
-    @OneToOne
-    @JoinColumn(name = "user_status_id", referencedColumnName = "id", nullable = false)
-    private UserStatusBO userStatus;
+  @OneToOne
+  @JoinColumn(name = "user_status_id", referencedColumnName = "id", nullable = false)
+  private UserStatusBO userStatus;
 
-    @Column(name = "provider", nullable = false)
-    private String provider;
+  @Column(name = "provider", nullable = false)
+  private String provider;
 
-    @Column(name = "provider_user_id", unique = true)
-    private String providerUserId;
+  @Column(name = "provider_user_id", unique = true)
+  private String providerUserId;
 
-    @Column(name = "created_ts", nullable = false)
-    private LocalDateTime createdTs;
+  @Column(name = "created_ts", nullable = false)
+  private LocalDateTime createdTs;
 }

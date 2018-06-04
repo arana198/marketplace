@@ -20,75 +20,75 @@ import java.util.stream.Collectors;
 @Service
 class ProductServiceImpl implements ProductService {
 
-    private final ServiceRepository serviceRepository;
-    private final ServiceResponseConverter serviceResponseConverter;
-    private final ServiceRequestConverter serviceRequestConverter;
+  private final ServiceRepository serviceRepository;
+  private final ServiceResponseConverter serviceResponseConverter;
+  private final ServiceRequestConverter serviceRequestConverter;
 
-    @Override
-    public List<ServiceResponse> findParentByIsActive(final boolean isActive) {
-        return serviceRepository.findByParentAndActive(null, isActive)
-                .parallelStream()
-                .map(serviceResponseConverter::convert)
-                .collect(Collectors.toList());
+  @Override
+  public List<ServiceResponse> findParentByIsActive(final boolean isActive) {
+    return serviceRepository.findByParentAndActive(null, isActive)
+        .parallelStream()
+        .map(serviceResponseConverter::convert)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<ServiceResponse> findByParentIdAndIsActive(final String parentId, final boolean isActive) throws ServiceNotFoundException {
+    final ServiceBO parentBO = serviceRepository.findById(parentId)
+        .orElseThrow(() -> new ServiceNotFoundException(parentId));
+
+    return serviceRepository.findByParentAndActive(parentBO, isActive)
+        .parallelStream()
+        .map(serviceResponseConverter::convert)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public Optional<ServiceResponse> findByServiceId(final String serviceId) {
+    return serviceRepository.findById(serviceId)
+        .map(serviceResponseConverter::convert);
+  }
+
+  @Override
+  public ServiceResponse addService(final ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException {
+
+    ServiceBO parent = null;
+    if (!StringUtils.isEmpty(serviceRequest.getParentServiceId())) {
+      parent = serviceRepository.findById(serviceRequest.getParentServiceId())
+          .orElseThrow(() -> new ServiceNotFoundException(serviceRequest.getParentServiceId()));
+
     }
 
-    @Override
-    public List<ServiceResponse> findByParentIdAndIsActive(final String parentId, final boolean isActive) throws ServiceNotFoundException {
-        final ServiceBO parentBO = serviceRepository.findById(parentId)
-                .orElseThrow(() -> new ServiceNotFoundException(parentId));
+    this.checkIfNameIsUnique(serviceRequest.getName());
+    ServiceBO serviceBO = serviceRequestConverter.convert(serviceRequest)
+        .setParent(parent);
 
-        return serviceRepository.findByParentAndActive(parentBO, isActive)
-                .parallelStream()
-                .map(serviceResponseConverter::convert)
-                .collect(Collectors.toList());
+    serviceRepository.save(serviceBO);
+    return serviceResponseConverter.convert(serviceBO);
+  }
+
+  @Override
+  public void updateService(final String serviceId, final ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException {
+    ServiceBO oldService = serviceRepository.findById(serviceId)
+        .orElseThrow(() -> new ServiceNotFoundException(serviceId));
+
+    if (!oldService.getDisplayName().equalsIgnoreCase(serviceRequest.getName())) {
+      this.checkIfNameIsUnique(serviceRequest.getName());
     }
 
-    @Override
-    public Optional<ServiceResponse> findByServiceId(final String serviceId) {
-        return serviceRepository.findById(serviceId)
-                .map(serviceResponseConverter::convert);
+    if (oldService.getParent() != null && !oldService.getParent().getId().equalsIgnoreCase(serviceRequest.getParentServiceId())) {
+      serviceRepository.findById(serviceRequest.getParentServiceId())
+          .orElseThrow(() -> new ServiceNotFoundException(serviceRequest.getParentServiceId()));
     }
 
-    @Override
-    public ServiceResponse addService(final ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException {
+    ServiceBO newService = serviceRequestConverter.convert(serviceRequest);
+    newService.update(oldService);
+    serviceRepository.save(newService);
+  }
 
-        ServiceBO parent = null;
-        if (!StringUtils.isEmpty(serviceRequest.getParentServiceId())) {
-            parent = serviceRepository.findById(serviceRequest.getParentServiceId())
-                    .orElseThrow(() -> new ServiceNotFoundException(serviceRequest.getParentServiceId()));
-
-        }
-
-        this.checkIfNameIsUnique(serviceRequest.getName());
-        ServiceBO serviceBO = serviceRequestConverter.convert(serviceRequest)
-                .setParent(parent);
-
-        serviceRepository.save(serviceBO);
-        return serviceResponseConverter.convert(serviceBO);
-    }
-
-    @Override
-    public void updateService(final String serviceId, final ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException {
-        ServiceBO oldService = serviceRepository.findById(serviceId)
-                .orElseThrow(() -> new ServiceNotFoundException(serviceId));
-
-        if (!oldService.getDisplayName().equalsIgnoreCase(serviceRequest.getName())) {
-            this.checkIfNameIsUnique(serviceRequest.getName());
-        }
-
-        if (oldService.getParent() != null && !oldService.getParent().getId().equalsIgnoreCase(serviceRequest.getParentServiceId())) {
-            serviceRepository.findById(serviceRequest.getParentServiceId())
-                    .orElseThrow(() -> new ServiceNotFoundException(serviceRequest.getParentServiceId()));
-        }
-
-        ServiceBO newService = serviceRequestConverter.convert(serviceRequest);
-        newService.update(oldService);
-        serviceRepository.save(newService);
-    }
-
-    private void checkIfNameIsUnique(final String displayName) throws ServiceAlreadyExistsException {
-        final String name = displayName.toUpperCase().replace(" ", "_");
-        serviceRepository.findByName(name)
-                .orElseThrow(() -> new ServiceAlreadyExistsException(displayName));
-    }
+  private void checkIfNameIsUnique(final String displayName) throws ServiceAlreadyExistsException {
+    final String name = displayName.toUpperCase().replace(" ", "_");
+    serviceRepository.findByName(name)
+        .orElseThrow(() -> new ServiceAlreadyExistsException(displayName));
+  }
 }

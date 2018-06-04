@@ -19,23 +19,23 @@ import org.springframework.web.client.RestTemplate;
 @Service
 class EmailSenderService {
 
-    private static final RestTemplate REST_TEMPLATE = new RestTemplate();
+  private static final RestTemplate REST_TEMPLATE = new RestTemplate();
 
-    private final ConfigurationService configurationService;
+  private final ConfigurationService configurationService;
 
-    public void send(final EmailRequest emailRequest) throws EmailFailedException {
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
-        headers.add("Authorization", configurationService.getEmailApiToken());
-        headers.add("Content-Type", "application/json");
+  public void send(final EmailRequest emailRequest) throws EmailFailedException {
+    MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+    headers.add("Authorization", configurationService.getEmailApiToken());
+    headers.add("Content-Type", "application/json");
 
-        HttpEntity<EmailRequest> request = new HttpEntity<EmailRequest>(emailRequest, headers);
-        try {
-            REST_TEMPLATE.postForEntity(configurationService.getEmailApiUrl(), request, String.class);
-        } catch (HttpServerErrorException ex) {
-            log.warn("Email failed to sent: ", ex);
-            throw ex;
-        } catch (HttpClientErrorException ex) {
-            throw new EmailFailedException(ex.getMessage());
-        }
+    HttpEntity<EmailRequest> request = new HttpEntity<EmailRequest>(emailRequest, headers);
+    try {
+      REST_TEMPLATE.postForEntity(configurationService.getEmailApiUrl(), request, String.class);
+    } catch (HttpServerErrorException ex) {
+      LOGGER.warn("Email failed to sent: ", ex);
+      throw ex;
+    } catch (HttpClientErrorException ex) {
+      throw new EmailFailedException(ex.getMessage());
     }
+  }
 }

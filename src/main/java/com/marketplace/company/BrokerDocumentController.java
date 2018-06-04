@@ -6,7 +6,7 @@ import com.marketplace.common.security.AuthUser;
 import com.marketplace.common.security.UserRole;
 import com.marketplace.company.dto.BrokerDocumentResponse;
 import com.marketplace.company.service.BrokerDocumentService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,47 +23,47 @@ import javax.annotation.security.RolesAllowed;
 import java.io.IOException;
 import java.util.List;
 
-@Data
 @Slf4j
+@AllArgsConstructor
 @Controller
 @RequestMapping("/companies/{companyId}/brokers/{brokerId}/documents")
 public class BrokerDocumentController {
 
-    private final BrokerDocumentService brokerDocumentService;
+  private final BrokerDocumentService brokerDocumentService;
 
-    @RolesAllowed({UserRole.ROLE_BROKER})
-    @GetMapping
-    public ResponseEntity<List<BrokerDocumentResponse>> getDocuments(@PathVariable final String companyId,
-                                                                     @PathVariable final String brokerId)
-            throws ResourceNotFoundException {
+  @RolesAllowed({UserRole.ROLE_BROKER})
+  @GetMapping
+  public ResponseEntity<List<BrokerDocumentResponse>> getDocuments(@PathVariable final String companyId,
+                                                                   @PathVariable final String brokerId)
+      throws ResourceNotFoundException {
 
-        log.info("Adding broker: {} certification document", brokerId);
-        List<BrokerDocumentResponse> brokerDocuments = brokerDocumentService.getBrokerDocuments(AuthUser.getUserId(), companyId, brokerId);
-        return new ResponseEntity<>(brokerDocuments, HttpStatus.OK);
-    }
+    LOGGER.info("Adding broker: {} certification document", brokerId);
+    List<BrokerDocumentResponse> brokerDocuments = brokerDocumentService.getBrokerDocuments(AuthUser.getUserId(), companyId, brokerId);
+    return new ResponseEntity<>(brokerDocuments, HttpStatus.OK);
+  }
 
-    @RolesAllowed({UserRole.ROLE_BROKER})
-    @PostMapping
-    public ResponseEntity<Void> addDocument(@PathVariable final String companyId,
-                                            @PathVariable final String brokerId,
-                                            @RequestPart(name = "file") final MultipartFile multipartFile)
-            throws ResourceNotFoundException, IOException {
+  @RolesAllowed({UserRole.ROLE_BROKER})
+  @PostMapping
+  public ResponseEntity<Void> addDocument(@PathVariable final String companyId,
+                                          @PathVariable final String brokerId,
+                                          @RequestPart(name = "file") final MultipartFile multipartFile)
+      throws ResourceNotFoundException, IOException {
 
-        log.info("Adding broker: {} certification document", brokerId);
-        brokerDocumentService.addDocument(AuthUser.getUserId(), companyId, brokerId, multipartFile);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    LOGGER.info("Adding broker: {} certification document", brokerId);
+    brokerDocumentService.addDocument(AuthUser.getUserId(), companyId, brokerId, multipartFile);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 
-    @IsActive
-    @RolesAllowed({UserRole.ROLE_ADMIN})
-    @PutMapping(path = "/{documentId}")
-    public ResponseEntity<Void> verifyCDocument(@PathVariable final String companyId,
-                                                @PathVariable final String brokerId,
-                                                @PathVariable final String documentId)
-            throws ResourceNotFoundException {
+  @IsActive
+  @RolesAllowed({UserRole.ROLE_ADMIN})
+  @PutMapping(path = "/{documentId}")
+  public ResponseEntity<Void> verifyCDocument(@PathVariable final String companyId,
+                                              @PathVariable final String brokerId,
+                                              @PathVariable final String documentId)
+      throws ResourceNotFoundException {
 
-        log.info("Verifying broker: {} document {}", brokerId, documentId);
-        brokerDocumentService.verifyDocument(companyId, brokerId, documentId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    LOGGER.info("Verifying broker: {} document {}", brokerId, documentId);
+    brokerDocumentService.verifyDocument(companyId, brokerId, documentId);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 }

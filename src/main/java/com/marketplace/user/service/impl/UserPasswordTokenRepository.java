@@ -7,7 +7,7 @@ import java.util.Optional;
 
 interface UserPasswordTokenRepository extends BaseRepository<UserPasswordTokenBO, Long> {
 
-    Optional<UserPasswordTokenBO> findByUserIdAndToken(String userId, String token);
+  Optional<UserPasswordTokenBO> findByUserIdAndToken(String userId, String token);
 
-    Optional<UserPasswordTokenBO> findByUserId(String userId);
+  Optional<UserPasswordTokenBO> findByUserId(String userId);
 }

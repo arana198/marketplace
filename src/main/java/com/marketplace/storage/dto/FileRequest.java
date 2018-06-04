@@ -15,51 +15,51 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties
 public class FileRequest {
 
-    public enum FileType {
-        PROFILE_IMAGE("PROFILE_IMAGE", true),
-        MORTGAGE_APPLICATION_DOCUMENT("MORTGAGE_APPLICATION_DOCUMENT", false),
-        BROKER_CERTIFICATE("BROKER_CERTIFICATE", false);
+  @Valid
+  @NotNull(message = "bucket is mandatory")
+  private final BucketRequest bucket;
 
-        private final String value;
-        private final boolean unrestricted;
+  @NotNull(message = "name is mandatory")
+  private final String name;
 
-        FileType(final String value, final boolean unrestricted) {
-            this.value = value;
-            this.unrestricted = unrestricted;
-        }
+  private final String description;
 
-        public static FileType getRoleFromString(String value) {
-            for (FileType file : FileType.values()) {
-                if (file.getValue().equalsIgnoreCase(value)) {
-                    return file;
-                }
-            }
+  @NotNull(message = "fileType is mandatory")
+  private final FileType fileType;
 
-            return null;
-        }
+  public enum FileType {
+    PROFILE_IMAGE("PROFILE_IMAGE", true),
+    MORTGAGE_APPLICATION_DOCUMENT("MORTGAGE_APPLICATION_DOCUMENT", false),
+    BROKER_CERTIFICATE("BROKER_CERTIFICATE", false);
 
-        public String getValue() {
-            return this.value;
-        }
+    private final String value;
+    private final boolean unrestricted;
 
-        public boolean isPublic() {
-            return unrestricted;
-        }
+    FileType(final String value, final boolean unrestricted) {
+      this.value = value;
+      this.unrestricted = unrestricted;
     }
 
-    @Valid
-    @NotNull(message = "bucket is mandatory")
-    private final BucketRequest bucket;
+    public static FileType getRoleFromString(final String value) {
+      for (FileType file : FileType.values()) {
+        if (file.getValue().equalsIgnoreCase(value)) {
+          return file;
+        }
+      }
 
-    @NotNull(message = "name is mandatory")
-    private final String name;
-
-    private final String description;
-
-    @NotNull(message = "fileType is mandatory")
-    private final FileType fileType;
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class FileRequestBuilder {
+      return null;
     }
+
+    public String getValue() {
+      return this.value;
+    }
+
+    public boolean isPublic() {
+      return unrestricted;
+    }
+  }
+
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class FileRequestBuilder {
+  }
 }

@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 class EmailRequestConverter implements BaseConverter<EmailRequest, EmailBO> {
-    @Override
-    public EmailBO convert(final EmailRequest source) {
-        return new EmailBO()
-                .setFromAddress(source.getFromAddress())
-                .setContent(source.getContent())
-                .setSubject(source.getSubject())
-                .setToAddress(source.getToAddress());
-    }
+  @Override
+  public EmailBO convert(final EmailRequest source) {
+    return new EmailBO()
+        .setFromAddress(source.getFromAddress())
+        .setContent(source.getContent())
+        .setSubject(source.getSubject())
+        .setToAddress(source.getToAddress());
+  }
 }

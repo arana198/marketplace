@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @IntegrationComponentScan
 public class MarketplaceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MarketplaceApplication.class, args);
-    }
+  public static void main(final String[] args) {
+    SpringApplication.run(MarketplaceApplication.class, args);
+  }
 
-    @Bean
-    public Gson gson() {
-        return new Gson();
-    }
+  @Bean
+  public Gson gson() {
+    return new Gson();
+  }
 }

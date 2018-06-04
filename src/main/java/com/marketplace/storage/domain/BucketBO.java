@@ -24,10 +24,10 @@ import java.util.Set;
 @Table(name = "buckets")
 public class BucketBO extends AbstractTimestampEntity {
 
-    @Column(name = "type", nullable = false)
-    private String type;
+  @Column(name = "type", nullable = false)
+  private String type;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "bucket_id")
-    private Set<BucketPermissionBO> permissions = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "bucket_id")
+  private Set<BucketPermissionBO> permissions = new HashSet<>();
 }

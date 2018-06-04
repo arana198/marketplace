@@ -19,19 +19,19 @@ import java.io.Serializable;
 @Table(name = "user_status")
 public class UserStatusBO implements Serializable {
 
-    private static final long serialVersionUID = 1815696712482274042L;
+  private static final long serialVersionUID = 1815696712482274042L;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id", nullable = false)
-    private String id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @Column(name = "id", nullable = false)
+  private String id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @Column(name = "description", nullable = false)
-    private String description;
+  @Column(name = "description", nullable = false)
+  private String description;
 
-    @Column(name = "is_selectable", nullable = false)
-    private boolean selectable;
+  @Column(name = "is_selectable", nullable = false)
+  private boolean selectable;
 }

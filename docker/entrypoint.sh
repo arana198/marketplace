@@ -18,4 +18,4 @@ sed -i 's|RABBITMQ_USERNAME|'"$RABBITMQ_USERNAME"'|g' application.properties
 sed -i 's|RABBITMQ_PASSWORD|'"$RABBITMQ_PASSWORD"'|g' application.properties
 
 cd /opt/webapp
-java -jar studyit.jar
+java -jar marketplace.jar

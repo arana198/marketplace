@@ -6,7 +6,7 @@ import com.marketplace.user.domain.UserRoleBO;
 import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.dto.UserStatusRequest.UserStatus;
 import com.marketplace.user.exception.UserAuthenticationException;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
+@AllArgsConstructor
 @Service
 class UserAuthenticationManager implements AuthenticationManager, UserDetailsService {
 

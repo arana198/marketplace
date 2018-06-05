@@ -6,7 +6,7 @@ import com.marketplace.company.dto.ServiceResponse;
 import com.marketplace.company.exception.ServiceAlreadyExistsException;
 import com.marketplace.company.exception.ServiceNotFoundException;
 import com.marketplace.company.service.ProductService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Data
+@AllArgsConstructor
 @Service
 class ProductServiceImpl implements ProductService {
 

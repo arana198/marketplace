@@ -3,12 +3,12 @@ package com.marketplace.company.facade;
 import com.marketplace.company.dto.ServiceResponse;
 import com.marketplace.company.exception.ServiceNotFoundException;
 import com.marketplace.company.service.ProductService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Data
+@AllArgsConstructor
 @Service
 class ServiceFacadeImpl implements ServiceFacade {
 

@@ -16,7 +16,7 @@ import com.marketplace.location.io.dto.Postcode;
 import com.marketplace.location.service.AddressService;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Data
+@AllArgsConstructor
 @Service
 class AddressServiceImpl implements AddressService {
 

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.marketplace.company.dto.BrokerProfileResponse;
 import com.marketplace.storage.dto.BucketPermissionResponse;
 import com.marketplace.storage.service.BucketService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Service
 class StorageMessageHandlerImpl implements MessageHandler {

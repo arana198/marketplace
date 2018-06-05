@@ -4,7 +4,7 @@ package com.marketplace.notification.email.service.impl;
 import com.marketplace.notification.email.dto.EmailRequest;
 import com.marketplace.notification.email.exception.EmailFailedException;
 import com.marketplace.utils.ConfigurationService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
-@Data
+@AllArgsConstructor
 @Service
 class EmailSenderService {
 

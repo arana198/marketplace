@@ -8,13 +8,13 @@ import com.marketplace.notification.email.dto.EmailRequest;
 import com.marketplace.notification.email.exception.EmailFailedException;
 import com.marketplace.notification.email.service.EmailService;
 import com.marketplace.user.dto.TokenVerificationResponse;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
+@AllArgsConstructor
 @Service
 class EmailServiceImpl implements EmailService {
 

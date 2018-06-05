@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: marketplace-api
+  cloud:
+    kubernetes:
+      reload:
+        enabled: true

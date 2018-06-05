@@ -6,7 +6,7 @@ import com.marketplace.company.exception.AdviceMethodNotFoundException;
 import com.marketplace.company.exception.CompanyAdviceAlreadyExistsException;
 import com.marketplace.company.service.AdviceMethodService;
 import com.marketplace.company.service.CompanyAdviceMethodService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Data
+@AllArgsConstructor
 @Service
 class CompanyAdviceMethodServiceImpl implements CompanyAdviceMethodService {
 

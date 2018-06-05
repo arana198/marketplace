@@ -28,68 +28,68 @@ import javax.sql.DataSource;
 @EnableAuthorizationServer
 public class OAuth2AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
 
-    @Autowired
-    private DataSource dataSource;
+  @Autowired
+  private DataSource dataSource;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+  @Autowired
+  private UserDetailsService userDetailsService;
 
-    @Autowired
-    private TokenEnhancer tokenEnhancer;
+  @Autowired
+  private TokenEnhancer tokenEnhancer;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public TokenStore tokenStore() {
-        return new JdbcTokenStore(dataSource);
-    }
+  @Bean
+  public TokenStore tokenStore() {
+    return new JdbcTokenStore(dataSource);
+  }
 
-    @Bean
-    public OAuth2AuthenticationEntryPoint oAuth2AuthenticationEntryPoint() {
-        OAuth2AuthenticationEntryPoint entryPoint = new OAuth2AuthenticationEntryPoint();
-        entryPoint.setTypeName("Basic");
-        return entryPoint;
-    }
+  @Bean
+  public OAuth2AuthenticationEntryPoint oAuth2AuthenticationEntryPoint() {
+    OAuth2AuthenticationEntryPoint entryPoint = new OAuth2AuthenticationEntryPoint();
+    entryPoint.setTypeName("Basic");
+    return entryPoint;
+  }
 
-    @Override
-    public void configure(final AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.pathMapping("/oauth/token", "/login")
-                .authenticationManager(authenticationManager)
-                .userDetailsService(userDetailsService)
-                .tokenEnhancer(tokenEnhancer)
-                .tokenStore(this.tokenStore());
-    }
+  @Override
+  public void configure(final AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+    endpoints.pathMapping("/oauth/token", "/login")
+        .authenticationManager(authenticationManager)
+        .userDetailsService(userDetailsService)
+        .tokenEnhancer(tokenEnhancer)
+        .tokenStore(this.tokenStore());
+  }
 
-    @Override
-    public void configure(final AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.checkTokenAccess("hasRole('ROLE_RESOURCE_SERVER')")
-                .passwordEncoder(this.passwordEncoder());
-    }
+  @Override
+  public void configure(final AuthorizationServerSecurityConfigurer security) throws Exception {
+    security.checkTokenAccess("hasRole('ROLE_RESOURCE_SERVER')")
+        .passwordEncoder(this.passwordEncoder());
+  }
 
-    @Override
-    public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
-        clients
-                .jdbc(dataSource)
-                .passwordEncoder(this.passwordEncoder());
-    }
+  @Override
+  public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
+    clients
+        .jdbc(dataSource)
+        .passwordEncoder(this.passwordEncoder());
+  }
 
-    @Bean
-    public FilterRegistrationBean corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
+  @Bean
+  public FilterRegistrationBean corsFilter() {
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.addAllowedOrigin("*");
+    config.addAllowedHeader("*");
+    config.addAllowedMethod("*");
+    source.registerCorsConfiguration("/**", config);
+    FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+    bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    return bean;
+  }
 }

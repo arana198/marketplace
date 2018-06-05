@@ -4,7 +4,7 @@ import com.marketplace.common.exception.BadRequestException;
 import com.marketplace.common.exception.ResourceNotFoundException;
 import com.marketplace.user.dto.ForgottenPasswordRequest;
 import com.marketplace.user.service.UserService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpStatus;
@@ -19,34 +19,34 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Controller
 @RequestMapping("/resetpassword")
 public class ResetPasswordController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<ResourceSupport> createResetPasswordToken(@RequestParam final String email)
-            throws ResourceNotFoundException {
+  @PostMapping
+  public ResponseEntity<ResourceSupport> createResetPasswordToken(@RequestParam final String email)
+      throws ResourceNotFoundException {
 
-        log.info("Creating reset password for user: {}", email);
-        userService.resetPassword(email);
-        return new ResponseEntity<ResourceSupport>(HttpStatus.CREATED);
+    LOGGER.info("Creating reset password for user: {}", email);
+    userService.resetPassword(email);
+    return new ResponseEntity<ResourceSupport>(HttpStatus.CREATED);
+  }
+
+  @PutMapping
+  public ResponseEntity<ResourceSupport> resetpassword(@Valid @RequestBody final ForgottenPasswordRequest forgottenPasswordRequest,
+                                                       final BindingResult bindingResult)
+      throws ResourceNotFoundException {
+
+    LOGGER.info("Resetting password for user: {}", forgottenPasswordRequest.getEmail());
+    if (bindingResult.hasErrors()) {
+      throw new BadRequestException("Invalid forgot password object", bindingResult);
     }
 
-    @PutMapping
-    public ResponseEntity<ResourceSupport> resetpassword(@Valid @RequestBody final ForgottenPasswordRequest forgottenPasswordRequest,
-                                                         final BindingResult bindingResult)
-            throws ResourceNotFoundException {
-
-        log.info("Resetting password for user: {}", forgottenPasswordRequest.getEmail());
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Invalid forgot password object", bindingResult);
-        }
-
-        userService.resetPassword(forgottenPasswordRequest);
-        return ResponseEntity.ok().build();
-    }
+    userService.resetPassword(forgottenPasswordRequest);
+    return ResponseEntity.ok().build();
+  }
 }

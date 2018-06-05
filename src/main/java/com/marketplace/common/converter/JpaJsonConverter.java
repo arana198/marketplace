@@ -8,24 +8,24 @@ import java.io.IOException;
 
 public class JpaJsonConverter implements AttributeConverter<Object, String> {
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @Override
-    public String convertToDatabaseColumn(final Object meta) {
-        try {
-            return objectMapper.writeValueAsString(meta);
-        } catch (JsonProcessingException ex) {
-            return null;
-        }
+  @Override
+  public String convertToDatabaseColumn(final Object meta) {
+    try {
+      return OBJECT_MAPPER.writeValueAsString(meta);
+    } catch (JsonProcessingException ex) {
+      return null;
     }
+  }
 
-    @Override
-    public Object convertToEntityAttribute(final String dbData) {
-        try {
-            return objectMapper.readValue(dbData, Object.class);
-        } catch (IOException ex) {
-            // logger.error("Unexpected IOEx decoding json from database: " + dbData);
-            return null;
-        }
+  @Override
+  public Object convertToEntityAttribute(final String dbData) {
+    try {
+      return OBJECT_MAPPER.readValue(dbData, Object.class);
+    } catch (IOException ex) {
+      // logger.error("Unexpected IOEx decoding json from database: " + dbData);
+      return null;
     }
+  }
 }

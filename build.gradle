@@ -1,96 +1,155 @@
 apply plugin: "java"
 apply plugin: "org.springframework.boot"
 apply plugin: "io.spring.dependency-management"
-apply plugin: "org.flywaydb.flyway"
 apply plugin: "groovy"
+apply plugin: "checkstyle"
+apply plugin: "jacoco"
+//apply plugin: "com.github.spotbugs"
 
 buildscript {
-    ext {
-        springBootVersion = "1.5.8.RELEASE"
-    }
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {url "http://repo.spring.io/libs-release"}
-        maven {url "https://plugins.gradle.org/m2/"}
+        //maven { url "http://repo.spring.io/libs-release" }
+        maven { url "https://repo.spring.io/libs-milestone" }
+        maven { url "https://plugins.gradle.org/m2/" }
 
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath "org.flywaydb:flyway-gradle-plugin:4.2.0"
+        classpath group: "org.springframework.boot", name: 'spring-boot-gradle-plugin', version: "2.0.2.RELEASE"
+        classpath group: "org.flywaydb", name: "flyway-gradle-plugin", version: "5.1.1"
+        classpath group: "gradle.plugin.com.github.spotbugs", name: "spotbugs-gradle-plugin", version: "1.6.2"
+        classpath group: "gradle.plugin.com.gorylenko.gradle-git-properties", name: "gradle-git-properties", version: "1.4.21"
     }
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 10
+targetCompatibility = 10
+
+checkstyle {
+    toolVersion "8.10.1"
+    configFile = rootProject.file("checkstyle.xml")
+    sourceSets = [project.sourceSets.main]
+}
+
+/*spotbugs {
+    toolVersion = '3.1.3'
+    sourceSets = [sourceSets.main]
+}*/
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.1"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.enabled = true
+    }
+
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "**/resource/**",
+                    "**/domain/**",
+                    "**/config/**",
+                    "**/exception/**"
+            ])
+        })
+    }
+}
+
+test {
+    jacoco {
+        excludes = ["**/resource/**"]
+    }
+
+    reports {
+        junitXml.enabled = false
+        html.enabled = true
+    }
+}
+
+test.finalizedBy(project.tasks.jacocoTestReport)
 
 repositories {
     mavenLocal()
     maven { url "http://download.osgeo.org/webdav/geotools" }
-    jcenter()
     mavenCentral()
+    maven { url "https://repo.spring.io/libs-milestone" }
     maven { url "https://repo.spring.io/libs-release" }
     maven { url "https://artifacts.alfresco.com/nexus/content/repositories/public/" }
 
 }
 
-dependencies {
-    compile "org.springframework.cloud:spring-cloud-starter-oauth2"
-    compile "org.springframework.boot:spring-boot-starter-data-jpa"
-    compile "org.springframework.boot:spring-boot-starter-hateoas"
-    compile "org.springframework.boot:spring-boot-starter-security"
-    compile "org.springframework.boot:spring-boot-starter-web"
-    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
-
-    compile "org.springframework.data:spring-data-envers:0.2.0.RELEASE"
-
-    compile "org.springframework.boot:spring-boot-starter-social-facebook"
-    compile "org.springframework.boot:spring-boot-starter-social-linkedin"
-    compile "org.springframework.social:spring-social-google:1.0.0.RELEASE"
-    compile "org.springframework.social:spring-social-security:2.0.0.M2"
-    compile "org.springframework.social:spring-social-facebook:3.0.0.M1"
-
-    compile "org.springframework.cloud:spring-cloud-starter-bus-amqp"
-    compile "org.springframework:spring-messaging:4.3.6.RELEASE"
-    compile "org.springframework.integration:spring-integration-amqp:4.3.7.RELEASE"
-    compile "org.springframework.integration:spring-integration-java-dsl:1.2.1.RELEASE"
-
-    //compile "io.springfox:springfox-swagger2:2.7.0"
-    //compile "io.springfox:springfox-swagger-ui:2.7.0"
-    compile "org.hibernate:hibernate-spatial:5.2.12.Final"
-
-    compile "org.projectlombok:lombok:1.16.18"
-    runtime "org.mariadb.jdbc:mariadb-java-client:2.2.0"
-    compile "org.apache.commons:commons-lang3:3.7"
-    compile "org.apache.commons:commons-compress:1.15"
-    compile "commons-io:commons-io:2.6"
-    compile "org.flywaydb:flyway-core:4.2.0"
-    compile "com.google.code.gson:gson:2.8.2"
-
-    compile "com.google.guava:guava:22.0"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.2"
-
-    compile "org.codehaus.groovy:groovy-all:2.4.12"
-    testCompile "org.spockframework:spock-spring:1.1-groovy-2.4"
-    testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
-    testCompile "org.springframework.boot:spring-boot-starter-test"
-}
-
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.SR4"
-        mavenBom "org.springframework.cloud:spring-cloud-bus:1.3.1.RELEASE"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.RC1"
+        mavenBom "org.springframework.cloud:spring-cloud-bus:2.0.0.RC2"
     }
 }
 
+dependencies {
+
+    compile group: "org.springframework.boot", name: "spring-boot-starter-web"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-data-jpa"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-actuator"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-hateoas"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-security"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-thymeleaf"
+
+    compile group: "org.springframework.cloud", name: "spring-cloud-starter-oauth2"
+    compile group: "org.springframework.cloud", name: "spring-cloud-starter-bus-amqp"
+
+    compile group: "org.springframework.boot", name: "spring-boot-starter-social-facebook", version: "2.0.0.M6"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-social-linkedin", version: "2.0.0.M6"
+    compile group: "org.springframework.social", name: "spring-social-google", version: "1.1.0"
+    compile group: "org.springframework.social", name: "spring-social-security", version: "2.0.0.M4"
+    compile group: "org.springframework.social", name: "spring-social-facebook", version: "3.0.0.M3"
+
+    compile group: "org.springframework.data", name: "spring-data-envers", version: "2.0.7.RELEASE"
+
+    compile group: "org.springframework", name: "spring-messaging", version: "5.0.6.RELEASE"
+    compile group: "org.springframework.integration", name: "spring-integration-amqp", version: "5.0.5.RELEASE"
+
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.3.1.Final'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.10.Final'
+    compile group: "org.hibernate", name: "hibernate-spatial", version: "5.3.1.Final"
+
+    compile group: "io.springfox", name: "springfox-swagger-ui", version: "2.8.0"
+    compile group: "io.springfox", name: "springfox-swagger2", version: "2.8.0"
+
+    compile group: "org.apache.commons", name: "commons-io", version: "1.3.2"
+    compile group: "org.apache.commons", name: "commons-lang3", version: "3.7"
+    compile group: "org.apache.commons", name: "commons-compress", version: "1.15"
+
+    compile group: "org.projectlombok", name: "lombok", version: "1.16.22"
+    runtime group: "org.mariadb.jdbc", name: "mariadb-java-client", version: "2.2.0"
+
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+    compile group: 'com.google.guava', name: 'guava', version: '23.0'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.2'
+
+    compile group: "javax.xml.bind", name: "jaxb-api", version: "2.3.0"
+    compile group: "com.sun.xml.bind", name: "jaxb-impl", version: "2.3.0"
+    compile group: "com.sun.xml.bind", name: "jaxb-core", version: "2.3.0"
+    compile group: "javax.activation", name: "javax.activation-api", version: "1.2.0"
+
+    testCompile group: "org.springframework.boot", name: "spring-boot-starter-test"
+    testCompile group: "org.codehaus.groovy", name: "groovy-all", version: "2.4.15"
+    testCompile group: "org.spockframework", name: "spock-core", version: "1.1-groovy-2.4"
+    testCompile group: "org.spockframework", name: "spock-spring", version: "1.1-groovy-2.4"
+    testCompile group: "org.hamcrest", name: "hamcrest-all", version: "1.3"
+}
+
 task wrapper(type: Wrapper) {
-    gradleVersion = "4.2"
+    gradleVersion = "4.8"
 }
-
-task setupDockerFolder(type: Copy) {
-    from("build/libs/")
-    into("docker/")
-    include("*.jar")
-}
-
-build.finalizedBy(setupDockerFolder)

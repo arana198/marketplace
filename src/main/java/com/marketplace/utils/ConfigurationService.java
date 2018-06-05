@@ -7,27 +7,27 @@ import org.springframework.stereotype.Service;
 @Getter
 @Service
 public class ConfigurationService {
-    @Value("${oauth.authzEndpoint}")
-    private String swaggerOAuthUrl;
+  @Value("${oauth.authzEndpoint}")
+  private String swaggerOAuthUrl;
 
-    @Value("${oauth.clientId}")
-    private String oAuthClientId;
+  @Value("${oauth.clientId}")
+  private String oAuthClientId;
 
-    @Value("${oauth.clientSecret}")
-    private String oAuthClientSecret;
+  @Value("${oauth.clientSecret}")
+  private String oAuthClientSecret;
 
-    @Value("${validator.api.company.url}")
-    private String companyValidatorUrlPrefix;
+  @Value("${validator.api.company.url}")
+  private String companyValidatorUrlPrefix;
 
-    @Value("${validator.api.company.key}")
-    private String companyValidatorApiKey;
+  @Value("${validator.api.company.key}")
+  private String companyValidatorApiKey;
 
-    @Value("${validator.api.vat.url}")
-    private String vatValidatorUrlPrefix;
+  @Value("${validator.api.vat.url}")
+  private String vatValidatorUrlPrefix;
 
-    @Value("${mail.api.url}")
-    private String emailApiUrl;
+  @Value("${mail.api.url}")
+  private String emailApiUrl;
 
-    @Value("${mail.api.token}")
-    private String emailApiToken;
+  @Value("${mail.api.token}")
+  private String emailApiToken;
 }

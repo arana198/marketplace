@@ -19,40 +19,40 @@ import java.util.UUID;
 @Service
 class EmailVerificationTokenService {
 
-    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
-    private final UserPublishService publishService;
+  private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+  private final UserPublishService publishService;
 
-    public void createToken(final UserBO userBO) {
-        log.info("Generating a reset password token for user {}", userBO.getId());
-        final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByUserId(userBO.getId())
-                .map(upt -> upt.setCreatedTs(LocalDateTime.now()))
-                .map(upt -> upt.setToken(UUID.randomUUID().toString()))
-                .orElse(new EmailVerificationTokenBO()
-                        .setUserId(userBO.getId())
-                        .setToken(UUID.randomUUID().toString())
-                        .setCreatedTs(LocalDateTime.now()));
+  public void createToken(final UserBO userBO) {
+    LOGGER.info("Generating a reset password token for user {}", userBO.getId());
+    final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByUserId(userBO.getId())
+        .map(upt -> upt.setCreatedTs(LocalDateTime.now()))
+        .map(upt -> upt.setToken(UUID.randomUUID().toString()))
+        .orElse(new EmailVerificationTokenBO()
+            .setUserId(userBO.getId())
+            .setToken(UUID.randomUUID().toString())
+            .setCreatedTs(LocalDateTime.now()));
 
-        emailVerificationTokenRepository.save(emailVerificationTokenBO);
-        final TokenVerificationResponse emailVerificationResponse = new TokenVerificationResponse(userBO.getId(),
-                userBO.getUsername(),
-                emailVerificationTokenBO.getToken(),
-                emailVerificationTokenBO.getCreatedTs());
+    emailVerificationTokenRepository.save(emailVerificationTokenBO);
+    final TokenVerificationResponse emailVerificationResponse = new TokenVerificationResponse(userBO.getId(),
+        userBO.getUsername(),
+        emailVerificationTokenBO.getToken(),
+        emailVerificationTokenBO.getCreatedTs());
 
-        publishService.sendMessage(UserPublishAction.VERIFY_EMAIL, emailVerificationResponse);
+    publishService.sendMessage(UserPublishAction.VERIFY_EMAIL, emailVerificationResponse);
+  }
+
+  public EmailVerificationTokenBO verifyToken(final String token) throws EmailVerificationTokenNotFoundException {
+    LOGGER.info("Getting a reset password token {}", token);
+    final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByToken(token)
+        .orElseThrow(() -> new EmailVerificationTokenNotFoundException(token));
+
+    if (emailVerificationTokenBO.getCreatedTs().compareTo(LocalDateTime.now().minusDays(2)) <= 0) {
+      LOGGER.debug("Token generated at {} for user id {} and token {} has expired", emailVerificationTokenBO.getCreatedTs(), emailVerificationTokenBO.getUserId(), token);
+      throw new BadRequestException(String.format("Email verification token [ %s ] has expired", token));
     }
 
-    public EmailVerificationTokenBO verifyToken(final String token) throws EmailVerificationTokenNotFoundException {
-        log.info("Getting a reset password token {}", token);
-        final EmailVerificationTokenBO emailVerificationTokenBO = emailVerificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new EmailVerificationTokenNotFoundException(token));
-
-        if (emailVerificationTokenBO.getCreatedTs().compareTo(LocalDateTime.now().minusDays(2)) <= 0) {
-            log.debug("Token generated at {} for user id {} and token {} has expired", emailVerificationTokenBO.getCreatedTs(), emailVerificationTokenBO.getUserId(), token);
-            throw new BadRequestException(String.format("Email verification token [ %s ] has expired", token));
-        }
-
-        log.info("Removing email verification token {}", token);
-        emailVerificationTokenRepository.delete(emailVerificationTokenBO);
-        return emailVerificationTokenBO;
-    }
+    LOGGER.info("Removing email verification token {}", token);
+    emailVerificationTokenRepository.delete(emailVerificationTokenBO);
+    return emailVerificationTokenBO;
+  }
 }

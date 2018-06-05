@@ -11,11 +11,11 @@ import java.util.Map;
 @Service
 class MailContentBuilder {
 
-    private final TemplateEngine templateEngine;
+  private final TemplateEngine templateEngine;
 
-    public String build(final String templateName, final Map<String, String> params) {
-        final Context context = new Context();
-        params.forEach((key, value) -> context.setVariable(key, value));
-        return templateEngine.process(templateName, context);
-    }
+  public String build(final String templateName, final Map<String, String> params) {
+    final Context context = new Context();
+    params.forEach((key, value) -> context.setVariable(key, value));
+    return templateEngine.process(templateName, context);
+  }
 }

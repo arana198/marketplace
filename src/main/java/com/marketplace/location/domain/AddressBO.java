@@ -18,18 +18,18 @@ import javax.persistence.Table;
 @Table(name = "address")
 public class AddressBO extends AbstractEntity {
 
-    @Column(name = "address", nullable = false)
-    private String address;
+  @Column(name = "address", nullable = false)
+  private String address;
 
-    @OneToOne
-    @JoinColumn(name = "city_id", referencedColumnName = "id", nullable = false)
-    private CityBO city;
+  @OneToOne
+  @JoinColumn(name = "city_id", referencedColumnName = "id", nullable = false)
+  private CityBO city;
 
-    @OneToOne
-    @JoinColumn(name = "state_id", referencedColumnName = "id", nullable = false)
-    private StateBO state;
+  @OneToOne
+  @JoinColumn(name = "state_id", referencedColumnName = "id", nullable = false)
+  private StateBO state;
 
-    @OneToOne
-    @JoinColumn(name = "postcode_id", referencedColumnName = "id", nullable = false)
-    private PostcodeBO postcode;
+  @OneToOne
+  @JoinColumn(name = "postcode_id", referencedColumnName = "id", nullable = false)
+  private PostcodeBO postcode;
 }

@@ -16,27 +16,27 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 class SocialConnectionSignUp implements ConnectionSignUp {
-    private final UserService userService;
+  private final UserService userService;
 
-    @Override
-    public String execute(final Connection<?> connection) {
-        final UserProfile profile = connection.fetchUserProfile();
-        return userService.findByUsername(profile.getEmail())
-                .map(UserResponse::getEmail)
-                .orElseGet(() -> {
-                    LoginProvider loginProvider = LoginProvider.getRoleFromString(connection.getKey().getProviderId());
-                    SocialUserRequest socialUserRequest = (SocialUserRequest) new SocialUserRequest(
-                            profile.getEmail(),
-                            connection.getKey().getProviderUserId(),
-                            connection.getImageUrl())
-                            .setLoginProvider(loginProvider);
+  @Override
+  public String execute(final Connection<?> connection) {
+    final UserProfile profile = connection.fetchUserProfile();
+    return userService.findByUsername(profile.getEmail())
+        .map(UserResponse::getEmail)
+        .orElseGet(() -> {
+          LoginProvider loginProvider = LoginProvider.getRoleFromString(connection.getKey().getProviderId());
+          SocialUserRequest socialUserRequest = (SocialUserRequest) new SocialUserRequest(
+              profile.getEmail(),
+              connection.getKey().getProviderUserId(),
+              connection.getImageUrl())
+              .setLoginProvider(loginProvider);
 
-                    try {
-                        userService.createUser(socialUserRequest);
-                        return socialUserRequest.getEmail();
-                    } catch (UserAlreadyExistsException e) {
-                        return null;
-                    }
-                });
-    }
+          try {
+            userService.createUser(socialUserRequest);
+            return socialUserRequest.getEmail();
+          } catch (UserAlreadyExistsException e) {
+            return null;
+          }
+        });
+  }
 }

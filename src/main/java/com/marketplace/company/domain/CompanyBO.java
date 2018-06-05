@@ -16,31 +16,27 @@ import javax.persistence.Table;
 @Table(name = "companies")
 public class CompanyBO extends AbstractAuditEntity {
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @Column(name = "company_number", nullable = false)
-    private String companyNumber;
+  @Column(name = "company_number", nullable = false)
+  private String companyNumber;
 
-    @Column(name = "vat_number", nullable = false)
-    private String vatNumber;
+  @Column(name = "vat_number", nullable = false)
+  private String vatNumber;
 
-    @Column(name = "fca_number", nullable = false)
-    private String fcaNumber;
+  @Column(name = "fca_number", nullable = false)
+  private String fcaNumber;
 
-    @Column(name = "fca_number_verified", nullable = false)
-    private boolean fcaNumberVerified = false;
+  @Column(name = "logo_url")
+  private String logoUrl;
 
-    @Column(name = "logo_url")
-    private String logoUrl;
+  @Column(name = "website_url")
+  private String websiteUrl;
 
-    @Column(name = "website_url")
-    private String websiteUrl;
+  @Column(name = "is_active", nullable = false)
+  private boolean active;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean active;
-
-    //TODO: Add fees
-    //TODO: Company address
-    //TODO: Billing inactive company inactive
+  //TODO: Add fees
+  //TODO: Company address
 }

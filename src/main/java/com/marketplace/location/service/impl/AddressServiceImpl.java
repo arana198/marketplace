@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,105 +29,105 @@ import java.util.stream.Collectors;
 @Service
 class AddressServiceImpl implements AddressService {
 
-    private final PostcodeRepository postcodeRepository;
-    private final AddressRepository addressRepository;
-    private final CityRepository cityRepository;
-    private final StateRepository stateRepository;
-    private final OutcodeRepository outcodeRepository;
-    private final AddressFinderService addressFinderService;
-    private final AddressConverter addressConverter;
+  private final PostcodeRepository postcodeRepository;
+  private final AddressRepository addressRepository;
+  private final CityRepository cityRepository;
+  private final StateRepository stateRepository;
+  private final OutcodeRepository outcodeRepository;
+  private final AddressFinderService addressFinderService;
+  private final AddressConverter addressConverter;
 
-    @Override
-    public Optional<AddressResponse> getAddressByPostcode(final String postcode)
-            throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException {
+  @Override
+  public List<AddressResponse> getAddressByPostcode(final String postcode)
+      throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException {
 
-        log.info("Getting address for location {}", postcode);
-        return addressConverter.convert(this.getOrCreateAddressBO(postcode.replaceAll(" ", "")));
+    LOGGER.info("Getting address for location {}", postcode);
+    return addressConverter.convert(this.getOrCreateAddressBO(postcode.replaceAll(" ", "")));
+  }
+
+  private List<AddressBO> getOrCreateAddressBO(final String postcode)
+      throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException {
+
+    List<AddressBO> addressList = addressRepository.findByPostcode(postcode);
+
+    if (addressList.isEmpty()) {
+      final Address address = addressFinderService.getAddressByPostcode(postcode);
+      PostcodeBO postcodeBO = this.getOrCreatePostcodeBO(address);
+
+      if (!address.getHouseNumber().isEmpty()) {
+        addressList = address.getHouseNumber()
+            .parallelStream()
+            .map(houseNumber -> {
+              final OutcodeBO outcodeBO = postcodeBO.getOutcode();
+              return new AddressBO()
+                  .setAddress(houseNumber)
+                  .setPostcode(postcodeBO)
+                  .setCity(outcodeBO.getCity())
+                  .setState(outcodeBO.getCity().getState());
+            })
+            .collect(Collectors.toList());
+
+        addressRepository.saveAll(addressList);
+      }
     }
 
-    private List<AddressBO> getOrCreateAddressBO(final String postcode)
-            throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException {
+    return addressList;
+  }
 
-        List<AddressBO> addressList = addressRepository.findByPostcode(postcode);
+  private StateBO getOrCreateStateBO(final Address address) {
+    return stateRepository.findByName(address.getState())
+        .orElseGet(() -> {
+          StateBO stateBO = new StateBO()
+              .setName(address.getState());
 
-        if (addressList.isEmpty()) {
-            final Address address = addressFinderService.getAddressByPostcode(postcode);
-            PostcodeBO postcodeBO = this.getOrCreatePostcodeBO(address);
+          stateRepository.save(stateBO);
+          return stateBO;
+        });
+  }
 
-            if (!address.getHouseNumber().isEmpty()) {
-                addressList = address.getHouseNumber()
-                        .parallelStream()
-                        .map(houseNumber -> {
-                            final OutcodeBO outcodeBO = postcodeBO.getOutcode();
-                            return new AddressBO()
-                                    .setAddress(houseNumber)
-                                    .setPostcode(postcodeBO)
-                                    .setCity(outcodeBO.getCity())
-                                    .setState(outcodeBO.getCity().getState());
-                        })
-                        .collect(Collectors.toList());
+  private CityBO getOrCreateCityBO(final Address address) {
+    return cityRepository.findByName(address.getCity())
+        .orElseGet(() -> {
+          CityBO cityBO = new CityBO()
+              .setState(this.getOrCreateStateBO(address))
+              .setName(address.getCity());
 
-                addressRepository.save(addressList);
-            }
-        }
+          cityRepository.save(cityBO);
+          return cityBO;
+        });
+  }
 
-        return addressList;
-    }
+  private PostcodeBO getOrCreatePostcodeBO(final Address address) {
+    final Postcode postcode = address.getPostcode();
+    final String postcodeStr = postcode.getPostcode().replaceAll(" ", "");
+    return postcodeRepository.findByPostcode(postcodeStr)
+        .orElseGet(() -> {
+          Coordinate coordinate = new Coordinate(postcode.getLatitude(), postcode.getLongitude());
+          PostcodeBO postcodeBO = new PostcodeBO()
+              .setPostcode(postcodeStr)
+              .setActive(true)
+              .setOutcode(this.getOrCreateOutcodeBO(address))
+              .setCoordinates(new GeometryFactory().createPoint(coordinate));
 
-    private StateBO getOrCreateStateBO(final Address address) {
-        return stateRepository.findByName(address.getState())
-                .orElseGet(() -> {
-                    StateBO stateBO = new StateBO()
-                            .setName(address.getState());
+          postcodeRepository.save(postcodeBO);
+          return postcodeBO;
+        });
+  }
 
-                    stateRepository.save(stateBO);
-                    return stateBO;
-                });
-    }
+  private OutcodeBO getOrCreateOutcodeBO(final Address address) {
+    final Outcode outcode = address.getPostcode().getOutcode();
+    return outcodeRepository.findByOutcode(outcode.getOutcode())
+        .orElseGet(() -> {
+          Coordinate coordinate = new Coordinate(outcode.getLatitude(), outcode.getLongitude());
+          OutcodeBO outcodeBO = new OutcodeBO()
+              .setActive(true)
+              .setOutcode(outcode.getOutcode())
+              .setCity(this.getOrCreateCityBO(address))
+              .setCoordinates(new GeometryFactory().createPoint(coordinate));
 
-    private CityBO getOrCreateCityBO(final Address address) {
-        return cityRepository.findByName(address.getCity())
-                .orElseGet(() -> {
-                    CityBO cityBO = new CityBO()
-                            .setState(this.getOrCreateStateBO(address))
-                            .setName(address.getCity());
-
-                    cityRepository.save(cityBO);
-                    return cityBO;
-                });
-    }
-
-    private PostcodeBO getOrCreatePostcodeBO(final Address address) {
-        final Postcode postcode = address.getPostcode();
-        final String postcodeStr = postcode.getPostcode().replaceAll(" ", "");
-        return postcodeRepository.findByPostcode(postcodeStr)
-                .orElseGet(() -> {
-                    Coordinate coordinate = new Coordinate(postcode.getLatitude(), postcode.getLongitude());
-                    PostcodeBO postcodeBO = new PostcodeBO()
-                            .setPostcode(postcodeStr)
-                            .setActive(true)
-                            .setOutcode(this.getOrCreateOutcodeBO(address))
-                            .setCoordinates(new GeometryFactory().createPoint(coordinate));
-
-                    postcodeRepository.save(postcodeBO);
-                    return postcodeBO;
-                });
-    }
-
-    private OutcodeBO getOrCreateOutcodeBO(final Address address) {
-        final Outcode outcode = address.getPostcode().getOutcode();
-        return outcodeRepository.findByOutcode(outcode.getOutcode())
-                .orElseGet(() -> {
-                    Coordinate coordinate = new Coordinate(outcode.getLatitude(), outcode.getLongitude());
-                    OutcodeBO outcodeBO = new OutcodeBO()
-                            .setActive(true)
-                            .setOutcode(outcode.getOutcode())
-                            .setCity(this.getOrCreateCityBO(address))
-                            .setCoordinates(new GeometryFactory().createPoint(coordinate));
-
-                    outcodeRepository.save(outcodeBO);
-                    return outcodeBO;
-                });
-    }
+          outcodeRepository.save(outcodeBO);
+          return outcodeBO;
+        });
+  }
 
 }

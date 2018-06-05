@@ -21,20 +21,20 @@ import javax.persistence.Table;
 @Table(name = "file_stores")
 public class FileStoreBO extends AbstractTimestampEntity {
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @Column(name = "description")
-    private String description;
+  @Column(name = "description")
+  private String description;
 
-    @Column(name = "type", nullable = false)
-    private String type;
+  @Column(name = "type", nullable = false)
+  private String type;
 
-    @Column(name = "format", nullable = false)
-    private String format;
+  @Column(name = "format", nullable = false)
+  private String format;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "data", nullable = false)
-    private byte[] data;
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  @Column(name = "data", nullable = false)
+  private byte[] data;
 }

@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface IsActive {
 
-    String[] roles() default {UserRole.ROLE_BROKER, UserRole.ROLE_USER, UserRole.ROLE_COMPANY_ADMIN};
+  String[] roles() default {UserRole.ROLE_BROKER, UserRole.ROLE_USER, UserRole.ROLE_COMPANY_ADMIN};
 }

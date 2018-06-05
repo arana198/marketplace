@@ -18,12 +18,12 @@ import java.util.List;
 @RequestMapping("/advices")
 public class AdviceMethodController {
 
-    private final AdviceMethodService adviceMethodService;
+  private final AdviceMethodService adviceMethodService;
 
-    @GetMapping
-    public ResponseEntity<List<AdviceResponse>> getAdvices() {
+  @GetMapping
+  public ResponseEntity<List<AdviceResponse>> getAdvices() {
 
-        List<AdviceResponse> response = adviceMethodService.getAdviceMethods();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    List<AdviceResponse> response = adviceMethodService.getAdviceMethods();
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
 }

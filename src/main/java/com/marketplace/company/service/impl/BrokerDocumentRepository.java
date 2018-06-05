@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 interface BrokerDocumentRepository extends BaseRepository<BrokerDocumentBO, String> {
 
-    List<BrokerDocumentBO> findByBrokerProfileId(String brokerProfileId);
+  List<BrokerDocumentBO> findByBrokerProfileId(String brokerProfileId);
 }

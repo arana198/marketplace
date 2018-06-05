@@ -10,10 +10,10 @@ import java.util.List;
 
 public interface BrokerDocumentService {
 
-    List<BrokerDocumentResponse> getBrokerDocuments(String userId, String companyId, String brokerProfileId) throws BrokerNotFoundException;
+  List<BrokerDocumentResponse> getBrokerDocuments(String userId, String companyId, String brokerProfileId) throws BrokerNotFoundException;
 
-    void addDocument(String userId, String companyId, String brokerProfileId, MultipartFile multipartFile) throws BrokerNotFoundException, IOException;
+  void addDocument(String userId, String companyId, String brokerProfileId, MultipartFile multipartFile) throws BrokerNotFoundException, IOException;
 
-    void verifyDocument(String companyId, String brokerProfileId, String brokerDocumentId) throws BrokerNotFoundException, BrokerDocumentNotFoundException;
+  void verifyDocument(String companyId, String brokerProfileId, String brokerDocumentId) throws BrokerNotFoundException, BrokerDocumentNotFoundException;
 
 }

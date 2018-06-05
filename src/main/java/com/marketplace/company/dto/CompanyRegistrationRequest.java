@@ -15,15 +15,15 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties
 public class CompanyRegistrationRequest {
 
-    @Valid
-    @NotNull(message = "company is mandatory")
-    private final CompanyRequest company;
+  @Valid
+  @NotNull(message = "company is mandatory")
+  private final CompanyRequest company;
 
-    @Valid
-    @NotNull(message = "brokerProfile is mandatory")
-    private final BrokerProfileRequest brokerProfile;
+  @Valid
+  @NotNull(message = "brokerProfile is mandatory")
+  private final BrokerProfileRequest brokerProfile;
 
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class CompanyRegistrationRequestBuilder {
-    }
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class CompanyRegistrationRequestBuilder {
+  }
 }

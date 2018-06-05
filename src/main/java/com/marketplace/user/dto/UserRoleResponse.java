@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class UserRoleResponse extends BaseResponseDomain {
-    private final String role;
-    private final String userStatus;
+  private final String role;
+  private final String userStatus;
 }

@@ -16,12 +16,12 @@ import javax.persistence.Table;
 @Table(name = "broker_validators")
 public class BrokerValidatorBO extends AbstractAuditEntity {
 
-    @Column(name = "broker_profile_id", nullable = false)
-    private String brokerProfileId;
+  @Column(name = "broker_profile_id", nullable = false)
+  private String brokerProfileId;
 
-    @Column(name = "certificate_verified", nullable = false)
-    private boolean certificateVerified = false;
+  @Column(name = "certificate_verified", nullable = false)
+  private boolean certificateVerified = false;
 
-    //TODO: ACTIVE user status - billing + certificate + email verifiedF
-    //TODO: Integrate Stripe + Billing
+  //TODO: ACTIVE user status - billing + certificate + email verifiedF
+  //TODO: Integrate Stripe + Billing
 }

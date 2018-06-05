@@ -4,6 +4,7 @@ apply plugin: "io.spring.dependency-management"
 apply plugin: "groovy"
 apply plugin: "checkstyle"
 apply plugin: "jacoco"
+apply plugin: "org.gradle.java.experimental-jigsaw"
 //apply plugin: "com.github.spotbugs"
 
 buildscript {
@@ -16,10 +17,10 @@ buildscript {
 
     }
     dependencies {
-        classpath group: "org.springframework.boot", name: 'spring-boot-gradle-plugin', version: "2.0.2.RELEASE"
+        classpath group: "org.springframework.boot", name: "spring-boot-gradle-plugin", version: "2.0.2.RELEASE"
         classpath group: "org.flywaydb", name: "flyway-gradle-plugin", version: "5.1.1"
         classpath group: "gradle.plugin.com.github.spotbugs", name: "spotbugs-gradle-plugin", version: "1.6.2"
-        classpath group: "gradle.plugin.com.gorylenko.gradle-git-properties", name: "gradle-git-properties", version: "1.4.21"
+        classpath "gradle.plugin.org.gradle.java:experimental-jigsaw:0.1.1"
     }
 }
 
@@ -33,7 +34,7 @@ checkstyle {
 }
 
 /*spotbugs {
-    toolVersion = '3.1.3'
+    toolVersion = "3.1.3"
     sourceSets = [sourceSets.main]
 }*/
 
@@ -92,24 +93,46 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.RC1"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.RC2"
         mavenBom "org.springframework.cloud:spring-cloud-bus:2.0.0.RC2"
     }
+}
+
+configurations {
+    all*.exclude group: "org.springframework.security", module: "spring-security-crypto"
+    all*.exclude group: "com.google.code.findbugs", module: "jsr305"
+    all*.exclude group: "io.springfox", module: "springfox-schema"
+    all*.exclude group: "io.springfox", module: "springfox-spi"
+    all*.exclude group: "org.postgresql", module: "postgresql"
+    all*.exclude group: "org.jboss.spec.javax.transaction", module: "jboss-transaction-api_1.2_spec"
 }
 
 dependencies {
 
     compile group: "org.springframework.boot", name: "spring-boot-starter-web"
-    compile group: "org.springframework.boot", name: "spring-boot-starter-data-jpa"
-    compile group: "org.springframework.boot", name: "spring-boot-starter-actuator"
+    compile (group: "org.springframework.boot", name: "spring-boot-starter-data-jpa") {
+        exclude group: "javax.transaction", module: "javax.transaction-api"
+        exclude group: "org.javassist", module: "javassist"
+
+    }
+
+    compile (group: "org.springframework.boot", name: "spring-boot-starter-actuator") {
+        exclude group: "org.springframework.boot", module: "spring-boot-actuator-autoconfigure"
+    }
+
     compile group: "org.springframework.boot", name: "spring-boot-starter-hateoas"
     compile group: "org.springframework.boot", name: "spring-boot-starter-security"
     compile group: "org.springframework.boot", name: "spring-boot-starter-thymeleaf"
 
-    compile group: "org.springframework.cloud", name: "spring-cloud-starter-oauth2"
+    compile (group: "org.springframework.cloud", name: "spring-cloud-starter-oauth2") {
+        exclude group: "org.springframework.security.oauth.boot", module: "spring-security-oauth2-autoconfigure"
+    }
+
     compile group: "org.springframework.cloud", name: "spring-cloud-starter-bus-amqp"
 
     compile group: "org.springframework.boot", name: "spring-boot-starter-social-facebook", version: "2.0.0.M6"
+
+    compile group: "org.springframework.security.oauth", name: "spring-security-oauth2", version: "2.3.3.RELEASE"
     compile group: "org.springframework.boot", name: "spring-boot-starter-social-linkedin", version: "2.0.0.M6"
     compile group: "org.springframework.social", name: "spring-social-google", version: "1.1.0"
     compile group: "org.springframework.social", name: "spring-social-security", version: "2.0.0.M4"
@@ -120,8 +143,8 @@ dependencies {
     compile group: "org.springframework", name: "spring-messaging", version: "5.0.6.RELEASE"
     compile group: "org.springframework.integration", name: "spring-integration-amqp", version: "5.0.5.RELEASE"
 
-    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.3.1.Final'
-    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.10.Final'
+    compile group: "org.hibernate", name: "hibernate-core", version: "5.3.1.Final"
+    compile group: "org.hibernate.validator", name: "hibernate-validator", version: "6.0.10.Final"
     compile group: "org.hibernate", name: "hibernate-spatial", version: "5.3.1.Final"
 
     compile group: "io.springfox", name: "springfox-swagger-ui", version: "2.8.0"
@@ -131,17 +154,16 @@ dependencies {
     compile group: "org.apache.commons", name: "commons-lang3", version: "3.7"
     compile group: "org.apache.commons", name: "commons-compress", version: "1.15"
 
-    compile group: "org.projectlombok", name: "lombok", version: "1.16.22"
+    compile group: "org.projectlombok", name: "lombok", version: "1.18.0"
     runtime group: "org.mariadb.jdbc", name: "mariadb-java-client", version: "2.2.0"
 
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
-    compile group: 'com.google.guava', name: 'guava', version: '23.0'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.2'
+    compile group: "com.google.code.gson", name: "gson", version: "2.8.5"
+    compile group: "com.google.guava", name: "guava", version: "23.0"
+    compile group: "com.fasterxml.jackson.datatype", name: "jackson-datatype-jsr310", version: "2.9.2"
 
-    compile group: "javax.xml.bind", name: "jaxb-api", version: "2.3.0"
-    compile group: "com.sun.xml.bind", name: "jaxb-impl", version: "2.3.0"
-    compile group: "com.sun.xml.bind", name: "jaxb-core", version: "2.3.0"
-    compile group: "javax.activation", name: "javax.activation-api", version: "1.2.0"
+    compile group: "javax.transaction", name: "javax.transaction-api", version: "1.2"
+    compile group: "javax.persistence", name: "javax.persistence-api", version: "2.2"
+    runtime group: "org.javassist", name: "javassist", version: "3.22.0-GA"
 
     testCompile group: "org.springframework.boot", name: "spring-boot-starter-test"
     testCompile group: "org.codehaus.groovy", name: "groovy-all", version: "2.4.15"
@@ -151,5 +173,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "4.8"
+    gradleVersion = "4.7"
 }

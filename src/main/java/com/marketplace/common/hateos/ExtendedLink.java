@@ -1,12 +1,12 @@
 package com.marketplace.common.hateos;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.UriTemplate;
 
-import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
-@XmlType(name = "link", namespace = Link.ATOM_NAMESPACE)
+@JsonRootName("link")
 public class ExtendedLink extends Link implements Serializable {
 
   private static final long serialVersionUID = 4580040790923646222L;

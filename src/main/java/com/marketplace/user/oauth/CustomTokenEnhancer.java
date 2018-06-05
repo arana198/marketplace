@@ -24,8 +24,7 @@ import java.util.stream.Collectors;
 class CustomTokenEnhancer implements TokenEnhancer {
 
   private final UserService userService;
-
-  private List<TokenEnhancer> delegates = Collections.emptyList();
+  private final List<TokenEnhancer> delegates = Collections.emptyList();
 
   @Override
   public OAuth2AccessToken enhance(final OAuth2AccessToken accessToken, final OAuth2Authentication authentication) {

@@ -7,15 +7,6 @@ import org.springframework.stereotype.Service;
 @Getter
 @Service
 public class ConfigurationService {
-  @Value("${oauth.authzEndpoint}")
-  private String swaggerOAuthUrl;
-
-  @Value("${oauth.clientId}")
-  private String oAuthClientId;
-
-  @Value("${oauth.clientSecret}")
-  private String oAuthClientSecret;
-
   @Value("${validator.api.company.url}")
   private String companyValidatorUrlPrefix;
 

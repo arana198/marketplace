@@ -25,7 +25,7 @@ import org.springframework.messaging.MessageHandler;
 @IntegrationComponentScan
 public class UserQueueConfig {
 
-  @Value("${exchange.name}")
+  @Value("${rabbitmq.exchange.name}")
   private String exchangeName;
 
   @Value("user-${environment.name}")

@@ -1,12 +1,12 @@
 package com.marketplace.config;
 
+import com.marketplace.common.properties.OauthConfigurationProperties;
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.utils.RolesExtractorUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
@@ -38,12 +38,13 @@ import java.util.Set;
 @Configuration
 @EnableResourceServer
 public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
-  private final Environment env;
+
   private final TokenStore tokenStore;
+  private final OauthConfigurationProperties oauthConfigurationProperties;
 
   @Override
   public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
-    resources.resourceId(env.getProperty("oauth.resourceId"))
+    resources.resourceId(oauthConfigurationProperties.getResourceId())
         .tokenServices(getTokenServices());
   }
 

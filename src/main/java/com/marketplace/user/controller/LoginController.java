@@ -33,8 +33,8 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
-@AllArgsConstructor
 @Slf4j
+@AllArgsConstructor
 @Controller
 public class LoginController {
 

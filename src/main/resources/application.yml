@@ -1,5 +1,9 @@
 info:
   component: This is REST API for Study Buddy application.
+  app:
+    name: ${app.name}
+    description: This is REST API for Study Buddy application.
+    version: ${app.version}
 
 server:
   port: 8080
@@ -9,28 +13,29 @@ spring:
   application:
     name: studyit-api
   datasource:
-    driverClassName: ${db.driver.class}
-    url: ${db.url}
+    url: jdbc:mariadb://${db.hostname}/${db.schema}?autoReconnect=true
     username: ${db.username}
     password: ${db.password}
-  jackson:
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
   jpa:
     database-platform: ${db.platform}
     properties:
+      org:
+        hibernate:
+          envers:
+            audit_table_suffix: _tt
       hibernate:
         dialect: ${db.hibernate.dialect}
+        default_schema: ${db.schema}
     show-sql: ${db.show.sql}
     hibernate:
       naming:
-        implicit-strategy: ${db.hibernate.naming.implicit-strategy}
-        physical-strategy: ${db.hibernate.naming.physical-strategy}
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: none
       format-sql: true
   bus:
     amqp:
-      exchange: ${exchange.name}
+      exchange: ${rabbitmq.exchange.name}
       enabled: true
   rabbitmq:
     host: ${rabbitmq.host}
@@ -47,6 +52,12 @@ spring:
     linkedin:
       appId: ${linkedin.appId}
       appSecret: ${linkedin.appSecret}
+  flyway:
+    enabled: true
+    locations: "classpath:db/migration"
+    baseline-on-migrate: false
+    clean-on-validation-error: false
+    schemas: ${db.schema}
 
 hystrix:
   streamEnabled: true
@@ -55,10 +66,6 @@ hystrix:
 archaius:
   dynamicPropertyFactory:
     registerConfigWithJMX: true
-
-endpoints:
-    restart:
-      enabled: true
 
 validator:
   api:
@@ -70,12 +77,26 @@ validator:
 
 mail:
   api:
-    url: ${zoho.mail.api.url}
-    token: ${zoho.mail.api.auth.token}
+    url: ${mail.api.url}
+    token: ${mail.api.auth.token}
+management:
+  context-path: /actuator
+  security:
+    enabled: true
 
-oauth:
-  resourceId: marketplace-api
-  clientId: 4f7ec648a48b9d3fa239b497f7b6b4d8019697bd
-  clientSecret: edfeba07ec1dd4ff45928ee715a8e1ecc149a060
-  tokenEndpoint: http://${oauth.hostname}/oauth/check_token
-  authzEndpoint: http://${oauth.hostname}/oauth/authorize
+security:
+  oauth2:
+    resourceId: marketplace-api
+    clientId: ${oauth2.resource.clientId}
+    clientSecret: ${oauth2.resource.clientSecret}
+    tokenEndpoint: ${oauth2.check.token.endpoint}
+    authzEndpoint: ${oauth2.authorize.endpoint}
+  user:
+    name: ${security.user.name}
+    password: ${security.user.password}
+    role: ACTUATOR
+
+logging:
+  level:
+    root: INFO
+  file: logs/${spring.application.name}.log

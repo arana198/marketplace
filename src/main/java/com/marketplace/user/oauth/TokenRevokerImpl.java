@@ -1,6 +1,6 @@
 package com.marketplace.user.oauth;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Service
 class TokenRevokerImpl implements TokenRevoker {

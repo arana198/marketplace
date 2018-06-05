@@ -3,7 +3,7 @@ package com.marketplace.user.oauth;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.dto.UserRoleResponse;
 import com.marketplace.user.service.UserService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Service
 class CustomTokenEnhancer implements TokenEnhancer {

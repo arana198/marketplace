@@ -2,7 +2,7 @@ package com.marketplace.config;
 
 import com.marketplace.common.security.AuthUser;
 import com.marketplace.utils.RolesExtractorUtils;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -34,7 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Data
+@AllArgsConstructor
 @Configuration
 @EnableResourceServer
 public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {

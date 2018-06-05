@@ -14,7 +14,7 @@ import com.marketplace.storage.dto.BucketResponse;
 import com.marketplace.user.dto.RoleRequest.UserRole;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.dto.UserStatusRequest.UserStatus;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +26,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Data
 @Slf4j
+@AllArgsConstructor
 @Service
 class CompanyMessageHandlerImpl implements MessageHandler {
 

@@ -18,7 +18,6 @@ class NotificationPublishServiceImpl implements NotificationPublishService {
   private static final String APPLICATION_NAME = "marketplace";
 
   private final MessageChannel messageChannel;
-
   private final Gson gson;
 
   NotificationPublishServiceImpl(@Qualifier("notificationMessageChannel") final MessageChannel messageChannel,

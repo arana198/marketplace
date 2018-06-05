@@ -5,12 +5,12 @@ import com.marketplace.company.domain.CompanyBO;
 import com.marketplace.company.dto.CompanyResponse;
 import com.marketplace.company.dto.CompanyValidatorResponse;
 import com.marketplace.company.service.CompanyValidatorService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-@Data
+@AllArgsConstructor
 @Service
 class CompanyResponseConverter implements BaseConverter<CompanyBO, CompanyResponse> {
 

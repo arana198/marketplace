@@ -4,14 +4,14 @@ import com.google.gson.Gson;
 import com.marketplace.company.dto.InviteBrokerTokenVerificationResponse;
 import com.marketplace.notification.email.service.EmailService;
 import com.marketplace.user.dto.TokenVerificationResponse;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Service
 class NotificationMessageHandlerImpl implements MessageHandler {

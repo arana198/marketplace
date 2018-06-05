@@ -1,13 +1,13 @@
 package com.marketplace.notification.email.service.impl;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.Map;
 
-@Data
+@AllArgsConstructor
 @Service
 class MailContentBuilder {
 

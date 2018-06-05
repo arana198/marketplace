@@ -7,14 +7,14 @@ import com.marketplace.user.dto.TokenVerificationResponse;
 import com.marketplace.user.exception.EmailVerificationTokenNotFoundException;
 import com.marketplace.user.queue.publish.UserPublishService;
 import com.marketplace.user.queue.publish.domain.UserPublishAction;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Service
 class EmailVerificationTokenService {

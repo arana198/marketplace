@@ -1,6 +1,6 @@
 package com.marketplace.config;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.encrypt.Encryptors;
@@ -17,7 +17,7 @@ import org.springframework.social.security.AuthenticationNameUserIdSource;
 
 import javax.sql.DataSource;
 
-@Data
+@AllArgsConstructor
 @EnableSocial
 @Configuration
 public class SocialConfig implements SocialConfigurer {

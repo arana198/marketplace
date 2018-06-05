@@ -5,14 +5,14 @@ import com.marketplace.user.dto.UserRequest.LoginProvider;
 import com.marketplace.user.dto.UserResponse;
 import com.marketplace.user.exception.UserAlreadyExistsException;
 import com.marketplace.user.service.UserService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionSignUp;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.stereotype.Component;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Component
 class SocialConnectionSignUp implements ConnectionSignUp {

@@ -6,14 +6,14 @@ import com.marketplace.user.dto.RoleRequest.UserRole;
 import com.marketplace.user.dto.UserStatusRequest.UserStatus;
 import com.marketplace.user.exception.UserNotFoundException;
 import com.marketplace.user.service.UserService;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 
-@Data
+@AllArgsConstructor
 @Slf4j
 @Service
 class UserMessageHandlerImpl implements MessageHandler {

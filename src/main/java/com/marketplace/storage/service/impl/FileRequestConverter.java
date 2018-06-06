@@ -11,16 +11,16 @@ import java.io.IOException;
 
 @Service
 class FileRequestConverter {
-  public FileStoreBO convert(final FileRequest source, final MultipartFile file) {
-    try {
-      return new FileStoreBO()
-          .setName(source.getName())
-          .setDescription(source.getDescription())
-          .setType(source.getFileType().getValue())
-          .setFormat(file.getContentType())
-          .setData(CompressorUtils.compress(file.getBytes()));
-    } catch (IOException e) {
-      throw new BadRequestException("Could not read file");
-    }
-  }
+     public FileStoreBO convert(final FileRequest source, final MultipartFile file) {
+          try {
+               return new FileStoreBO()
+                   .setName(source.getName())
+                   .setDescription(source.getDescription())
+                   .setType(source.getFileType().getValue())
+                   .setFormat(file.getContentType())
+                   .setData(CompressorUtils.compress(file.getBytes()));
+          } catch (IOException e) {
+               throw new BadRequestException("Could not read file");
+          }
+     }
 }

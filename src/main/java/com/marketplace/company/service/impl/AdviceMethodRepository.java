@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 interface AdviceMethodRepository extends BaseRepository<AdviceMethodBO, String> {
 
-  Optional<AdviceMethodBO> findByName(String name);
+     Optional<AdviceMethodBO> findByName(String name);
 
-  List<AdviceMethodBO> findByActive(boolean active);
+     List<AdviceMethodBO> findByActive(boolean active);
 }

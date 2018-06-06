@@ -14,21 +14,21 @@ import java.time.LocalDateTime;
 @Service
 class CompanyResponseConverter implements BaseConverter<CompanyBO, CompanyResponse> {
 
-  private final CompanyValidatorService companyValidatorService;
+     private final CompanyValidatorService companyValidatorService;
 
-  @Override
-  public CompanyResponse convert(final CompanyBO source) {
-    LocalDateTime fcaNumberVerifiedAt = companyValidatorService.findByCompanyId(source.getId())
-        .map(CompanyValidatorResponse::getFcaNumberVerifiedAt)
-        .orElse(null);
+     @Override
+     public CompanyResponse convert(final CompanyBO source) {
+          LocalDateTime fcaNumberVerifiedAt = companyValidatorService.findByCompanyId(source.getId())
+              .map(CompanyValidatorResponse::getFcaNumberVerifiedAt)
+              .orElse(null);
 
-    return new CompanyResponse(source.getId(),
-        source.getName(),
-        source.getCompanyNumber(),
-        source.getVatNumber(),
-        source.getLogoUrl(),
-        source.getWebsiteUrl(),
-        fcaNumberVerifiedAt,
-        source.isActive());
-  }
+          return new CompanyResponse(source.getId(),
+              source.getName(),
+              source.getCompanyNumber(),
+              source.getVatNumber(),
+              source.getLogoUrl(),
+              source.getWebsiteUrl(),
+              fcaNumberVerifiedAt,
+              source.isActive());
+     }
 }

@@ -8,6 +8,6 @@ import java.util.List;
 
 @Data
 public class BucketPermissionResponse extends BaseResponseDomain {
-  private final String bucketId;
-  private final List<BrokerProfileResponse> brokerProfiles;
+     private final String bucketId;
+     private final List<BrokerProfileResponse> brokerProfiles;
 }

@@ -27,97 +27,97 @@ import java.util.stream.Collectors;
 @Service
 class BrokerDocumentServiceImpl implements BrokerDocumentService {
 
-  private final BrokerDocumentRepository brokerDocumentRepository;
-  private final BrokerService brokerService;
-  private final FileStoreService fileStoreService;
-  private final CompanyFileRequestConverter fileRequestConverter;
-  private final BrokerDocumentResponseConverter brokerDocumentResponseConverter;
-  private final CompanyPublishService publishService;
+     private final BrokerDocumentRepository brokerDocumentRepository;
+     private final BrokerService brokerService;
+     private final FileStoreService fileStoreService;
+     private final CompanyFileRequestConverter fileRequestConverter;
+     private final BrokerDocumentResponseConverter brokerDocumentResponseConverter;
+     private final CompanyPublishService publishService;
 
     /* TODO:
         Billing no longer valid -> isActive flag is false -> Broker Status Pending
         Publish event -> documentVerified, billingSpecified, isActive, fcaNumberVerified
     */
 
-  @Override
-  public List<BrokerDocumentResponse> getBrokerDocuments(final String userId,
-                                                         final String companyId,
-                                                         final String brokerProfileId)
-      throws BrokerNotFoundException {
+     @Override
+     public List<BrokerDocumentResponse> getBrokerDocuments(final String userId,
+                                                            final String companyId,
+                                                            final String brokerProfileId)
+         throws BrokerNotFoundException {
 
-    LOGGER.info("Getting broker [ {} ] documents", brokerProfileId);
-    this.verifyBrokerProfile(userId, companyId, brokerProfileId);
+          LOGGER.info("Getting broker [ {} ] documents", brokerProfileId);
+          this.verifyBrokerProfile(userId, companyId, brokerProfileId);
 
-    return brokerDocumentRepository.findByBrokerProfileId(brokerProfileId)
-        .parallelStream()
-        .map(brokerDocumentResponseConverter::convert)
-        .collect(Collectors.toList());
-  }
+          return brokerDocumentRepository.findByBrokerProfileId(brokerProfileId)
+              .parallelStream()
+              .map(brokerDocumentResponseConverter::convert)
+              .collect(Collectors.toList());
+     }
 
-  @Override
-  public void addDocument(final String userId,
-                          final String companyId,
-                          final String brokerProfileId,
-                          final MultipartFile multipartFile)
-      throws BrokerNotFoundException, IOException {
-
-    LOGGER.info("Add broker [ {} ] document", brokerProfileId);
-
-    final BrokerProfileResponse brokerProfile = brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
-        .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
-        .filter(ce -> ce.getUserId().equalsIgnoreCase(userId))
-        .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
-
-    final FileRequest fileRequest = fileRequestConverter.getFileRequest(
-        brokerProfile.getBrokerProfileId(),
-        multipartFile.getOriginalFilename(),
-        "Broker Certificate",
-        FileType.BROKER_CERTIFICATE);
-
-    final FileResponse fileResponse = fileStoreService.store(fileRequest, multipartFile);
-
-    BrokerDocumentBO brokerDocumentBO = this.getBrokerDocumentBO(brokerProfile, fileResponse);
-    brokerDocumentRepository.save(brokerDocumentBO);
-    publishService.sendMessage(CompanyPublishAction.BROKER_SUBMITTED_CERTIFICATION, brokerDocumentResponseConverter.convert(brokerDocumentBO));
-  }
-
-  @Override
-  public void verifyDocument(final String companyId,
+     @Override
+     public void addDocument(final String userId,
+                             final String companyId,
                              final String brokerProfileId,
-                             final String brokerDocumentId)
-      throws BrokerNotFoundException, BrokerDocumentNotFoundException {
+                             final MultipartFile multipartFile)
+         throws BrokerNotFoundException, IOException {
 
-    LOGGER.info("Verifying broker document [ {} ]", brokerProfileId);
+          LOGGER.info("Add broker [ {} ] document", brokerProfileId);
 
-    brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
-        .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
-        .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
+          final BrokerProfileResponse brokerProfile = brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
+              .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+              .filter(ce -> ce.getUserId().equalsIgnoreCase(userId))
+              .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
 
-    BrokerDocumentBO brokerDocumentBO = brokerDocumentRepository.findById(brokerDocumentId)
-        .orElseThrow(() -> new BrokerDocumentNotFoundException(brokerDocumentId));
+          final FileRequest fileRequest = fileRequestConverter.getFileRequest(
+              brokerProfile.getBrokerProfileId(),
+              multipartFile.getOriginalFilename(),
+              "Broker Certificate",
+              FileType.BROKER_CERTIFICATE);
 
-    if (!brokerDocumentBO.isVerified()) {
-      brokerDocumentBO.setVerified(true);
-      brokerDocumentRepository.save(brokerDocumentBO);
-      publishService.sendMessage(CompanyPublishAction.BROKER_CERTIFICATE_VERIFIED, brokerDocumentResponseConverter.convert(brokerDocumentBO));
-    }
-  }
+          final FileResponse fileResponse = fileStoreService.store(fileRequest, multipartFile);
 
-  private BrokerDocumentBO getBrokerDocumentBO(final BrokerProfileResponse brokerProfile, final FileResponse file) {
-    return new BrokerDocumentBO()
-        .setBrokerProfileId(brokerProfile.getBrokerProfileId())
-        .setFileId(file.getFileId())
-        .setVerified(false);
-  }
+          BrokerDocumentBO brokerDocumentBO = this.getBrokerDocumentBO(brokerProfile, fileResponse);
+          brokerDocumentRepository.save(brokerDocumentBO);
+          publishService.sendMessage(CompanyPublishAction.BROKER_SUBMITTED_CERTIFICATION, brokerDocumentResponseConverter.convert(brokerDocumentBO));
+     }
 
-  private void verifyBrokerProfile(final String userId,
-                                   final String companyId,
-                                   final String brokerProfileId)
-      throws BrokerNotFoundException {
+     @Override
+     public void verifyDocument(final String companyId,
+                                final String brokerProfileId,
+                                final String brokerDocumentId)
+         throws BrokerNotFoundException, BrokerDocumentNotFoundException {
 
-    brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
-        .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
-        .filter(ce -> ce.getUserId().equalsIgnoreCase(userId))
-        .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
-  }
+          LOGGER.info("Verifying broker document [ {} ]", brokerProfileId);
+
+          brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
+              .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+              .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
+
+          BrokerDocumentBO brokerDocumentBO = brokerDocumentRepository.findById(brokerDocumentId)
+              .orElseThrow(() -> new BrokerDocumentNotFoundException(brokerDocumentId));
+
+          if (!brokerDocumentBO.isVerified()) {
+               brokerDocumentBO.setVerified(true);
+               brokerDocumentRepository.save(brokerDocumentBO);
+               publishService.sendMessage(CompanyPublishAction.BROKER_CERTIFICATE_VERIFIED, brokerDocumentResponseConverter.convert(brokerDocumentBO));
+          }
+     }
+
+     private BrokerDocumentBO getBrokerDocumentBO(final BrokerProfileResponse brokerProfile, final FileResponse file) {
+          return new BrokerDocumentBO()
+              .setBrokerProfileId(brokerProfile.getBrokerProfileId())
+              .setFileId(file.getFileId())
+              .setVerified(false);
+     }
+
+     private void verifyBrokerProfile(final String userId,
+                                      final String companyId,
+                                      final String brokerProfileId)
+         throws BrokerNotFoundException {
+
+          brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerProfileId)
+              .filter(ce -> ce.getCompanyId().equalsIgnoreCase(companyId))
+              .filter(ce -> ce.getUserId().equalsIgnoreCase(userId))
+              .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerProfileId));
+     }
 }

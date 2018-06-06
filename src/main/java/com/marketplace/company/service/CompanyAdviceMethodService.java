@@ -6,10 +6,10 @@ import com.marketplace.company.exception.CompanyAdviceAlreadyExistsException;
 
 public interface CompanyAdviceMethodService {
 
-  CompanyAdviceMethodResponse getCompanyAdvice(String companyId);
+     CompanyAdviceMethodResponse getCompanyAdvice(String companyId);
 
-  void addCompanyAdvice(String companyId, String adviceId) throws CompanyAdviceAlreadyExistsException, AdviceMethodNotFoundException;
+     void addCompanyAdvice(String companyId, String adviceId) throws CompanyAdviceAlreadyExistsException, AdviceMethodNotFoundException;
 
-  void removeCompanyAdvice(String companyId, String adviceId);
+     void removeCompanyAdvice(String companyId, String adviceId);
 
 }

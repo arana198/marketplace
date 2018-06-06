@@ -13,17 +13,17 @@ import java.util.Optional;
 @Service
 class UserStatusServiceImpl implements UserStatusService {
 
-  private final UserStatusRepository userStatusRepository;
+     private final UserStatusRepository userStatusRepository;
 
-  @Override
-  public Optional<UserStatusBO> findById(final String id) {
-    LOGGER.info("Finding user domain by id {}", id);
-    return Optional.ofNullable(userStatusRepository.getOne(id));
-  }
+     @Override
+     public Optional<UserStatusBO> findById(final String id) {
+          LOGGER.info("Finding user domain by id {}", id);
+          return Optional.ofNullable(userStatusRepository.getOne(id));
+     }
 
-  @Override
-  public Optional<UserStatusBO> findByName(final String userStatus) {
-    LOGGER.info("Finding user domain by name {}", userStatus);
-    return userStatusRepository.findByName(userStatus);
-  }
+     @Override
+     public Optional<UserStatusBO> findByName(final String userStatus) {
+          LOGGER.info("Finding user domain by name {}", userStatus);
+          return userStatusRepository.findByName(userStatus);
+     }
 }

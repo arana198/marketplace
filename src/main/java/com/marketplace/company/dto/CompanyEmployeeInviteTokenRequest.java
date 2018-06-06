@@ -13,14 +13,14 @@ import javax.validation.constraints.NotNull;
 @Data
 @JsonDeserialize(builder = CompanyEmployeeInviteTokenRequest.CompanyEmployeeInviteTokenRequestBuilder.class)
 public class CompanyEmployeeInviteTokenRequest {
-  @NotBlank(message = "token is mandatory")
-  private final String token;
+     @NotBlank(message = "token is mandatory")
+     private final String token;
 
-  @Valid
-  @NotNull(message = "brokerProfileRequest is mandatory")
-  private final BrokerProfileRequest brokerProfile;
+     @Valid
+     @NotNull(message = "brokerProfileRequest is mandatory")
+     private final BrokerProfileRequest brokerProfile;
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class CompanyEmployeeInviteTokenRequestBuilder {
-  }
+     @JsonPOJOBuilder(withPrefix = "")
+     public static class CompanyEmployeeInviteTokenRequestBuilder {
+     }
 }

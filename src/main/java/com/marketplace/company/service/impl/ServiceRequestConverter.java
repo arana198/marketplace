@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 @Service
 class ServiceRequestConverter implements BaseConverter<ServiceRequest, ServiceBO> {
 
-  @Override
-  public ServiceBO convert(final ServiceRequest source) {
-    final String name = source.getName().toUpperCase().replace(" ", "_");
-    return new ServiceBO()
-        .setName(name)
-        .setDisplayName(source.getName())
-        .setDescription(source.getDescription())
-        .setActive(source.isActive());
-  }
+     @Override
+     public ServiceBO convert(final ServiceRequest source) {
+          final String name = source.getName().toUpperCase().replace(" ", "_");
+          return new ServiceBO()
+              .setName(name)
+              .setDisplayName(source.getName())
+              .setDescription(source.getDescription())
+              .setActive(source.isActive());
+     }
 }

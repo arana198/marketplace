@@ -22,19 +22,19 @@ import java.io.IOException;
 @RequestMapping("/documents")
 public class FileStoreController {
 
-  private final FileStoreService fileStoreService;
+     private final FileStoreService fileStoreService;
 
-  @RequestMapping(value = "/{fileId}", method = RequestMethod.GET)
-  public ResponseEntity<FileResponse> downloadDocument(@PathVariable final String fileId) throws IOException, FileNotFoundException {
+     @RequestMapping(value = "/{fileId}", method = RequestMethod.GET)
+     public ResponseEntity<FileResponse> downloadDocument(@PathVariable final String fileId) throws IOException, FileNotFoundException {
 
-    final FileResponse document = fileStoreService.findById(AuthUser.getUserId(), fileId)
-        .orElseThrow(() -> new FileNotFoundException(fileId));
+          final FileResponse document = fileStoreService.findById(AuthUser.getUserId(), fileId)
+              .orElseThrow(() -> new FileNotFoundException(fileId));
 
-    final HttpHeaders responseHeaders = new HttpHeaders();
-    responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
-    responseHeaders.add(HttpHeaders.CONTENT_TYPE, document.getFormat());
-    responseHeaders.add(HttpHeaders.CONTENT_LENGTH, Long.toString(document.getFile().length));
+          final HttpHeaders responseHeaders = new HttpHeaders();
+          responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+          responseHeaders.add(HttpHeaders.CONTENT_TYPE, document.getFormat());
+          responseHeaders.add(HttpHeaders.CONTENT_LENGTH, Long.toString(document.getFile().length));
 
-    return new ResponseEntity(document.getFile(), responseHeaders, HttpStatus.OK);
-  }
+          return new ResponseEntity(document.getFile(), responseHeaders, HttpStatus.OK);
+     }
 }

@@ -20,16 +20,16 @@ import java.util.List;
 @RequestMapping("/address/{postcode}")
 public class AddressController {
 
-  private final AddressService addressService;
+     private final AddressService addressService;
 
-  @GetMapping
-  public ResponseEntity<List<AddressResponse>> getAddress(@PathVariable final String postcode)
-      throws ResourceNotFoundException, IOException {
+     @GetMapping
+     public ResponseEntity<List<AddressResponse>> getAddress(@PathVariable final String postcode)
+         throws ResourceNotFoundException, IOException {
 
-    LOGGER.info("Get address for location [ {} ]", postcode);
+          LOGGER.info("Get address for location [ {} ]", postcode);
 
-    List<AddressResponse> addressResponse = addressService.getAddressByPostcode(postcode);
+          List<AddressResponse> addressResponse = addressService.getAddressByPostcode(postcode);
 
-    return ResponseEntity.ok(addressResponse);
-  }
+          return ResponseEntity.ok(addressResponse);
+     }
 }

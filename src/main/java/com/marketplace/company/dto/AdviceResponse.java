@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class AdviceResponse extends BaseResponseDomain {
-  private final String adviceId;
-  private final String name;
-  private final String description;
+     private final String adviceId;
+     private final String name;
+     private final String description;
 }

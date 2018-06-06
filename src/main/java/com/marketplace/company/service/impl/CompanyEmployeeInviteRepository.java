@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 interface CompanyEmployeeInviteRepository extends BaseRepository<CompanyEmployeeInviteBO, Long> {
-  Optional<CompanyEmployeeInviteBO> findByCompanyIdAndEmail(String companyId, String email);
+     Optional<CompanyEmployeeInviteBO> findByCompanyIdAndEmail(String companyId, String email);
 
-  Optional<CompanyEmployeeInviteBO> findByCompanyIdAndToken(String companyId, String token);
+     Optional<CompanyEmployeeInviteBO> findByCompanyIdAndToken(String companyId, String token);
 }

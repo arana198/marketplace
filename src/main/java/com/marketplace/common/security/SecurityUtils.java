@@ -15,69 +15,69 @@ import java.util.stream.Collectors;
 @Component
 public class SecurityUtils {
 
-  private final BrokerService brokerService;
+     private final BrokerService brokerService;
 
-  public boolean checkIfUserAuthorized(final String userId) {
+     public boolean checkIfUserAuthorized(final String userId) {
 
-    final List<String> roles = this.getAuthenticatedUserRole();
-    if (roles.contains(UserRole.ROLE_ADMIN)) {
-      return true;
-    }
+          final List<String> roles = this.getAuthenticatedUserRole();
+          if (roles.contains(UserRole.ROLE_ADMIN)) {
+               return true;
+          }
 
-    if (!AuthUser.getUserId().equalsIgnoreCase(userId)) {
-      throw new UnauthorizedUserException("Unauthorized user");
-    }
+          if (!AuthUser.getUserId().equalsIgnoreCase(userId)) {
+               throw new UnauthorizedUserException("Unauthorized user");
+          }
 
-    return true;
-  }
+          return true;
+     }
 
-  public boolean isCompanyAdmin(final String companyId) {
+     public boolean isCompanyAdmin(final String companyId) {
 
-    final List<String> roles = this.getAuthenticatedUserRole();
-    if (roles.contains(UserRole.ROLE_ADMIN)) {
-      return true;
-    }
+          final List<String> roles = this.getAuthenticatedUserRole();
+          if (roles.contains(UserRole.ROLE_ADMIN)) {
+               return true;
+          }
 
-    if (roles.contains(UserRole.ROLE_ADMIN) || (companyId == null && roles.contains(UserRole.ROLE_COMPANY_ADMIN))) {
-      return true;
-    }
+          if (roles.contains(UserRole.ROLE_ADMIN) || (companyId == null && roles.contains(UserRole.ROLE_COMPANY_ADMIN))) {
+               return true;
+          }
 
-    if (!roles.contains(UserRole.ROLE_COMPANY_ADMIN) || !this.checkIfCompanyAdmin(companyId)) {
-      throw new UnauthorizedUserException("Unauthorized user");
-    }
+          if (!roles.contains(UserRole.ROLE_COMPANY_ADMIN) || !this.checkIfCompanyAdmin(companyId)) {
+               throw new UnauthorizedUserException("Unauthorized user");
+          }
 
-    return true;
-  }
+          return true;
+     }
 
-  public boolean isCompanyEmployee(final String companyId, final String brokerId) {
+     public boolean isCompanyEmployee(final String companyId, final String brokerId) {
 
-    final List<String> roles = this.getAuthenticatedUserRole();
-    if (roles.contains(UserRole.ROLE_ADMIN)) {
-      return true;
-    }
+          final List<String> roles = this.getAuthenticatedUserRole();
+          if (roles.contains(UserRole.ROLE_ADMIN)) {
+               return true;
+          }
 
-    if ((roles.contains(UserRole.ROLE_COMPANY_ADMIN) && !this.checkIfCompanyAdmin(companyId)) ||
-        !brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerId)
-            .filter(bp -> bp.getUserId().equalsIgnoreCase(AuthUser.getUserId()))
-            .isPresent()) {
-      throw new UnauthorizedUserException("Unauthorized user");
-    }
+          if ((roles.contains(UserRole.ROLE_COMPANY_ADMIN) && !this.checkIfCompanyAdmin(companyId)) ||
+              !brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerId)
+                  .filter(bp -> bp.getUserId().equalsIgnoreCase(AuthUser.getUserId()))
+                  .isPresent()) {
+               throw new UnauthorizedUserException("Unauthorized user");
+          }
 
-    return true;
-  }
+          return true;
+     }
 
-  private boolean checkIfCompanyAdmin(final String companyId) {
-    return brokerService.findByUserId(AuthUser.getUserId())
-        .filter(bp -> bp.getCompanyId().equalsIgnoreCase(companyId))
-        .filter(bp -> bp.isAdmin())
-        .isPresent();
-  }
+     private boolean checkIfCompanyAdmin(final String companyId) {
+          return brokerService.findByUserId(AuthUser.getUserId())
+              .filter(bp -> bp.getCompanyId().equalsIgnoreCase(companyId))
+              .filter(bp -> bp.isAdmin())
+              .isPresent();
+     }
 
-  private List<String> getAuthenticatedUserRole() {
-    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return authentication.getAuthorities()
-        .parallelStream()
-        .map(GrantedAuthority::getAuthority)
-        .collect(Collectors.toList());
-  }
+     private List<String> getAuthenticatedUserRole() {
+          final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+          return authentication.getAuthorities()
+              .parallelStream()
+              .map(GrantedAuthority::getAuthority)
+              .collect(Collectors.toList());
+     }
 }

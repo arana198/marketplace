@@ -16,19 +16,19 @@ import javax.persistence.Table;
 @Table(name = "services")
 public class ServiceBO extends AbstractTimestampEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+     @Column(name = "name", nullable = false)
+     private String name;
 
-  @Column(name = "display_name", nullable = false)
-  private String displayName;
+     @Column(name = "display_name", nullable = false)
+     private String displayName;
 
-  @Column(name = "description")
-  private String description;
+     @Column(name = "description")
+     private String description;
 
-  @OneToOne
-  @JoinColumn(name = "parent_id", referencedColumnName = "id")
-  private ServiceBO parent;
+     @OneToOne
+     @JoinColumn(name = "parent_id", referencedColumnName = "id")
+     private ServiceBO parent;
 
-  @Column(name = "is_active", nullable = false)
-  private boolean active;
+     @Column(name = "is_active", nullable = false)
+     private boolean active;
 }

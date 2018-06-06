@@ -16,9 +16,9 @@ import javax.persistence.Table;
 @Table(name = "company_services")
 public class CompanyServiceBO extends AbstractTimestampEntity {
 
-  @Column(name = "company_id", nullable = false)
-  private String companyId;
+     @Column(name = "company_id", nullable = false)
+     private String companyId;
 
-  @Column(name = "service_id", nullable = false)
-  private String serviceId;
+     @Column(name = "service_id", nullable = false)
+     private String serviceId;
 }

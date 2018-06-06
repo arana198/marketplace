@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 interface BrokerValidatorRepository extends BaseRepository<BrokerValidatorBO, String> {
 
-  Optional<BrokerValidatorBO> findByBrokerProfileId(String brokerProfileId);
+     Optional<BrokerValidatorBO> findByBrokerProfileId(String brokerProfileId);
 }

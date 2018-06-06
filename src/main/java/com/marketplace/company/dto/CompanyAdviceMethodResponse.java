@@ -7,5 +7,5 @@ import java.util.List;
 
 @Data
 public class CompanyAdviceMethodResponse extends BaseResponseDomain {
-  private final List<String> adviceIds;
+     private final List<String> adviceIds;
 }

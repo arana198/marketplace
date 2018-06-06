@@ -13,18 +13,18 @@ import javax.validation.constraints.NotNull;
 @JsonDeserialize(builder = ServiceRequest.ServiceRequestRequestBuilder.class)
 public class ServiceRequest {
 
-  @NotBlank(message = "name is mandatory")
-  private final String name;
+     @NotBlank(message = "name is mandatory")
+     private final String name;
 
-  @NotBlank(message = "description is mandatory")
-  private final String description;
+     @NotBlank(message = "description is mandatory")
+     private final String description;
 
-  private final String parentServiceId;
+     private final String parentServiceId;
 
-  @NotNull(message = "active is mandatory")
-  private final boolean active;
+     @NotNull(message = "active is mandatory")
+     private final boolean active;
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class ServiceRequestRequestBuilder {
-  }
+     @JsonPOJOBuilder(withPrefix = "")
+     public static class ServiceRequestRequestBuilder {
+     }
 }

@@ -11,10 +11,10 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @JsonDeserialize(builder = CompanyEmployeeInviteRequest.CompanyEmployeeInviteRequestBuilder.class)
 public class CompanyEmployeeInviteRequest {
-  @NotBlank(message = "email is mandatory")
-  private final String email;
+     @NotBlank(message = "email is mandatory")
+     private final String email;
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class CompanyEmployeeInviteRequestBuilder {
-  }
+     @JsonPOJOBuilder(withPrefix = "")
+     public static class CompanyEmployeeInviteRequestBuilder {
+     }
 }

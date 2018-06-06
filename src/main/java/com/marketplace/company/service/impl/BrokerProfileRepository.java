@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 interface BrokerProfileRepository extends BaseRepository<BrokerProfileBO, String> {
 
-  List<BrokerProfileBO> findByUserId(String userId);
+     List<BrokerProfileBO> findByUserId(String userId);
 
-  Page<BrokerProfileBO> findByCompanyId(String companyId, Pageable pageable);
+     Page<BrokerProfileBO> findByCompanyId(String companyId, Pageable pageable);
 
-  List<BrokerProfileBO> findByCompanyIdAndAdmin(String companyId, boolean admin);
+     List<BrokerProfileBO> findByCompanyIdAndAdmin(String companyId, boolean admin);
 }

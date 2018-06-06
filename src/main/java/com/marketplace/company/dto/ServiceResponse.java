@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class ServiceResponse extends BaseResponseDomain {
-  private final String serviceId;
-  private final String name;
-  private final String description;
-  private final String parentId;
+     private final String serviceId;
+     private final String name;
+     private final String description;
+     private final String parentId;
 }

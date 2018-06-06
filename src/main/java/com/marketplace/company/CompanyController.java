@@ -42,80 +42,80 @@ import java.net.URI;
 @RequestMapping("/companies")
 public class CompanyController {
 
-  private final CompanyService companyService;
-  private final CompanyValidatorService companyValidatorService;
+     private final CompanyService companyService;
+     private final CompanyValidatorService companyValidatorService;
 
-  @RolesAllowed({UserRole.ROLE_ADMIN})
-  @GetMapping
-  public PagedResources<CompanyResponse> getCompanies(@RequestParam(value = "name", required = false) final String companyName,
-                                                      final Pageable pageable) {
+     @RolesAllowed({UserRole.ROLE_ADMIN})
+     @GetMapping
+     public PagedResources<CompanyResponse> getCompanies(@RequestParam(value = "name", required = false) final String companyName,
+                                                         final Pageable pageable) {
 
-    final Page<CompanyResponse> companyResponses = companyService.findAll(companyName, pageable);
-    return PagedResourceConverter.convert(companyResponses);
-  }
+          final Page<CompanyResponse> companyResponses = companyService.findAll(companyName, pageable);
+          return PagedResourceConverter.convert(companyResponses);
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @GetMapping(value = "/{companyId}")
-  public ResponseEntity<CompanyResponse> getCompany(@PathVariable final String companyId)
-      throws ResourceNotFoundException {
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @GetMapping(value = "/{companyId}")
+     public ResponseEntity<CompanyResponse> getCompany(@PathVariable final String companyId)
+         throws ResourceNotFoundException {
 
-    LOGGER.info("Getting company for id: {}", companyId);
-    return companyService.findById(companyId)
-        .map(ResponseEntity::ok)
-        .orElseThrow(() -> new CompanyNotFoundException(companyId));
-  }
+          LOGGER.info("Getting company for id: {}", companyId);
+          return companyService.findById(companyId)
+              .map(ResponseEntity::ok)
+              .orElseThrow(() -> new CompanyNotFoundException(companyId));
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyAdmin(null)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @PostMapping
-  public ResponseEntity<Void> createCompany(@RequestBody @Valid final CompanyRegistrationRequest companyRegistrationRequest,
-                                            final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @PreAuthorize("@securityUtils.isCompanyAdmin(null)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @PostMapping
+     public ResponseEntity<Void> createCompany(@RequestBody @Valid final CompanyRegistrationRequest companyRegistrationRequest,
+                                               final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid company object", bindingResult);
-    }
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid company object", bindingResult);
+          }
 
-    LOGGER.info("Creating company: {}", companyRegistrationRequest.getCompany().getName());
-    final CompanyResponse companyResponse = companyService.createCompany(AuthUser.getUserId(), companyRegistrationRequest);
-    final URI location = ServletUriComponentsBuilder
-        .fromCurrentRequest().path("/{companyId}")
-        .buildAndExpand(companyResponse.getCompanyId()).toUri();
+          LOGGER.info("Creating company: {}", companyRegistrationRequest.getCompany().getName());
+          final CompanyResponse companyResponse = companyService.createCompany(AuthUser.getUserId(), companyRegistrationRequest);
+          final URI location = ServletUriComponentsBuilder
+              .fromCurrentRequest().path("/{companyId}")
+              .buildAndExpand(companyResponse.getCompanyId()).toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+          return ResponseEntity.created(location).build();
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @PutMapping(value = "/{companyId}")
-  public ResponseEntity<Void> updateCompany(@PathVariable final String companyId,
-                                            @RequestBody @Valid final CompanyRequest companyRequest,
-                                            final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @PutMapping(value = "/{companyId}")
+     public ResponseEntity<Void> updateCompany(@PathVariable final String companyId,
+                                               @RequestBody @Valid final CompanyRequest companyRequest,
+                                               final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Updating company: {}", companyId);
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid company object", bindingResult);
-    }
+          LOGGER.info("Updating company: {}", companyId);
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid company object", bindingResult);
+          }
 
-    companyService.updateCompany(companyId, companyRequest);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          companyService.updateCompany(companyId, companyRequest);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 
-  @RolesAllowed({UserRole.ROLE_ADMIN})
-  @PutMapping(value = "/{companyId}/fcaNumber/verify")
-  public ResponseEntity<Void> verifyCompany(@PathVariable final String companyId) {
+     @RolesAllowed({UserRole.ROLE_ADMIN})
+     @PutMapping(value = "/{companyId}/fcaNumber/verify")
+     public ResponseEntity<Void> verifyCompany(@PathVariable final String companyId) {
 
-    companyValidatorService.fcaNumberVerified(companyId);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          companyValidatorService.fcaNumberVerified(companyId);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 
-  @RolesAllowed({UserRole.ROLE_ADMIN})
-  @DeleteMapping(value = "/{companyId}/fcaNumber/unverify")
-  public ResponseEntity<Void> unverifyCompany(@PathVariable final String companyId) throws CompanyNotFoundException {
+     @RolesAllowed({UserRole.ROLE_ADMIN})
+     @DeleteMapping(value = "/{companyId}/fcaNumber/unverify")
+     public ResponseEntity<Void> unverifyCompany(@PathVariable final String companyId) throws CompanyNotFoundException {
 
-    companyValidatorService.fcaNumberUnverified(companyId);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          companyValidatorService.fcaNumberUnverified(companyId);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 }

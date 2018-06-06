@@ -22,25 +22,25 @@ import java.io.Serializable;
 @Table(name = "roles")
 public class RoleBO implements GrantedAuthority, Serializable {
 
-  private static final long serialVersionUID = -2934253177419534374L;
+     private static final long serialVersionUID = -2934253177419534374L;
 
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Id
-  @Column(name = "id", nullable = false)
-  private String id;
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     @Id
+     @Column(name = "id", nullable = false)
+     private String id;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+     @Column(name = "name", nullable = false)
+     private String name;
 
-  @Column(name = "description", nullable = false)
-  private String description;
+     @Column(name = "description", nullable = false)
+     private String description;
 
-  @Column(name = "is_selectable", nullable = false)
-  private boolean selectable;
+     @Column(name = "is_selectable", nullable = false)
+     private boolean selectable;
 
-  @Override
-  public String getAuthority() {
-    return name;
-  }
+     @Override
+     public String getAuthority() {
+          return name;
+     }
 
 }

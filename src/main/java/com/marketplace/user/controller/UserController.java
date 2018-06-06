@@ -32,51 +32,51 @@ import javax.validation.Valid;
 @RequestMapping("users")
 public class UserController {
 
-  private final UserService userService;
+     private final UserService userService;
 
-  @PostMapping
-  public ResponseEntity<Void> signup(@RequestParam final UserType userType,
-                                     @Valid @RequestBody final UserRequest userRequest,
-                                     final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @PostMapping
+     public ResponseEntity<Void> signup(@RequestParam final UserType userType,
+                                        @Valid @RequestBody final UserRequest userRequest,
+                                        final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Signup user: {}", userRequest.getEmail());
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid user request object", bindingResult);
-    }
+          LOGGER.info("Signup user: {}", userRequest.getEmail());
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid user request object", bindingResult);
+          }
 
-    userService.createUser(userRequest, userType);
-    return new ResponseEntity<>(HttpStatus.CREATED);
-  }
+          userService.createUser(userRequest, userType);
+          return new ResponseEntity<>(HttpStatus.CREATED);
+     }
 
-  @PreAuthorize("@securityUtils.checkIfUserAuthorized(#userId)")
-  @RolesAllowed({UserRole.ROLE_BROKER})
-  @PutMapping(path = "/{userId}/passwords")
-  public ResponseEntity<Void> updatePassword(@PathVariable final String userId,
-                                             @Valid @RequestBody final UpdatePasswordRequest updatePasswordRequest,
+     @PreAuthorize("@securityUtils.checkIfUserAuthorized(#userId)")
+     @RolesAllowed({UserRole.ROLE_BROKER})
+     @PutMapping(path = "/{userId}/passwords")
+     public ResponseEntity<Void> updatePassword(@PathVariable final String userId,
+                                                @Valid @RequestBody final UpdatePasswordRequest updatePasswordRequest,
+                                                final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
+
+          LOGGER.info("Update password for user: {}", userId);
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid update password request object", bindingResult);
+          }
+
+          userService.updatePassword(userId, updatePasswordRequest);
+          return ResponseEntity.ok().build();
+     }
+
+     @PutMapping(path = "/verifyemail")
+     public ResponseEntity<Void> verifyEmail(@Valid @RequestBody final EmailVerificationRequest emailVerificationRequest,
                                              final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Update password for user: {}", userId);
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid update password request object", bindingResult);
-    }
+          LOGGER.info("Verify email for token: {}", emailVerificationRequest.getToken());
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid update password request object", bindingResult);
+          }
 
-    userService.updatePassword(userId, updatePasswordRequest);
-    return ResponseEntity.ok().build();
-  }
-
-  @PutMapping(path = "/verifyemail")
-  public ResponseEntity<Void> verifyEmail(@Valid @RequestBody final EmailVerificationRequest emailVerificationRequest,
-                                          final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
-
-    LOGGER.info("Verify email for token: {}", emailVerificationRequest.getToken());
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid update password request object", bindingResult);
-    }
-
-    userService.verifyEmail(emailVerificationRequest);
-    return ResponseEntity.ok().build();
-  }
+          userService.verifyEmail(emailVerificationRequest);
+          return ResponseEntity.ok().build();
+     }
 }

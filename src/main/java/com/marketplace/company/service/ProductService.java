@@ -10,13 +10,13 @@ import java.util.Optional;
 
 public interface ProductService {
 
-  List<ServiceResponse> findParentByIsActive(boolean isActive);
+     List<ServiceResponse> findParentByIsActive(boolean isActive);
 
-  List<ServiceResponse> findByParentIdAndIsActive(String parentId, boolean isActive) throws ServiceNotFoundException;
+     List<ServiceResponse> findByParentIdAndIsActive(String parentId, boolean isActive) throws ServiceNotFoundException;
 
-  Optional<ServiceResponse> findByServiceId(String serviceId);
+     Optional<ServiceResponse> findByServiceId(String serviceId);
 
-  ServiceResponse addService(ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException;
+     ServiceResponse addService(ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException;
 
-  void updateService(String serviceId, ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException;
+     void updateService(String serviceId, ServiceRequest serviceRequest) throws ServiceNotFoundException, ServiceAlreadyExistsException;
 }

@@ -16,34 +16,34 @@ import java.util.HashMap;
 @Service
 class CompanyNumberValidatorImpl implements CompanyNumberValidator {
 
-  private final String apiUrl;
-  private final String apiKey;
-  private final RestTemplate restTemplate;
+     private final String apiUrl;
+     private final String apiKey;
+     private final RestTemplate restTemplate;
 
-  public CompanyNumberValidatorImpl(final ConfigurationService configurationService) {
-    this.apiUrl = configurationService.getCompanyValidatorUrlPrefix();
-    this.apiKey = configurationService.getCompanyValidatorApiKey();
-    this.restTemplate = new RestTemplate();
-  }
+     public CompanyNumberValidatorImpl(final ConfigurationService configurationService) {
+          this.apiUrl = configurationService.getCompanyValidatorUrlPrefix();
+          this.apiKey = configurationService.getCompanyValidatorApiKey();
+          this.restTemplate = new RestTemplate();
+     }
 
-  public boolean validate(final String companyName, final String companyNumber) {
-    final String url = apiUrl + "/company/" + companyNumber;
+     public boolean validate(final String companyName, final String companyNumber) {
+          final String url = apiUrl + "/company/" + companyNumber;
 
-    String base64Creds = Base64.encodeBase64String(apiKey.getBytes());
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Basic " + base64Creds);
+          String base64Creds = Base64.encodeBase64String(apiKey.getBytes());
+          HttpHeaders headers = new HttpHeaders();
+          headers.add("Authorization", "Basic " + base64Creds);
 
-    try {
-      final CompanyVerificationResponse companyVerificationResponse = this.restTemplate
-          .exchange(url, HttpMethod.GET, new HttpEntity<String>(headers), CompanyVerificationResponse.class, new HashMap<>()).getBody();
-      return companyName.replaceAll(" ", "").equalsIgnoreCase(companyVerificationResponse.getName().replaceAll(" ", ""));
-    } catch (HttpClientErrorException ex) {
-      if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
-        throw ex;
-      }
-    }
+          try {
+               final CompanyVerificationResponse companyVerificationResponse = this.restTemplate
+                   .exchange(url, HttpMethod.GET, new HttpEntity<String>(headers), CompanyVerificationResponse.class, new HashMap<>()).getBody();
+               return companyName.replaceAll(" ", "").equalsIgnoreCase(companyVerificationResponse.getName().replaceAll(" ", ""));
+          } catch (HttpClientErrorException ex) {
+               if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
+                    throw ex;
+               }
+          }
 
-    return false;
-  }
+          return false;
+     }
 }
 

@@ -16,6 +16,6 @@ import javax.persistence.Table;
 @Table(name = "state")
 public class StateBO extends AbstractEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+     @Column(name = "name", nullable = false)
+     private String name;
 }

@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 interface StateRepository extends BaseRepository<StateBO, String> {
 
-  Optional<StateBO> findByName(String name);
+     Optional<StateBO> findByName(String name);
 }

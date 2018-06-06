@@ -42,131 +42,131 @@ import java.net.URI;
 @RequestMapping("/companies/{companyId}/brokers")
 public class BrokerController {
 
-  private final BrokerService brokerService;
+     private final BrokerService brokerService;
 
-  @IsActive
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @PostMapping(path = "/invite")
-  public ResponseEntity<BrokerProfileResponse> inviteEmployee(@PathVariable final String companyId,
-                                                              @RequestBody @Valid final CompanyEmployeeInviteRequest companyEmployeeInviteRequest,
-                                                              final BindingResult bindingResult)
-      throws ResourceNotFoundException {
+     @IsActive
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @PostMapping(path = "/invite")
+     public ResponseEntity<BrokerProfileResponse> inviteEmployee(@PathVariable final String companyId,
+                                                                 @RequestBody @Valid final CompanyEmployeeInviteRequest companyEmployeeInviteRequest,
+                                                                 final BindingResult bindingResult)
+         throws ResourceNotFoundException {
 
-    LOGGER.info("Inviting broker email [ {} ] to company [ {} ]", companyEmployeeInviteRequest.getEmail(), companyId);
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid company invite object", bindingResult);
-    }
+          LOGGER.info("Inviting broker email [ {} ] to company [ {} ]", companyEmployeeInviteRequest.getEmail(), companyId);
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid company invite object", bindingResult);
+          }
 
-    brokerService.inviteEmployee(companyId, companyEmployeeInviteRequest);
+          brokerService.inviteEmployee(companyId, companyEmployeeInviteRequest);
 
-    return new ResponseEntity<BrokerProfileResponse>(HttpStatus.CREATED);
-  }
+          return new ResponseEntity<BrokerProfileResponse>(HttpStatus.CREATED);
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyEmployee(#companyId, #brokerId)")
-  @RolesAllowed({UserRole.ROLE_BROKER})
-  @GetMapping(path = "/{brokerId}")
-  public ResponseEntity<BrokerProfileResponse> getBrokerProfile(@PathVariable final String companyId,
-                                                                @PathVariable final String brokerId)
-      throws ResourceNotFoundException {
+     @PreAuthorize("@securityUtils.isCompanyEmployee(#companyId, #brokerId)")
+     @RolesAllowed({UserRole.ROLE_BROKER})
+     @GetMapping(path = "/{brokerId}")
+     public ResponseEntity<BrokerProfileResponse> getBrokerProfile(@PathVariable final String companyId,
+                                                                   @PathVariable final String brokerId)
+         throws ResourceNotFoundException {
 
-    BrokerProfileResponse brokerProfileResponse = brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerId)
-        .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerId));
+          BrokerProfileResponse brokerProfileResponse = brokerService.findByCompanyIdAndBrokerProfileId(companyId, brokerId)
+              .orElseThrow(() -> new BrokerNotFoundException(companyId, brokerId));
 
-    return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
-  }
+          return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
+     }
 
-  @RolesAllowed({UserRole.ROLE_BROKER})
-  @PostMapping
-  public ResponseEntity<Void> addEmployeeToCompany(@PathVariable final String companyId,
-                                                   @RequestBody @Valid final CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest,
-                                                   final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @RolesAllowed({UserRole.ROLE_BROKER})
+     @PostMapping
+     public ResponseEntity<Void> addEmployeeToCompany(@PathVariable final String companyId,
+                                                      @RequestBody @Valid final CompanyEmployeeInviteTokenRequest companyEmployeeInviteTokenRequest,
+                                                      final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Adding broker [ {} ] to company: [ {} ]", AuthUser.getUserId(), companyId);
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid company object", bindingResult);
-    }
+          LOGGER.info("Adding broker [ {} ] to company: [ {} ]", AuthUser.getUserId(), companyId);
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid company object", bindingResult);
+          }
 
-    final BrokerProfileResponse brokerProfileResponse = brokerService.addBrokerToCompany(AuthUser.getUserId(), companyId, companyEmployeeInviteTokenRequest);
-    final URI location = ServletUriComponentsBuilder
-        .fromCurrentRequest().path("/{brokerId}")
-        .buildAndExpand(brokerProfileResponse.getBrokerProfileId()).toUri();
+          final BrokerProfileResponse brokerProfileResponse = brokerService.addBrokerToCompany(AuthUser.getUserId(), companyId, companyEmployeeInviteTokenRequest);
+          final URI location = ServletUriComponentsBuilder
+              .fromCurrentRequest().path("/{brokerId}")
+              .buildAndExpand(brokerProfileResponse.getBrokerProfileId()).toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+          return ResponseEntity.created(location).build();
+     }
 
-  @RolesAllowed({UserRole.ROLE_BROKER})
-  @PutMapping(path = "/{brokerId}")
-  public ResponseEntity<Void> updateBrokerInCompany(@PathVariable final String companyId,
-                                                    @PathVariable final String brokerId,
-                                                    @RequestBody @Valid final BrokerProfileRequest brokerProfileRequest,
-                                                    final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @RolesAllowed({UserRole.ROLE_BROKER})
+     @PutMapping(path = "/{brokerId}")
+     public ResponseEntity<Void> updateBrokerInCompany(@PathVariable final String companyId,
+                                                       @PathVariable final String brokerId,
+                                                       @RequestBody @Valid final BrokerProfileRequest brokerProfileRequest,
+                                                       final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Updating broker: {} for comapny: ", brokerId, companyId);
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid company object", bindingResult);
-    }
+          LOGGER.info("Updating broker: {} for comapny: ", brokerId, companyId);
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid company object", bindingResult);
+          }
 
-    brokerService.updateBrokerProfile(AuthUser.getUserId(), companyId, brokerId, brokerProfileRequest);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          brokerService.updateBrokerProfile(AuthUser.getUserId(), companyId, brokerId, brokerProfileRequest);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 
-  @IsActive
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @DeleteMapping(path = "/{brokerId}")
-  public ResponseEntity<Void> removeBrokerFromCompany(@PathVariable final String companyId,
-                                                      @PathVariable final String brokerId)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @IsActive
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @DeleteMapping(path = "/{brokerId}")
+     public ResponseEntity<Void> removeBrokerFromCompany(@PathVariable final String companyId,
+                                                         @PathVariable final String brokerId)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Removing broker {} from company: {}", brokerId, companyId);
-    brokerService.removeBrokerFromCompany(companyId, brokerId);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+          LOGGER.info("Removing broker {} from company: {}", brokerId, companyId);
+          brokerService.removeBrokerFromCompany(companyId, brokerId);
+          return new ResponseEntity<>(HttpStatus.OK);
+     }
 
-  @IsActive
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @DeleteMapping(path = "/{brokerId}/admins")
-  public ResponseEntity<Void> removeAdminBrokerFromCompany(@PathVariable final String companyId,
-                                                           @PathVariable final String brokerId)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @IsActive
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @DeleteMapping(path = "/{brokerId}/admins")
+     public ResponseEntity<Void> removeAdminBrokerFromCompany(@PathVariable final String companyId,
+                                                              @PathVariable final String brokerId)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Removing admin broker {} from company: {}", brokerId, companyId);
-    brokerService.removeAdminBrokerFromCompany(companyId, brokerId);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+          LOGGER.info("Removing admin broker {} from company: {}", brokerId, companyId);
+          brokerService.removeAdminBrokerFromCompany(companyId, brokerId);
+          return new ResponseEntity<>(HttpStatus.OK);
+     }
 
-  @IsActive
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @PostMapping(path = "/{brokerId}/admins")
-  public ResponseEntity<Void> addAdminBrokerForCompany(@PathVariable final String companyId,
-                                                       @PathVariable final String brokerId)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @IsActive
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @PostMapping(path = "/{brokerId}/admins")
+     public ResponseEntity<Void> addAdminBrokerForCompany(@PathVariable final String companyId,
+                                                          @PathVariable final String brokerId)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Add admin broker {} for company: {}", brokerId, companyId);
-    brokerService.addAdminBrokerForCompany(companyId, brokerId);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+          LOGGER.info("Add admin broker {} for company: {}", brokerId, companyId);
+          brokerService.addAdminBrokerForCompany(companyId, brokerId);
+          return new ResponseEntity<>(HttpStatus.OK);
+     }
 
-  @RolesAllowed({UserRole.ROLE_BROKER})
-  @PostMapping(path = "/{brokerId}/profileimages")
-  public ResponseEntity<BrokerProfileResponse> addOrUpdateProfileImage(@PathVariable final String companyId,
-                                                                       @PathVariable final String brokerId,
-                                                                       @RequestPart(name = "file") final MultipartFile multipartFile)
-      throws ResourceNotFoundException, IOException {
+     @RolesAllowed({UserRole.ROLE_BROKER})
+     @PostMapping(path = "/{brokerId}/profileimages")
+     public ResponseEntity<BrokerProfileResponse> addOrUpdateProfileImage(@PathVariable final String companyId,
+                                                                          @PathVariable final String brokerId,
+                                                                          @RequestPart(name = "file") final MultipartFile multipartFile)
+         throws ResourceNotFoundException, IOException {
 
-    LOGGER.info("Updating broker: {} for company: ", brokerId, companyId);
-    if (!MediaType.IMAGE_GIF_VALUE.equalsIgnoreCase(multipartFile.getContentType())
-        || !MediaType.IMAGE_JPEG_VALUE.equalsIgnoreCase(multipartFile.getContentType())
-        || !MediaType.IMAGE_PNG_VALUE.equalsIgnoreCase(multipartFile.getContentType())) {
-      throw new BadRequestException("File must of image type");
-    }
+          LOGGER.info("Updating broker: {} for company: ", brokerId, companyId);
+          if (!MediaType.IMAGE_GIF_VALUE.equalsIgnoreCase(multipartFile.getContentType())
+              || !MediaType.IMAGE_JPEG_VALUE.equalsIgnoreCase(multipartFile.getContentType())
+              || !MediaType.IMAGE_PNG_VALUE.equalsIgnoreCase(multipartFile.getContentType())) {
+               throw new BadRequestException("File must of image type");
+          }
 
-    BrokerProfileResponse brokerProfileResponse = brokerService.addOrUpdateImage(AuthUser.getUserId(), companyId, brokerId, multipartFile);
-    return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
-  }
+          BrokerProfileResponse brokerProfileResponse = brokerService.addOrUpdateImage(AuthUser.getUserId(), companyId, brokerId, multipartFile);
+          return new ResponseEntity<>(brokerProfileResponse, HttpStatus.OK);
+     }
 }

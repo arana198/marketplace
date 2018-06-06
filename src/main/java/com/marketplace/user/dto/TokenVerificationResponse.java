@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 public class TokenVerificationResponse extends BaseResponseDomain {
-  private final String userId;
-  private final String email;
-  private final String token;
-  private final LocalDateTime createdTs;
+     private final String userId;
+     private final String email;
+     private final String token;
+     private final LocalDateTime createdTs;
 }

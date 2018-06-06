@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 interface OutcodeRepository extends BaseRepository<OutcodeBO, String> {
 
-  Optional<OutcodeBO> findByOutcode(String outcode);
+     Optional<OutcodeBO> findByOutcode(String outcode);
 }

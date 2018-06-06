@@ -25,37 +25,37 @@ import javax.annotation.security.RolesAllowed;
 @RequestMapping("/companies/{companyId}/advices")
 public class CompanyAdviceMethodController {
 
-  private final CompanyAdviceMethodService companyAdviceMethodService;
+     private final CompanyAdviceMethodService companyAdviceMethodService;
 
-  @GetMapping
-  public ResponseEntity<CompanyAdviceMethodResponse> getCompanyServices(@PathVariable final String companyId) {
-    CompanyAdviceMethodResponse advices = companyAdviceMethodService.getCompanyAdvice(companyId);
-    return new ResponseEntity<>(advices, HttpStatus.OK);
-  }
+     @GetMapping
+     public ResponseEntity<CompanyAdviceMethodResponse> getCompanyServices(@PathVariable final String companyId) {
+          CompanyAdviceMethodResponse advices = companyAdviceMethodService.getCompanyAdvice(companyId);
+          return new ResponseEntity<>(advices, HttpStatus.OK);
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @PostMapping(path = "/{adviceId}")
-  public ResponseEntity<Void> addCompanyService(@PathVariable final String companyId,
-                                                @PathVariable final String adviceId)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @PostMapping(path = "/{adviceId}")
+     public ResponseEntity<Void> addCompanyService(@PathVariable final String companyId,
+                                                   @PathVariable final String adviceId)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Adding advice method [ {} ] to the company [ {} ]", adviceId, companyId);
+          LOGGER.info("Adding advice method [ {} ] to the company [ {} ]", adviceId, companyId);
 
-    companyAdviceMethodService.addCompanyAdvice(companyId, adviceId);
+          companyAdviceMethodService.addCompanyAdvice(companyId, adviceId);
 
-    return new ResponseEntity<>(HttpStatus.CREATED);
-  }
+          return new ResponseEntity<>(HttpStatus.CREATED);
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @DeleteMapping(path = "/{adviceId}")
-  public ResponseEntity<Void> removeCompanyService(@PathVariable final String companyId,
-                                                   @PathVariable final String adviceId) {
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @DeleteMapping(path = "/{adviceId}")
+     public ResponseEntity<Void> removeCompanyService(@PathVariable final String companyId,
+                                                      @PathVariable final String adviceId) {
 
-    LOGGER.info("Removing advice method: {} from company [ {} ]", adviceId, companyId);
-    companyAdviceMethodService.removeCompanyAdvice(companyId, adviceId);
+          LOGGER.info("Removing advice method: {} from company [ {} ]", adviceId, companyId);
+          companyAdviceMethodService.removeCompanyAdvice(companyId, adviceId);
 
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+          return new ResponseEntity<>(HttpStatus.OK);
+     }
 }

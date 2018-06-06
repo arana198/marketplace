@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface AddressService {
 
-  List<AddressResponse> getAddressByPostcode(final String postcode) throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException;
+     List<AddressResponse> getAddressByPostcode(final String postcode) throws PostcodeNotFoundException, IOException, OutcodeNotFoundException, AddressNotFoundException;
 }

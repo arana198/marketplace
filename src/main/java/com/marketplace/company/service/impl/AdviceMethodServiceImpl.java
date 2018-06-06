@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 @Service
 class AdviceMethodServiceImpl implements AdviceMethodService {
 
-  private final AdviceMethodRepository adviceRepository;
-  private final AdviceMethodResponseConverter adviceResponseConverter;
+     private final AdviceMethodRepository adviceRepository;
+     private final AdviceMethodResponseConverter adviceResponseConverter;
 
-  @Override
-  public List<AdviceResponse> getAdviceMethods() {
-    return adviceRepository.findByActive(true)
-        .parallelStream()
-        .map(adviceResponseConverter::convert)
-        .collect(Collectors.toList());
-  }
+     @Override
+     public List<AdviceResponse> getAdviceMethods() {
+          return adviceRepository.findByActive(true)
+              .parallelStream()
+              .map(adviceResponseConverter::convert)
+              .collect(Collectors.toList());
+     }
 }

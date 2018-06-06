@@ -20,7 +20,7 @@ buildscript {
         classpath group: "org.springframework.boot", name: "spring-boot-gradle-plugin", version: "2.0.2.RELEASE"
         classpath group: "org.flywaydb", name: "flyway-gradle-plugin", version: "5.1.1"
         classpath group: "gradle.plugin.com.github.spotbugs", name: "spotbugs-gradle-plugin", version: "1.6.2"
-        classpath "gradle.plugin.org.gradle.java:experimental-jigsaw:0.1.1"
+        classpath group: "gradle.plugin.org.gradle.java", name: "experimental-jigsaw", version: "0.1.1"
     }
 }
 
@@ -110,13 +110,13 @@ configurations {
 dependencies {
 
     compile group: "org.springframework.boot", name: "spring-boot-starter-web"
-    compile (group: "org.springframework.boot", name: "spring-boot-starter-data-jpa") {
+    compile(group: "org.springframework.boot", name: "spring-boot-starter-data-jpa") {
         exclude group: "javax.transaction", module: "javax.transaction-api"
         exclude group: "org.javassist", module: "javassist"
 
     }
 
-    compile (group: "org.springframework.boot", name: "spring-boot-starter-actuator") {
+    compile(group: "org.springframework.boot", name: "spring-boot-starter-actuator") {
         exclude group: "org.springframework.boot", module: "spring-boot-actuator-autoconfigure"
     }
 
@@ -124,7 +124,7 @@ dependencies {
     compile group: "org.springframework.boot", name: "spring-boot-starter-security"
     compile group: "org.springframework.boot", name: "spring-boot-starter-thymeleaf"
 
-    compile (group: "org.springframework.cloud", name: "spring-cloud-starter-oauth2") {
+    compile(group: "org.springframework.cloud", name: "spring-cloud-starter-oauth2") {
         exclude group: "org.springframework.security.oauth.boot", module: "spring-security-oauth2-autoconfigure"
     }
 
@@ -173,5 +173,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "4.7"
+    gradleVersion = "4.8"
 }

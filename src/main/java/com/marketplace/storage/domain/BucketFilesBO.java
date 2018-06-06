@@ -20,13 +20,13 @@ import javax.persistence.Table;
 @Table(name = "bucket_files")
 public class BucketFilesBO extends AbstractAuditEntity {
 
-  @Column(name = "bucket_id", nullable = false)
-  private String bucketId;
+     @Column(name = "bucket_id", nullable = false)
+     private String bucketId;
 
-  @OneToOne
-  @JoinColumn(name = "file_store_id", referencedColumnName = "id", nullable = false)
-  private FileStoreBO fileStore;
+     @OneToOne
+     @JoinColumn(name = "file_store_id", referencedColumnName = "id", nullable = false)
+     private FileStoreBO fileStore;
 
-  @Column(name = "is_public", nullable = false)
-  private boolean unrestricted = false;
+     @Column(name = "is_public", nullable = false)
+     private boolean unrestricted = false;
 }

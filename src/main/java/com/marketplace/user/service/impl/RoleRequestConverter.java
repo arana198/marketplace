@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RoleRequestConverter implements BaseConverter<RoleRequest, RoleBO> {
-  @Override
-  public RoleBO convert(final RoleRequest source) {
-    return new RoleBO()
-        .setName(source.getName().getValue())
-        .setDescription(source.getDescription())
-        .setSelectable(source.isSelectable());
-  }
+     @Override
+     public RoleBO convert(final RoleRequest source) {
+          return new RoleBO()
+              .setName(source.getName().getValue())
+              .setDescription(source.getDescription())
+              .setSelectable(source.isSelectable());
+     }
 }

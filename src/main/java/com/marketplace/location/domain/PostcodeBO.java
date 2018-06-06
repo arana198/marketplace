@@ -19,16 +19,16 @@ import javax.persistence.Table;
 @Table(name = "location")
 public class PostcodeBO extends AbstractEntity {
 
-  @Column(name = "location", nullable = false)
-  private String postcode;
+     @Column(name = "location", nullable = false)
+     private String postcode;
 
-  @OneToOne
-  @JoinColumn(name = "outcode_id", referencedColumnName = "id", nullable = false)
-  private OutcodeBO outcode;
+     @OneToOne
+     @JoinColumn(name = "outcode_id", referencedColumnName = "id", nullable = false)
+     private OutcodeBO outcode;
 
-  @Column(name = "coordinates", columnDefinition = "geometry", nullable = false)
-  private Point coordinates;
+     @Column(name = "coordinates", columnDefinition = "geometry", nullable = false)
+     private Point coordinates;
 
-  @Column(name = "is_active", nullable = false)
-  private boolean active;
+     @Column(name = "is_active", nullable = false)
+     private boolean active;
 }

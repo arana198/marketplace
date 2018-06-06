@@ -18,10 +18,10 @@ import javax.persistence.Table;
 @Table(name = "email_notifications")
 public class EmailNotificationBO extends AbstractTimestampEntity {
 
-  @Column(name = "sent_to", nullable = false)
-  private String sentTo;
+     @Column(name = "sent_to", nullable = false)
+     private String sentTo;
 
-  @Convert(converter = JpaJsonConverter.class)
-  @Column(name = "email", columnDefinition = "json", nullable = false)
-  private Object emailBO;
+     @Convert(converter = JpaJsonConverter.class)
+     @Column(name = "email", columnDefinition = "json", nullable = false)
+     private Object emailBO;
 }

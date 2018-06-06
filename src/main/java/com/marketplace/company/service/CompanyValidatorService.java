@@ -7,15 +7,15 @@ import java.util.Optional;
 
 public interface CompanyValidatorService {
 
-  void fcaNumberUnverified(String companyId) throws CompanyNotFoundException;
+     void fcaNumberUnverified(String companyId) throws CompanyNotFoundException;
 
-  void fcaNumberVerified(String companyId);
+     void fcaNumberVerified(String companyId);
 
-  void billingIsActive(String companyId);
+     void billingIsActive(String companyId);
 
-  void billingInactivated(String companyId) throws CompanyNotFoundException;
+     void billingInactivated(String companyId) throws CompanyNotFoundException;
 
-  boolean checkIfCompanyVerified(String companyId);
+     boolean checkIfCompanyVerified(String companyId);
 
-  Optional<CompanyValidatorResponse> findByCompanyId(String companyId);
+     Optional<CompanyValidatorResponse> findByCompanyId(String companyId);
 }

@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
 @Service
 class BrokerProfileRequestConverter implements BaseConverter<BrokerProfileRequest, BrokerProfileBO> {
 
-  @Override
-  public BrokerProfileBO convert(final BrokerProfileRequest source) {
-    return new BrokerProfileBO()
-        .setCompanyId(source.getCompanyId())
-        .setUserId(source.getUserId())
-        .setFirstName(source.getFirstName())
-        .setLastName(source.getLastName())
-        .setMobileNumber(source.getMobileNumber())
-        .setAboutMe(source.getAboutMe())
-        .setAdmin(false)
-        .setActive(source.isActive());
-  }
+     @Override
+     public BrokerProfileBO convert(final BrokerProfileRequest source) {
+          return new BrokerProfileBO()
+              .setCompanyId(source.getCompanyId())
+              .setUserId(source.getUserId())
+              .setFirstName(source.getFirstName())
+              .setLastName(source.getLastName())
+              .setMobileNumber(source.getMobileNumber())
+              .setAboutMe(source.getAboutMe())
+              .setAdmin(false)
+              .setActive(source.isActive());
+     }
 }

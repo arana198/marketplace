@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 interface CityRepository extends BaseRepository<CityBO, String> {
 
-  Optional<CityBO> findByName(String name);
+     Optional<CityBO> findByName(String name);
 }

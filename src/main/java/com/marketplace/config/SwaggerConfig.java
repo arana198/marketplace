@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration;
 //@EnableSwagger2
 public class SwaggerConfig {
 
-  private static final String securitySchemaOAuth2 = "oauth2schema";
-  private static final String authorizationScopeGlobal = "global";
-  private static final String authorizationScopeGlobalDesc = "accessEverything";
+     private static final String securitySchemaOAuth2 = "oauth2schema";
+     private static final String authorizationScopeGlobal = "global";
+     private static final String authorizationScopeGlobalDesc = "accessEverything";
 
     /*private ApiInfo apiInfo() {
         return new ApiInfoBuilder()

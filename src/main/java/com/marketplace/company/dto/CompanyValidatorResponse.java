@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class CompanyValidatorResponse extends BaseResponseDomain {
-  private final String companyId;
-  private final boolean fcaNumberVerified;
-  private final boolean billingActive;
-  private final LocalDateTime fcaNumberVerifiedAt;
+     private final String companyId;
+     private final boolean fcaNumberVerified;
+     private final boolean billingActive;
+     private final LocalDateTime fcaNumberVerifiedAt;
 }

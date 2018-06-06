@@ -5,9 +5,9 @@ import com.marketplace.storage.dto.BucketRequest;
 import com.marketplace.storage.dto.BucketResponse;
 
 public interface BucketService {
-  BucketResponse getOrCreate(BucketRequest bucketRequest);
+     BucketResponse getOrCreate(BucketRequest bucketRequest);
 
-  boolean checkIfUserHasPermission(String bucketId, String userId);
+     boolean checkIfUserHasPermission(String bucketId, String userId);
 
-  void addPermissions(BucketPermissionResponse bucketPermissionResponse);
+     void addPermissions(BucketPermissionResponse bucketPermissionResponse);
 }

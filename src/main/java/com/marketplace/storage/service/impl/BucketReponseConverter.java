@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 class BucketReponseConverter implements BaseConverter<BucketBO, BucketResponse> {
-  @Override
-  public BucketResponse convert(final BucketBO source) {
-    return new BucketResponse(
-        source.getId(),
-        source.getType());
-  }
+     @Override
+     public BucketResponse convert(final BucketBO source) {
+          return new BucketResponse(
+              source.getId(),
+              source.getType());
+     }
 }

@@ -6,11 +6,11 @@ import com.marketplace.profile.domain.UserProfileBO;
 import java.util.Optional;
 
 interface UserProfileRepository extends BaseRepository<UserProfileBO, String> {
-  Optional<UserProfileBO> findByUserId(String userId);
+     Optional<UserProfileBO> findByUserId(String userId);
 
-  Optional<UserProfileBO> findByEmail(String email);
+     Optional<UserProfileBO> findByEmail(String email);
 
-  Optional<UserProfileBO> findByIdAndUserId(String id, String userId);
+     Optional<UserProfileBO> findByIdAndUserId(String id, String userId);
 
-  Optional<UserProfileBO> findByMobileNumber(String mobileNumber);
+     Optional<UserProfileBO> findByMobileNumber(String mobileNumber);
 }

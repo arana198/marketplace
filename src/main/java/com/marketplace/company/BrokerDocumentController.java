@@ -29,41 +29,41 @@ import java.util.List;
 @RequestMapping("/companies/{companyId}/brokers/{brokerId}/documents")
 public class BrokerDocumentController {
 
-  private final BrokerDocumentService brokerDocumentService;
+     private final BrokerDocumentService brokerDocumentService;
 
-  @RolesAllowed({UserRole.ROLE_BROKER})
-  @GetMapping
-  public ResponseEntity<List<BrokerDocumentResponse>> getDocuments(@PathVariable final String companyId,
-                                                                   @PathVariable final String brokerId)
-      throws ResourceNotFoundException {
+     @RolesAllowed({UserRole.ROLE_BROKER})
+     @GetMapping
+     public ResponseEntity<List<BrokerDocumentResponse>> getDocuments(@PathVariable final String companyId,
+                                                                      @PathVariable final String brokerId)
+         throws ResourceNotFoundException {
 
-    LOGGER.info("Adding broker: {} certification document", brokerId);
-    List<BrokerDocumentResponse> brokerDocuments = brokerDocumentService.getBrokerDocuments(AuthUser.getUserId(), companyId, brokerId);
-    return new ResponseEntity<>(brokerDocuments, HttpStatus.OK);
-  }
+          LOGGER.info("Adding broker: {} certification document", brokerId);
+          List<BrokerDocumentResponse> brokerDocuments = brokerDocumentService.getBrokerDocuments(AuthUser.getUserId(), companyId, brokerId);
+          return new ResponseEntity<>(brokerDocuments, HttpStatus.OK);
+     }
 
-  @RolesAllowed({UserRole.ROLE_BROKER})
-  @PostMapping
-  public ResponseEntity<Void> addDocument(@PathVariable final String companyId,
-                                          @PathVariable final String brokerId,
-                                          @RequestPart(name = "file") final MultipartFile multipartFile)
-      throws ResourceNotFoundException, IOException {
+     @RolesAllowed({UserRole.ROLE_BROKER})
+     @PostMapping
+     public ResponseEntity<Void> addDocument(@PathVariable final String companyId,
+                                             @PathVariable final String brokerId,
+                                             @RequestPart(name = "file") final MultipartFile multipartFile)
+         throws ResourceNotFoundException, IOException {
 
-    LOGGER.info("Adding broker: {} certification document", brokerId);
-    brokerDocumentService.addDocument(AuthUser.getUserId(), companyId, brokerId, multipartFile);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          LOGGER.info("Adding broker: {} certification document", brokerId);
+          brokerDocumentService.addDocument(AuthUser.getUserId(), companyId, brokerId, multipartFile);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 
-  @IsActive
-  @RolesAllowed({UserRole.ROLE_ADMIN})
-  @PutMapping(path = "/{documentId}")
-  public ResponseEntity<Void> verifyCDocument(@PathVariable final String companyId,
-                                              @PathVariable final String brokerId,
-                                              @PathVariable final String documentId)
-      throws ResourceNotFoundException {
+     @IsActive
+     @RolesAllowed({UserRole.ROLE_ADMIN})
+     @PutMapping(path = "/{documentId}")
+     public ResponseEntity<Void> verifyCDocument(@PathVariable final String companyId,
+                                                 @PathVariable final String brokerId,
+                                                 @PathVariable final String documentId)
+         throws ResourceNotFoundException {
 
-    LOGGER.info("Verifying broker: {} document {}", brokerId, documentId);
-    brokerDocumentService.verifyDocument(companyId, brokerId, documentId);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          LOGGER.info("Verifying broker: {} document {}", brokerId, documentId);
+          brokerDocumentService.verifyDocument(companyId, brokerId, documentId);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 }

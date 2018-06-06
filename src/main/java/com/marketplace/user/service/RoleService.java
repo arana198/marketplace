@@ -9,13 +9,13 @@ import com.marketplace.user.exception.RoleNotFoundException;
 import java.util.Optional;
 
 public interface RoleService {
-  Optional<RoleList> findActiveRoles();
+     Optional<RoleList> findActiveRoles();
 
-  void updateRole(String roleId, RoleRequest roleRequest) throws RoleNotFoundException;
+     void updateRole(String roleId, RoleRequest roleRequest) throws RoleNotFoundException;
 
-  Optional<RoleBO> findById(String id);
+     Optional<RoleBO> findById(String id);
 
-  Optional<RoleBO> findByName(UserRole role);
+     Optional<RoleBO> findByName(UserRole role);
 }
 
 

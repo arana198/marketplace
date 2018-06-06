@@ -15,16 +15,16 @@ import java.time.LocalDate;
 @JsonIgnoreProperties
 public class UserProfileResponse extends BaseResponseDomain {
 
-  private final String profileId;
-  private final String userId;
-  private final String email;
-  private final String firstName;
-  private final String lastName;
-  private final String mobileNumber;
-  private final LocalDate dateOfBirth;
-  private final String postcode;
+     private final String profileId;
+     private final String userId;
+     private final String email;
+     private final String firstName;
+     private final String lastName;
+     private final String mobileNumber;
+     private final LocalDate dateOfBirth;
+     private final String postcode;
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class UserProfileResponseBuilder {
-  }
+     @JsonPOJOBuilder(withPrefix = "")
+     public static class UserProfileResponseBuilder {
+     }
 }

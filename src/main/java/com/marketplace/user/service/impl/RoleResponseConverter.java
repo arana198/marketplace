@@ -12,19 +12,19 @@ import java.util.stream.Collectors;
 @Service
 public class RoleResponseConverter implements BaseConverter<RoleBO, RoleResponse> {
 
-  @Override
-  public RoleResponse convert(final RoleBO source) {
-    return new RoleResponse(source.getId(),
-        source.getName(),
-        source.getDescription(),
-        source.isSelectable());
-  }
+     @Override
+     public RoleResponse convert(final RoleBO source) {
+          return new RoleResponse(source.getId(),
+              source.getName(),
+              source.getDescription(),
+              source.isSelectable());
+     }
 
-  public RoleList convert(final Set<RoleBO> source) {
-    return new RoleList(
-        source.stream()
-            .map(this::convert)
-            .collect(Collectors.toList())
-    );
-  }
+     public RoleList convert(final Set<RoleBO> source) {
+          return new RoleList(
+              source.stream()
+                  .map(this::convert)
+                  .collect(Collectors.toList())
+          );
+     }
 }

@@ -22,25 +22,25 @@ import javax.sql.DataSource;
 @Configuration
 public class SocialConfig implements SocialConfigurer {
 
-  private final DataSource dataSource;
-  private final ConnectionSignUp connectionSignUp;
+     private final DataSource dataSource;
+     private final ConnectionSignUp connectionSignUp;
 
-  @Override
-  public UsersConnectionRepository getUsersConnectionRepository(final ConnectionFactoryLocator connectionFactoryLocator) {
-    JdbcUsersConnectionRepository jdbcUsersConnectionRepository = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText());
-    jdbcUsersConnectionRepository.setConnectionSignUp(connectionSignUp);
-    return jdbcUsersConnectionRepository;
-  }
+     @Override
+     public UsersConnectionRepository getUsersConnectionRepository(final ConnectionFactoryLocator connectionFactoryLocator) {
+          JdbcUsersConnectionRepository jdbcUsersConnectionRepository = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText());
+          jdbcUsersConnectionRepository.setConnectionSignUp(connectionSignUp);
+          return jdbcUsersConnectionRepository;
+     }
 
-  @Override
-  public void addConnectionFactories(final ConnectionFactoryConfigurer connectionFactoryConfigurer, final Environment environment) {
-    connectionFactoryConfigurer.addConnectionFactory(new GoogleConnectionFactory(
-        environment.getProperty("spring.social.google.appId"),
-        environment.getProperty("spring.social.google.appSecret")));
-  }
+     @Override
+     public void addConnectionFactories(final ConnectionFactoryConfigurer connectionFactoryConfigurer, final Environment environment) {
+          connectionFactoryConfigurer.addConnectionFactory(new GoogleConnectionFactory(
+              environment.getProperty("spring.social.google.appId"),
+              environment.getProperty("spring.social.google.appSecret")));
+     }
 
-  @Override
-  public UserIdSource getUserIdSource() {
-    return new AuthenticationNameUserIdSource();
-  }
+     @Override
+     public UserIdSource getUserIdSource() {
+          return new AuthenticationNameUserIdSource();
+     }
 }

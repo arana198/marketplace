@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 interface CompanyValidatorRepository extends BaseRepository<CompanyValidatorBO, String> {
 
-  Optional<CompanyValidatorBO> findByCompanyId(String companyId);
+     Optional<CompanyValidatorBO> findByCompanyId(String companyId);
 }

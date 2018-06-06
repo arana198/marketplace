@@ -16,20 +16,20 @@ import java.util.UUID;
 @MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
 
-  private static final long serialVersionUID = 6384069660089559035L;
+     private static final long serialVersionUID = 6384069660089559035L;
 
-  @Id
-  @Column(name = "id", nullable = false)
-  private String id;
+     @Id
+     @Column(name = "id", nullable = false)
+     private String id;
 
-  @Version
-  @Column(name = "version", nullable = false)
-  private Long version;
+     @Version
+     @Column(name = "version", nullable = false)
+     private Long version;
 
-  @PrePersist
-  protected void onCreate() {
-    if (this.id == null) {
-      this.id = UUID.randomUUID().toString();
-    }
-  }
+     @PrePersist
+     protected void onCreate() {
+          if (this.id == null) {
+               this.id = UUID.randomUUID().toString();
+          }
+     }
 }

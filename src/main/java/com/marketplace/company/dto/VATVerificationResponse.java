@@ -9,24 +9,24 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VATVerificationResponse {
 
-  public final boolean valid;
-  public final Name name;
+     public final boolean valid;
+     public final Name name;
 
-  @JsonCreator
-  public VATVerificationResponse(@JsonProperty("valid") final boolean valid,
-                                 @JsonProperty("name") final Name name) {
-    this.valid = valid;
-    this.name = name;
-  }
+     @JsonCreator
+     public VATVerificationResponse(@JsonProperty("valid") final boolean valid,
+                                    @JsonProperty("name") final Name name) {
+          this.valid = valid;
+          this.name = name;
+     }
 
-  @Data
-  public static final class Name {
+     @Data
+     public static final class Name {
 
-    private final String name;
+          private final String name;
 
-    @JsonCreator
-    public Name(@JsonProperty("0") final String name) {
-      this.name = name;
-    }
-  }
+          @JsonCreator
+          public Name(@JsonProperty("0") final String name) {
+               this.name = name;
+          }
+     }
 }

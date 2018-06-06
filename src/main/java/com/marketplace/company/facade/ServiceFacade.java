@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ServiceFacade {
 
-  List<ServiceResponse> findByParentIdAndIsActive(String parentId, boolean isActive) throws ServiceNotFoundException;
+     List<ServiceResponse> findByParentIdAndIsActive(String parentId, boolean isActive) throws ServiceNotFoundException;
 }

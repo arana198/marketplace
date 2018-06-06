@@ -20,106 +20,106 @@ import java.util.Optional;
 @Service
 class CompanyValidatorServiceImpl implements CompanyValidatorService {
 
-  private final CompanyValidatorRepository companyValidatorRepository;
-  private final CompanyService companyService;
-  private final CompanyPublishService publishService;
+     private final CompanyValidatorRepository companyValidatorRepository;
+     private final CompanyService companyService;
+     private final CompanyPublishService publishService;
 
-  @Autowired
-  CompanyValidatorServiceImpl(final CompanyValidatorRepository companyValidatorRepository,
-                              @Lazy final CompanyService companyService,
-                              final CompanyPublishService publishService) {
-    this.companyValidatorRepository = companyValidatorRepository;
-    this.companyService = companyService;
-    this.publishService = publishService;
-  }
+     @Autowired
+     CompanyValidatorServiceImpl(final CompanyValidatorRepository companyValidatorRepository,
+                                 @Lazy final CompanyService companyService,
+                                 final CompanyPublishService publishService) {
+          this.companyValidatorRepository = companyValidatorRepository;
+          this.companyService = companyService;
+          this.publishService = publishService;
+     }
 
-  @Transactional
-  @Override
-  public void fcaNumberUnverified(final String companyId) throws CompanyNotFoundException {
-    CompanyValidatorBO brokerValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
-        .setFcaNumberVerified(false)
-        .setFcaNumberVerifiedAt(null);
+     @Transactional
+     @Override
+     public void fcaNumberUnverified(final String companyId) throws CompanyNotFoundException {
+          CompanyValidatorBO brokerValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
+              .setFcaNumberVerified(false)
+              .setFcaNumberVerifiedAt(null);
 
-    companyValidatorRepository.save(brokerValidatorBO);
-    companyService.activateOrInactiveCompany(companyId, false);
-  }
+          companyValidatorRepository.save(brokerValidatorBO);
+          companyService.activateOrInactiveCompany(companyId, false);
+     }
 
-  @Transactional
-  @Override
-  public void fcaNumberVerified(final String companyId) {
-    LOGGER.info("Verifying FCA number for company [ {} ]", companyId);
-    try {
-      CompanyValidatorBO companyValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
-          .setFcaNumberVerified(true)
-          .setFcaNumberVerifiedAt(LocalDateTime.now());
+     @Transactional
+     @Override
+     public void fcaNumberVerified(final String companyId) {
+          LOGGER.info("Verifying FCA number for company [ {} ]", companyId);
+          try {
+               CompanyValidatorBO companyValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
+                   .setFcaNumberVerified(true)
+                   .setFcaNumberVerifiedAt(LocalDateTime.now());
 
-      companyValidatorRepository.save(companyValidatorBO);
-      this.activateCompany(companyValidatorBO);
-      publishService.sendMessage(CompanyPublishAction.COMPANY_FCA_NUMBER_VERIFIED, companyService.findById(companyId).orElse(null));
-    } catch (CompanyNotFoundException e) {
-      LOGGER.warn("Company {} not found", companyId);
-    }
-  }
+               companyValidatorRepository.save(companyValidatorBO);
+               this.activateCompany(companyValidatorBO);
+               publishService.sendMessage(CompanyPublishAction.COMPANY_FCA_NUMBER_VERIFIED, companyService.findById(companyId).orElse(null));
+          } catch (CompanyNotFoundException e) {
+               LOGGER.warn("Company {} not found", companyId);
+          }
+     }
 
-  @Transactional
-  @Override
-  public void billingIsActive(final String companyId) {
-    LOGGER.info("Activating billing for company [ {} ]", companyId);
-    try {
-      CompanyValidatorBO companyValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
-          .setBillingActive(true);
+     @Transactional
+     @Override
+     public void billingIsActive(final String companyId) {
+          LOGGER.info("Activating billing for company [ {} ]", companyId);
+          try {
+               CompanyValidatorBO companyValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
+                   .setBillingActive(true);
 
-      companyValidatorRepository.save(companyValidatorBO);
-      this.activateCompany(companyValidatorBO);
-    } catch (CompanyNotFoundException e) {
-      LOGGER.warn("Company {} not found", companyId);
-    }
-  }
+               companyValidatorRepository.save(companyValidatorBO);
+               this.activateCompany(companyValidatorBO);
+          } catch (CompanyNotFoundException e) {
+               LOGGER.warn("Company {} not found", companyId);
+          }
+     }
 
-  @Override
-  public void billingInactivated(final String companyId) throws CompanyNotFoundException {
-    CompanyValidatorBO brokerValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
-        .setBillingActive(false);
+     @Override
+     public void billingInactivated(final String companyId) throws CompanyNotFoundException {
+          CompanyValidatorBO brokerValidatorBO = this.getOrCreateCompanyValidatorBO(companyId)
+              .setBillingActive(false);
 
-    companyValidatorRepository.save(brokerValidatorBO);
-    companyService.activateOrInactiveCompany(companyId, false);
-  }
+          companyValidatorRepository.save(brokerValidatorBO);
+          companyService.activateOrInactiveCompany(companyId, false);
+     }
 
 
-  @Override
-  public boolean checkIfCompanyVerified(final String companyId) {
-    return companyValidatorRepository.findByCompanyId(companyId)
-        .map(company -> company.isFcaNumberVerified())
-        .orElse(false);
-  }
+     @Override
+     public boolean checkIfCompanyVerified(final String companyId) {
+          return companyValidatorRepository.findByCompanyId(companyId)
+              .map(company -> company.isFcaNumberVerified())
+              .orElse(false);
+     }
 
-  @Override
-  public Optional<CompanyValidatorResponse> findByCompanyId(final String companyId) {
-    return companyValidatorRepository.findByCompanyId(companyId)
-        .map(cv -> new CompanyValidatorResponse(cv.getCompanyId(),
-            cv.isFcaNumberVerified(),
-            cv.isBillingActive(),
-            cv.getFcaNumberVerifiedAt()));
-  }
+     @Override
+     public Optional<CompanyValidatorResponse> findByCompanyId(final String companyId) {
+          return companyValidatorRepository.findByCompanyId(companyId)
+              .map(cv -> new CompanyValidatorResponse(cv.getCompanyId(),
+                  cv.isFcaNumberVerified(),
+                  cv.isBillingActive(),
+                  cv.getFcaNumberVerifiedAt()));
+     }
 
-  private CompanyValidatorBO getOrCreateCompanyValidatorBO(final String companyId) throws CompanyNotFoundException {
-    companyService.findById(companyId)
-        .orElseThrow(() -> new CompanyNotFoundException(companyId));
+     private CompanyValidatorBO getOrCreateCompanyValidatorBO(final String companyId) throws CompanyNotFoundException {
+          companyService.findById(companyId)
+              .orElseThrow(() -> new CompanyNotFoundException(companyId));
 
-    return companyValidatorRepository.findByCompanyId(companyId)
-        .orElse(this.createCompanyValidatorBO(companyId));
-  }
+          return companyValidatorRepository.findByCompanyId(companyId)
+              .orElse(this.createCompanyValidatorBO(companyId));
+     }
 
-  private CompanyValidatorBO createCompanyValidatorBO(final String companyId) {
-    return new CompanyValidatorBO()
-        .setCompanyId(companyId);
-  }
+     private CompanyValidatorBO createCompanyValidatorBO(final String companyId) {
+          return new CompanyValidatorBO()
+              .setCompanyId(companyId);
+     }
 
-  private void activateCompany(final CompanyValidatorBO companyValidatorBO) throws CompanyNotFoundException {
-    if (companyValidatorBO.isFcaNumberVerified() && companyValidatorBO.isBillingActive()) {
-      companyService.activateOrInactiveCompany(companyValidatorBO.getCompanyId(), true);
-    }
-  }
+     private void activateCompany(final CompanyValidatorBO companyValidatorBO) throws CompanyNotFoundException {
+          if (companyValidatorBO.isFcaNumberVerified() && companyValidatorBO.isBillingActive()) {
+               companyService.activateOrInactiveCompany(companyValidatorBO.getCompanyId(), true);
+          }
+     }
 
-  //TODO: Automate FCA status check monthly
+     //TODO: Automate FCA status check monthly
 }

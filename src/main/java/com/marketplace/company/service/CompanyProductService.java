@@ -6,10 +6,10 @@ import com.marketplace.company.exception.ServiceNotFoundException;
 
 public interface CompanyProductService {
 
-  CompanyServiceResponse getCompanyServices(String companyId);
+     CompanyServiceResponse getCompanyServices(String companyId);
 
-  void addCompanyService(String companyId, String serviceId) throws CompanyServiceAlreadyExistsException, ServiceNotFoundException;
+     void addCompanyService(String companyId, String serviceId) throws CompanyServiceAlreadyExistsException, ServiceNotFoundException;
 
-  void removeCompanyService(String companyId, String serviceId);
+     void removeCompanyService(String companyId, String serviceId);
 
 }

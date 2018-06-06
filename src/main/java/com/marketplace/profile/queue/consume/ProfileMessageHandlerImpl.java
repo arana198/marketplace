@@ -13,21 +13,21 @@ import org.springframework.stereotype.Service;
 @Service
 class ProfileMessageHandlerImpl implements MessageHandler {
 
-  private final Gson gson;
+     private final Gson gson;
 
-  @Override
-  public void handleMessage(final Message<?> message) throws MessagingException {
-    LOGGER.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
-    if (message.getPayload() instanceof String) {
-      ProfileConsumeAction.getActionFromString(message.getHeaders().get("action").toString())
-          .ifPresent(consumedAction -> {
-            final String payload = (String) message.getPayload();
+     @Override
+     public void handleMessage(final Message<?> message) throws MessagingException {
+          LOGGER.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
+          if (message.getPayload() instanceof String) {
+               ProfileConsumeAction.getActionFromString(message.getHeaders().get("action").toString())
+                   .ifPresent(consumedAction -> {
+                        final String payload = (String) message.getPayload();
 
-            switch (consumedAction) {
-              default:
-                break;
-            }
-          });
-    }
-  }
+                        switch (consumedAction) {
+                             default:
+                                  break;
+                        }
+                   });
+          }
+     }
 }

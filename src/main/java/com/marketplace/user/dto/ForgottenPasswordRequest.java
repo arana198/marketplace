@@ -17,18 +17,18 @@ import javax.validation.constraints.Size;
 @JsonDeserialize(builder = ForgottenPasswordRequest.ForgottenPasswordRequestBuilder.class)
 public class ForgottenPasswordRequest {
 
-  @NotBlank(message = "email is mandatory")
-  @Email(message = "email format incorrect")
-  private final String email;
+     @NotBlank(message = "email is mandatory")
+     @Email(message = "email format incorrect")
+     private final String email;
 
-  @Size(min = 6, max = 30, message = "password is wrong size")
-  @NotBlank(message = "password is mandatory")
-  private final String password;
+     @Size(min = 6, max = 30, message = "password is wrong size")
+     @NotBlank(message = "password is mandatory")
+     private final String password;
 
-  @NotBlank(message = "token is mandatory")
-  private final String token;
+     @NotBlank(message = "token is mandatory")
+     private final String token;
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class ForgottenPasswordRequestBuilder {
-  }
+     @JsonPOJOBuilder(withPrefix = "")
+     public static class ForgottenPasswordRequestBuilder {
+     }
 }

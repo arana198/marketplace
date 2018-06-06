@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class BucketResponse extends BaseResponseDomain {
-  private final String bucketId;
-  private final String type;
+     private final String bucketId;
+     private final String type;
 }

@@ -25,42 +25,42 @@ import org.springframework.messaging.MessageHandler;
 @IntegrationComponentScan
 public class CompanyQueueConfig {
 
-  @Value("company-${environment.name}")
-  private String queueName;
+     @Value("company-${environment.name}")
+     private String queueName;
 
-  @Bean("companyQueue")
-  public Queue queue() {
-    return new Queue(queueName, true);
-  }
+     @Bean("companyQueue")
+     public Queue queue() {
+          return new Queue(queueName, true);
+     }
 
-  @Bean("companyMessageChannel")
-  public MessageChannel messageChannel() {
-    return new PublishSubscribeChannel();
-  }
+     @Bean("companyMessageChannel")
+     public MessageChannel messageChannel() {
+          return new PublishSubscribeChannel();
+     }
 
-  @Bean(value = "companyBinding")
-  public Binding binding(@Qualifier("companyQueue") final Queue queue,
-                         final FanoutExchange exchange) {
-    return BindingBuilder.bind(queue).to(exchange);
-  }
+     @Bean(value = "companyBinding")
+     public Binding binding(@Qualifier("companyQueue") final Queue queue,
+                            final FanoutExchange exchange) {
+          return BindingBuilder.bind(queue).to(exchange);
+     }
 
-  @Bean("companyAmqpOutboundFlow")
-  public IntegrationFlow amqpOutboundFlow(final AmqpTemplate amqpTemplate,
-                                          @Qualifier("companyMessageChannel") final MessageChannel publishSubscribeChannel,
-                                          final FanoutExchange exchange) {
-    return IntegrationFlows.from(publishSubscribeChannel)
-        .handle(Amqp.outboundGateway(amqpTemplate).exchangeName(exchange.getName()))
-        .get();
-  }
+     @Bean("companyAmqpOutboundFlow")
+     public IntegrationFlow amqpOutboundFlow(final AmqpTemplate amqpTemplate,
+                                             @Qualifier("companyMessageChannel") final MessageChannel publishSubscribeChannel,
+                                             final FanoutExchange exchange) {
+          return IntegrationFlows.from(publishSubscribeChannel)
+              .handle(Amqp.outboundGateway(amqpTemplate).exchangeName(exchange.getName()))
+              .get();
+     }
 
-  @Bean("companyAmqpInboundFlow")
-  public IntegrationFlow amqpInboundFlow(final ConnectionFactory rabbitConnectionFactory,
-                                         @Qualifier("companyQueueFilterImpl") final MessageSelector messageSelector,
-                                         @Qualifier("companyMessageHandlerImpl") final MessageHandler messageHandler) {
-    return IntegrationFlows
-        .from(Amqp.inboundAdapter(rabbitConnectionFactory, this.queue()))
-        .filter(messageSelector)
-        .handle(messageHandler)
-        .get();
-  }
+     @Bean("companyAmqpInboundFlow")
+     public IntegrationFlow amqpInboundFlow(final ConnectionFactory rabbitConnectionFactory,
+                                            @Qualifier("companyQueueFilterImpl") final MessageSelector messageSelector,
+                                            @Qualifier("companyMessageHandlerImpl") final MessageHandler messageHandler) {
+          return IntegrationFlows
+              .from(Amqp.inboundAdapter(rabbitConnectionFactory, this.queue()))
+              .filter(messageSelector)
+              .handle(messageHandler)
+              .get();
+     }
 }

@@ -25,37 +25,37 @@ import javax.annotation.security.RolesAllowed;
 @RequestMapping("/companies/{companyId}/services")
 public class CompanyServiceController {
 
-  private final CompanyProductService companyProductService;
+     private final CompanyProductService companyProductService;
 
-  @GetMapping
-  public ResponseEntity<CompanyServiceResponse> getCompanyServices(@PathVariable final String companyId) {
-    CompanyServiceResponse services = companyProductService.getCompanyServices(companyId);
-    return new ResponseEntity<>(services, HttpStatus.OK);
-  }
+     @GetMapping
+     public ResponseEntity<CompanyServiceResponse> getCompanyServices(@PathVariable final String companyId) {
+          CompanyServiceResponse services = companyProductService.getCompanyServices(companyId);
+          return new ResponseEntity<>(services, HttpStatus.OK);
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @PostMapping(path = "/{serviceId}")
-  public ResponseEntity<Void> addCompanyService(@PathVariable final String companyId,
-                                                @PathVariable final String serviceId)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @PostMapping(path = "/{serviceId}")
+     public ResponseEntity<Void> addCompanyService(@PathVariable final String companyId,
+                                                   @PathVariable final String serviceId)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
 
-    LOGGER.info("Adding service [ {} ] to the company [ {} ]", serviceId, companyId);
+          LOGGER.info("Adding service [ {} ] to the company [ {} ]", serviceId, companyId);
 
-    companyProductService.addCompanyService(companyId, serviceId);
+          companyProductService.addCompanyService(companyId, serviceId);
 
-    return new ResponseEntity<>(HttpStatus.CREATED);
-  }
+          return new ResponseEntity<>(HttpStatus.CREATED);
+     }
 
-  @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
-  @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
-  @DeleteMapping(path = "/{serviceId}")
-  public ResponseEntity<Void> removeCompanyService(@PathVariable final String companyId,
-                                                   @PathVariable final String serviceId) {
+     @PreAuthorize("@securityUtils.isCompanyAdmin(#companyId)")
+     @RolesAllowed({UserRole.ROLE_COMPANY_ADMIN})
+     @DeleteMapping(path = "/{serviceId}")
+     public ResponseEntity<Void> removeCompanyService(@PathVariable final String companyId,
+                                                      @PathVariable final String serviceId) {
 
-    LOGGER.info("Removing service: {} from company [ {} ]", serviceId, companyId);
-    companyProductService.removeCompanyService(companyId, serviceId);
+          LOGGER.info("Removing service: {} from company [ {} ]", serviceId, companyId);
+          companyProductService.removeCompanyService(companyId, serviceId);
 
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+          return new ResponseEntity<>(HttpStatus.OK);
+     }
 }

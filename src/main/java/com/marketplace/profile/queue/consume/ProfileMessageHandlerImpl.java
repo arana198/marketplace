@@ -8,26 +8,31 @@ import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @AllArgsConstructor
 @Slf4j
 @Service
 class ProfileMessageHandlerImpl implements MessageHandler {
 
-  private final Gson gson;
+    private final Gson gson;
 
-  @Override
-  public void handleMessage(final Message<?> message) throws MessagingException {
-    LOGGER.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
-    if (message.getPayload() instanceof String) {
-      ProfileConsumeAction.getActionFromString(message.getHeaders().get("action").toString())
-          .ifPresent(consumedAction -> {
-            final String payload = (String) message.getPayload();
+    @Override
+    public void handleMessage(final Message<?> message) throws MessagingException {
+        LOGGER.debug("Message action is {} and message payload is {}", message.getHeaders().get("action"), message.getPayload());
+        if (message.getPayload() instanceof String) {
+            Optional.ofNullable(message.getHeaders())
+                    .map(header -> header.get("action"))
+                    .map(Object::toString)
+                    .flatMap(ProfileConsumeAction::getActionFromString)
+                    .ifPresent(consumedAction -> {
+                        final String payload = (String) message.getPayload();
 
-            switch (consumedAction) {
-              default:
-                break;
-            }
-          });
+                        switch (consumedAction) {
+                            default:
+                                break;
+                        }
+                    });
+        }
     }
-  }
 }

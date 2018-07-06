@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 @Service
@@ -29,7 +30,7 @@ class CompanyNumberValidatorImpl implements CompanyNumberValidator {
   public boolean validate(final String companyName, final String companyNumber) {
     final String url = apiUrl + "/company/" + companyNumber;
 
-    String base64Creds = Base64.encodeBase64String(apiKey.getBytes());
+    String base64Creds = Base64.encodeBase64String(apiKey.getBytes(StandardCharsets.UTF_8));
     HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Basic " + base64Creds);
 

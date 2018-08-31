@@ -1,3 +1,14 @@
+Technologies and frameworks:
+
+Java 10 by default (although lombok is not compatible with Java modules yet so I was not able to utilise the modules feature) but can be converted to Java 8 by change the Java version is build.gradle
+Spring Cloud
+Social Login
+Oauth2
+Lombok
+Docker
+Spock (for testing)
+
+
 Build the application using:
 
 ./gradlew clean build

@@ -1,39 +1,17 @@
-Done:
-User registration
-User Authorization
-Company setup and verification
-Broker profile
-Basic notifications setup
-Storage
-Company services
-Postcode DB
-Company Advice method
-Company active/inactive
+Build the application using:
 
-Remaining:
-Postcode validation
-Company address
-Company/Broker fees
+./gradlew clean build
 
-Mortgage application form
-Mortgage document submission
-Mortgage documents approval by brokers
+Run the application using:
 
-Matching - including accept/reject choice
-Billing
-Payment integration (Stripe)
-Rating and feedback
+docker-compose up (on the root directory)
 
-Notification
-Admin functionality
-Discounts/Offers promotion
-Loan Calculator - How much I can borrow?
+then:
 
-Future:
-Mortgage sourcing integration
-Mortgage sourcing based on customer's details
-Full CRM
+./gradlew bootRun
 
-Future future:
-Mortgage lender DIP/AIP integration
-Mortgage application integration
+It will run on port 8080
+
+Swagger endpoint:
+
+Currently not working

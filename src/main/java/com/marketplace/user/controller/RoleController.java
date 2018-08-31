@@ -28,22 +28,22 @@ import javax.validation.Valid;
 @RequestMapping("roles")
 public class RoleController {
 
-  private final RoleService roleService;
+     private final RoleService roleService;
 
-  @RolesAllowed({UserRole.ROLE_ADMIN})
-  @GetMapping
-  public ResponseEntity<RoleList> findActiveRoles() throws ResourceNotFoundException {
-    return roleService.findActiveRoles()
-        .map(ResponseEntity::ok)
-        .orElse(new ResponseEntity(HttpStatus.OK));
-  }
+     @RolesAllowed({UserRole.ROLE_ADMIN})
+     @GetMapping
+     public ResponseEntity<RoleList> findActiveRoles() throws ResourceNotFoundException {
+          final RoleList roleList = roleService.findActiveRoles();
 
-  @RolesAllowed({UserRole.ROLE_ADMIN})
-  @PutMapping(value = "/{roleId}")
-  public ResponseEntity<Void> updateRole(@PathVariable final String roleId,
-                                         @RequestBody @Valid final RoleRequest roleRequest) throws ResourceNotFoundException {
-    LOGGER.info("Updating roleResponse {}", roleId);
-    roleService.updateRole(roleId, roleRequest);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          return new ResponseEntity<>(roleList, HttpStatus.OK);
+     }
+
+     @RolesAllowed({UserRole.ROLE_ADMIN})
+     @PutMapping(value = "/{roleId}")
+     public ResponseEntity<Void> updateRole(@PathVariable final String roleId,
+                                            @RequestBody @Valid final RoleRequest roleRequest) throws ResourceNotFoundException {
+          LOGGER.info("Updating roleResponse {}", roleId);
+          roleService.updateRole(roleId, roleRequest);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 }

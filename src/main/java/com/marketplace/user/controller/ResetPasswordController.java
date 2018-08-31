@@ -25,28 +25,28 @@ import javax.validation.Valid;
 @RequestMapping("/resetpassword")
 public class ResetPasswordController {
 
-  private final UserService userService;
+     private final UserService userService;
 
-  @PostMapping
-  public ResponseEntity<ResourceSupport> createResetPasswordToken(@RequestParam final String email)
-      throws ResourceNotFoundException {
+     @PostMapping
+     public ResponseEntity<ResourceSupport> createResetPasswordToken(@RequestParam final String email)
+         throws ResourceNotFoundException {
 
-    LOGGER.info("Creating reset password for user: {}", email);
-    userService.resetPassword(email);
-    return new ResponseEntity<ResourceSupport>(HttpStatus.CREATED);
-  }
+          LOGGER.info("Creating reset password for user: {}", email);
+          userService.resetPassword(email);
+          return new ResponseEntity<ResourceSupport>(HttpStatus.CREATED);
+     }
 
-  @PutMapping
-  public ResponseEntity<ResourceSupport> resetpassword(@Valid @RequestBody final ForgottenPasswordRequest forgottenPasswordRequest,
-                                                       final BindingResult bindingResult)
-      throws ResourceNotFoundException {
+     @PutMapping
+     public ResponseEntity<ResourceSupport> resetpassword(@Valid @RequestBody final ForgottenPasswordRequest forgottenPasswordRequest,
+                                                          final BindingResult bindingResult)
+         throws ResourceNotFoundException {
 
-    LOGGER.info("Resetting password for user: {}", forgottenPasswordRequest.getEmail());
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid forgot password object", bindingResult);
-    }
+          LOGGER.info("Resetting password for user: {}", forgottenPasswordRequest.getEmail());
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid forgot password object", bindingResult);
+          }
 
-    userService.resetPassword(forgottenPasswordRequest);
-    return ResponseEntity.ok().build();
-  }
+          userService.resetPassword(forgottenPasswordRequest);
+          return ResponseEntity.ok().build();
+     }
 }

@@ -1,7 +1,7 @@
 SET MODE MySQL;
 
-INSERT INTO roleResponses(id, name, description, is_selectable) VALUES ('1', 'ROLE_ADMIN', 'Indicates the roleResponse is for site admin', true);
-INSERT INTO roleResponses(id, name, description, is_selectable) VALUES ('2', 'ROLE_USER', 'Indicates the roleResponse is for club admin', true);
+INSERT INTO roles(id, name, description, is_selectable) VALUES ('1', 'ROLE_ADMIN', 'Indicates the roleResponse is for site admin', true);
+INSERT INTO roles(id, name, description, is_selectable) VALUES ('2', 'ROLE_USER', 'Indicates the roleResponse is for club admin', true);
 
 INSERT INTO user_status(id, name, description, is_selectable) VALUES ('1', 'ACTIVE', 'Indicates the user is active', true);
 INSERT INTO user_status(id, name, description, is_selectable) VALUES ('2', 'PENDING', 'Indicates the user is pending', true);

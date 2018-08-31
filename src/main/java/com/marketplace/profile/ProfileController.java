@@ -34,51 +34,50 @@ import java.net.URI;
 @PreAuthorize("@securityUtils.checkIfUserAuthorized(#userId)")
 public class ProfileController {
 
-  private final UserProfileService userProfileService;
+     private final UserProfileService userProfileService;
 
-  @RolesAllowed({UserRole.ROLE_USER})
-  @GetMapping(value = "/{profileId}")
-  public ResponseEntity<UserProfileResponse> getProfile(@PathVariable final String userId,
-                                                        @PathVariable final String profileId)
-      throws ResourceNotFoundException {
-    LOGGER.info("Getting company for id: {}", profileId);
-    return userProfileService.findByUserId(userId)
-        .map(ResponseEntity::ok)
-        .orElseThrow(() -> new UserProfileNotFoundException(userId, profileId));
-  }
+     @RolesAllowed({UserRole.ROLE_USER})
+     @GetMapping
+     public ResponseEntity<UserProfileResponse> getProfile(@PathVariable final String userId)
+         throws ResourceNotFoundException {
+          LOGGER.info("Getting profile for user id: {}", userId);
+          return userProfileService.findByUserId(userId)
+              .map(ResponseEntity::ok)
+              .orElseThrow(() -> new UserProfileNotFoundException(userId));
+     }
 
-  @RolesAllowed({UserRole.ROLE_USER})
-  @PostMapping
-  public ResponseEntity<Void> createProfile(@PathVariable final String userId,
-                                            @RequestBody @Valid final UserProfileRequest userProfile,
-                                            final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
-    LOGGER.info("Creating company for user: {}", userId);
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid user company object", bindingResult);
-    }
+     @RolesAllowed({UserRole.ROLE_USER})
+     @PostMapping
+     public ResponseEntity<Void> createProfile(@PathVariable final String userId,
+                                               @RequestBody @Valid final UserProfileRequest userProfile,
+                                               final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
+          LOGGER.info("Creating company for user: {}", userId);
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid user company object", bindingResult);
+          }
 
-    final UserProfileResponse userProfileResponse = userProfileService.createProfile(userId, userProfile);
-    final URI location = ServletUriComponentsBuilder
-        .fromCurrentRequest().path("/{id}")
-        .buildAndExpand(userProfileResponse.getProfileId()).toUri();
+          final UserProfileResponse userProfileResponse = userProfileService.createProfile(userId, userProfile);
+          final URI location = ServletUriComponentsBuilder
+              .fromCurrentRequest().path("/{id}")
+              .buildAndExpand(userProfileResponse.getProfileId()).toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+          return ResponseEntity.created(location).build();
+     }
 
-  @RolesAllowed({UserRole.ROLE_USER})
-  @PutMapping(value = "/{profileId}")
-  public ResponseEntity<Void> updateProfile(@PathVariable final String userId,
-                                            @PathVariable final String profileId,
-                                            @RequestBody @Valid final UserProfileRequest userProfile,
-                                            final BindingResult bindingResult)
-      throws ResourceNotFoundException, ResourceAlreadyExistsException {
-    LOGGER.info("Updating company {}, for user: {}", profileId, userId);
-    if (bindingResult.hasErrors()) {
-      throw new BadRequestException("Invalid user company object", bindingResult);
-    }
+     @RolesAllowed({UserRole.ROLE_USER})
+     @PutMapping(value = "/{profileId}")
+     public ResponseEntity<Void> updateProfile(@PathVariable final String userId,
+                                               @PathVariable final String profileId,
+                                               @RequestBody @Valid final UserProfileRequest userProfile,
+                                               final BindingResult bindingResult)
+         throws ResourceNotFoundException, ResourceAlreadyExistsException {
+          LOGGER.info("Updating company {}, for user: {}", profileId, userId);
+          if (bindingResult.hasErrors()) {
+               throw new BadRequestException("Invalid user company object", bindingResult);
+          }
 
-    userProfileService.updateProfile(userId, profileId, userProfile);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+          userProfileService.updateProfile(userId, profileId, userProfile);
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
 }

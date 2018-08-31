@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS user_password_tokens (
   CONSTRAINT fk_user_password_token_users FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS roleResponses (
+CREATE TABLE IF NOT EXISTS roles (
   id varchar(36) NOT NULL,
   name varchar(255) NOT NULL,
   description varchar(255) NOT NULL,
@@ -112,6 +112,6 @@ CREATE TABLE IF NOT EXISTS user_roles (
   PRIMARY KEY (id),
   KEY ix_user_id (user_id),
   KEY fk_user_roles_role (role_id),
-  CONSTRAINT fk_user_roles_roles FOREIGN KEY (role_id) REFERENCES roleResponses (id),
+  CONSTRAINT fk_user_roles_roles FOREIGN KEY (role_id) REFERENCES roles (id),
   CONSTRAINT fk_user_roles_users FOREIGN KEY (user_id) REFERENCES users (id)
 );

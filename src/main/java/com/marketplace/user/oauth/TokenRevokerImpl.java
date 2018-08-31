@@ -15,20 +15,20 @@ import java.util.Collection;
 @Service
 class TokenRevokerImpl implements TokenRevoker {
 
-  private final JdbcTokenStore jdbcTokenStore;
+     private final JdbcTokenStore jdbcTokenStore;
 
-  @Autowired
-  public TokenRevokerImpl(final TokenStore jdbcTokenStore) {
-    this.jdbcTokenStore = (JdbcTokenStore) jdbcTokenStore;
-  }
+     @Autowired
+     public TokenRevokerImpl(final TokenStore jdbcTokenStore) {
+          this.jdbcTokenStore = (JdbcTokenStore) jdbcTokenStore;
+     }
 
-  @Override
-  public void revoke(final String userId) {
-    Collection<OAuth2AccessToken> accessTokenList = jdbcTokenStore.findTokensByUserName(userId);
-    accessTokenList.stream().forEach(token -> {
-      LOGGER.debug("Removing token {} for user {}", token.getValue(), userId);
-      jdbcTokenStore.removeAccessToken(token);
-      jdbcTokenStore.removeRefreshToken(token.getRefreshToken());
-    });
-  }
+     @Override
+     public void revoke(final String userId) {
+          Collection<OAuth2AccessToken> accessTokenList = jdbcTokenStore.findTokensByUserName(userId);
+          accessTokenList.stream().forEach(token -> {
+               LOGGER.debug("Removing token {} for user {}", token.getValue(), userId);
+               jdbcTokenStore.removeAccessToken(token);
+               jdbcTokenStore.removeRefreshToken(token.getRefreshToken());
+          });
+     }
 }

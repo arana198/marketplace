@@ -16,21 +16,21 @@ import java.time.ZoneId;
 @Component
 class UserConnectionServiceImpl implements UserConnectionService {
 
-  private final UserConnectionRepository userConnectionRepository;
-  private final UserRepository userRepository;
+     private final UserConnectionRepository userConnectionRepository;
+     private final UserRepository userRepository;
 
-  @Override
-  public boolean checkValidityForProviderTokenByUser(final String providerId, final String username) {
-    final String providerUserId = userRepository.findByUsername(username)
-        .map(UserBO::getRoles)
-        .filter(userRoles -> userRoles.parallelStream().anyMatch(ur -> ur.getProvider().equalsIgnoreCase(providerId)))
-        .flatMap(ur -> ur.parallelStream().findAny())
-        .map(UserRoleBO::getProviderUserId)
-        .orElse(null);
+     @Override
+     public boolean checkValidityForProviderTokenByUser(final String providerId, final String username) {
+          final String providerUserId = userRepository.findByUsername(username)
+              .map(UserBO::getRoles)
+              .filter(userRoles -> userRoles.stream().anyMatch(ur -> ur.getProvider().equalsIgnoreCase(providerId)))
+              .flatMap(ur -> ur.stream().findAny())
+              .map(UserRoleBO::getProviderUserId)
+              .orElse(null);
 
-    return userConnectionRepository.findByProviderIdAndProviderUserId(providerId, providerUserId)
-        .map(uc -> LocalDateTime.ofInstant(Instant.ofEpochMilli(uc.getExpireTime()), ZoneId.systemDefault()))
-        .filter(expiryTime -> expiryTime.isBefore(LocalDateTime.now()))
-        .isPresent();
-  }
+          return userConnectionRepository.findByProviderIdAndProviderUserId(providerId, providerUserId)
+              .map(uc -> LocalDateTime.ofInstant(Instant.ofEpochMilli(uc.getExpireTime()), ZoneId.systemDefault()))
+              .filter(expiryTime -> expiryTime.isBefore(LocalDateTime.now()))
+              .isPresent();
+     }
 }

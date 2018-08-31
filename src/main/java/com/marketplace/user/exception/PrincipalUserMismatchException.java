@@ -4,9 +4,9 @@ import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserExc
 
 public class PrincipalUserMismatchException extends UnauthorizedUserException {
 
-  private static final long serialVersionUID = -5464030706060936824L;
+     private static final long serialVersionUID = -5464030706060936824L;
 
-  public PrincipalUserMismatchException(final String message) {
-    super(message);
-  }
+     public PrincipalUserMismatchException(final String message) {
+          super(message);
+     }
 }

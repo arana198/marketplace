@@ -23,13 +23,13 @@ import javax.sql.DataSource;
 @EnableJpaRepositories
 class JpaRepositoryConfig {
 
-  @Primary
-  @Bean
-  public PlatformTransactionManager transactionManager(final EntityManagerFactory entityManagerFactory,
+     @Primary
+     @Bean
+     public PlatformTransactionManager transactionManager(final EntityManagerFactory entityManagerFactory,
                                                           final DataSource dataSource) {
-    JpaTransactionManager tm = new JpaTransactionManager();
-    tm.setEntityManagerFactory(entityManagerFactory);
-    tm.setDataSource(dataSource);
-    return tm;
-  }
+          JpaTransactionManager tm = new JpaTransactionManager();
+          tm.setEntityManagerFactory(entityManagerFactory);
+          tm.setDataSource(dataSource);
+          return tm;
+     }
 }

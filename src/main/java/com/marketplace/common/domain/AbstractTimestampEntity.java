@@ -14,26 +14,26 @@ import java.time.LocalDate;
 @MappedSuperclass
 public abstract class AbstractTimestampEntity extends AbstractEntity {
 
-  @Column(name = "created_ts", nullable = false)
-  private LocalDate createdAt;
+     @Column(name = "created_ts", nullable = false)
+     private LocalDate createdAt;
 
-  @Column(name = "updated_ts", nullable = false)
-  private LocalDate updatedAt;
+     @Column(name = "updated_ts", nullable = false)
+     private LocalDate updatedAt;
 
-  @PrePersist
-  protected void onCreate() {
-    super.onCreate();
-    updatedAt = createdAt = LocalDate.now();
-  }
+     @PrePersist
+     protected void onCreate() {
+          super.onCreate();
+          updatedAt = createdAt = LocalDate.now();
+     }
 
-  @PreUpdate
-  protected void onUpdate() {
-    updatedAt = LocalDate.now();
-  }
+     @PreUpdate
+     protected void onUpdate() {
+          updatedAt = LocalDate.now();
+     }
 
-  public void update(final AbstractTimestampEntity abstractEntity) {
-    this.setId(abstractEntity.getId());
-    this.setCreatedAt(abstractEntity.getCreatedAt());
-    this.setUpdatedAt(abstractEntity.getUpdatedAt());
-  }
+     public void update(final AbstractTimestampEntity abstractEntity) {
+          this.setId(abstractEntity.getId());
+          this.setCreatedAt(abstractEntity.getCreatedAt());
+          this.setUpdatedAt(abstractEntity.getUpdatedAt());
+     }
 }

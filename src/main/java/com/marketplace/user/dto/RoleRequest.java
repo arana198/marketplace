@@ -16,46 +16,46 @@ import javax.validation.constraints.Size;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RoleRequest {
 
-  private final String roleId;
+     private final String roleId;
 
-  @NotNull(message = "name is mandatory")
-  private final UserRole name;
+     @NotNull(message = "name is mandatory")
+     private final UserRole name;
 
-  @Size(min = 5, max = 50, message = "description is wrong size")
-  @NotBlank(message = "description is mandatory")
-  private final String description;
+     @Size(min = 5, max = 50, message = "description is wrong size")
+     @NotBlank(message = "description is mandatory")
+     private final String description;
 
-  @NotNull(message = "isSelectable is mandatory")
-  private final boolean isSelectable;
+     @NotNull(message = "isSelectable is mandatory")
+     private final boolean isSelectable;
 
-  public enum UserRole {
-    ROLE_ADMIN("ROLE_ADMIN"),
-    ROLE_COMPANY_ADMIN("ROLE_COMPANY_ADMIN"),
-    ROLE_BROKER("ROLE_BROKER"),
-    ROLE_USER("ROLE_USER");
+     public enum UserRole {
+          ROLE_ADMIN("ROLE_ADMIN"),
+          ROLE_COMPANY_ADMIN("ROLE_COMPANY_ADMIN"),
+          ROLE_BROKER("ROLE_BROKER"),
+          ROLE_USER("ROLE_USER");
 
-    private final String value;
+          private final String value;
 
-    UserRole(final String value) {
-      this.value = value;
-    }
+          UserRole(final String value) {
+               this.value = value;
+          }
 
-    public static UserRole getRoleFromString(final String value) {
-      for (UserRole role : UserRole.values()) {
-        if (role.getValue().equalsIgnoreCase(value)) {
-          return role;
-        }
-      }
+          public static UserRole getRoleFromString(final String value) {
+               for (UserRole role : UserRole.values()) {
+                    if (role.getValue().equalsIgnoreCase(value)) {
+                         return role;
+                    }
+               }
 
-      return null;
-    }
+               return null;
+          }
 
-    public String getValue() {
-      return this.value;
-    }
-  }
+          public String getValue() {
+               return this.value;
+          }
+     }
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class RoleRequestBuilder {
-  }
+     @JsonPOJOBuilder(withPrefix = "")
+     public static class RoleRequestBuilder {
+     }
 }

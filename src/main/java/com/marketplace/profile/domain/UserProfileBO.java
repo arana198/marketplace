@@ -20,24 +20,24 @@ import java.time.LocalDate;
 })
 public class UserProfileBO extends AbstractAuditEntity {
 
-  @Column(name = "user_id", nullable = false)
-  private String userId;
+     @Column(name = "user_id", nullable = false)
+     private String userId;
 
-  @Column(name = "email", nullable = false)
-  private String email;
+     @Column(name = "email", nullable = false)
+     private String email;
 
-  @Column(name = "firstname", nullable = false)
-  private String firstName;
+     @Column(name = "firstname", nullable = false)
+     private String firstName;
 
-  @Column(name = "lastname", nullable = false)
-  private String lastName;
+     @Column(name = "lastname", nullable = false)
+     private String lastName;
 
-  @Column(name = "mobile_number", nullable = false)
-  private String mobileNumber;
+     @Column(name = "mobile_number", nullable = false)
+     private String mobileNumber;
 
-  @Column(name = "dob", nullable = false)
-  private LocalDate dateOfBirth;
+     @Column(name = "dob", nullable = false)
+     private LocalDate dateOfBirth;
 
-  @Column(name = "location")
-  private String postcode;
+     @Column(name = "location")
+     private String postcode;
 }

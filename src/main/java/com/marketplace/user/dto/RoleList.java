@@ -9,10 +9,10 @@ import java.util.List;
 
 @Data
 public class RoleList extends BaseResponseDomain {
-  private final List<RoleResponse> roleResponses;
+     private final List<RoleResponse> roles;
 
-  @JsonCreator
-  public RoleList(@JsonProperty(value = "roleResponses") final List<RoleResponse> roleResponses) {
-    this.roleResponses = roleResponses;
-  }
+     @JsonCreator
+     public RoleList(@JsonProperty(value = "roles") final List<RoleResponse> roles) {
+          this.roles = roles;
+     }
 }

@@ -12,11 +12,11 @@ import javax.validation.constraints.NotBlank;
 @Accessors(chain = true)
 public class EmailVerificationRequest {
 
-  @NotBlank(message = "token is mandatory")
-  private final String token;
+     @NotBlank(message = "token is mandatory")
+     private final String token;
 
-  @JsonCreator
-  public EmailVerificationRequest(@JsonProperty(value = "token") final String token) {
-    this.token = token;
-  }
+     @JsonCreator
+     public EmailVerificationRequest(@JsonProperty(value = "token") final String token) {
+          this.token = token;
+     }
 }

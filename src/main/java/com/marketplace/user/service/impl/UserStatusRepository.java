@@ -8,9 +8,9 @@ import java.util.Optional;
 
 interface UserStatusRepository extends BaseRepository<UserStatusBO, String> {
 
-  @Cacheable("UserStatusRepository.findById")
-  Optional<UserStatusBO> findById(String id);
+     @Cacheable("UserStatusRepository.findById")
+     Optional<UserStatusBO> findById(String id);
 
-  @Cacheable("UserStatusRepository.findByName")
-  Optional<UserStatusBO> findByName(String userStatus);
+     @Cacheable("UserStatusRepository.findByName")
+     Optional<UserStatusBO> findByName(String userStatus);
 }

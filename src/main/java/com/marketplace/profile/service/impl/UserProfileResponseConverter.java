@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 class UserProfileResponseConverter implements BaseConverter<UserProfileBO, UserProfileResponse> {
 
-  @Override
-  public UserProfileResponse convert(final UserProfileBO source) {
-    return UserProfileResponse.builder()
-        .userId(source.getUserId())
-        .email(source.getEmail())
-        .firstName(source.getFirstName())
-        .lastName(source.getLastName())
-        .mobileNumber(source.getMobileNumber())
-        .postcode(source.getPostcode())
-        .build();
-  }
+     @Override
+     public UserProfileResponse convert(final UserProfileBO source) {
+          return UserProfileResponse.builder()
+              .userId(source.getUserId())
+              .email(source.getEmail())
+              .firstName(source.getFirstName())
+              .lastName(source.getLastName())
+              .mobileNumber(source.getMobileNumber())
+              .postcode(source.getPostcode())
+              .build();
+     }
 }

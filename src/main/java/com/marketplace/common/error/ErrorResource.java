@@ -10,14 +10,14 @@ import java.util.List;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ErrorResource {
-  private final int code;
-  private final String error;
-  private final String message;
-  private List<FieldErrorResource> fieldErrors;
+     private final int code;
+     private final String error;
+     private final String message;
+     private List<FieldErrorResource> fieldErrors;
 
-  public ErrorResource(final int code, final String error, final String message) {
-    this.code = code;
-    this.error = error;
-    this.message = message;
-  }
+     public ErrorResource(final int code, final String error, final String message) {
+          this.code = code;
+          this.error = error;
+          this.message = message;
+     }
 }

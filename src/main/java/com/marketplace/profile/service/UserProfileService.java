@@ -11,11 +11,11 @@ import com.marketplace.user.exception.UserNotFoundException;
 import java.util.Optional;
 
 public interface UserProfileService {
-  Optional<UserProfileResponse> findByUserId(String userId);
+     Optional<UserProfileResponse> findByUserId(String userId);
 
-  UserProfileResponse createProfile(String userId, UserProfileRequest userProfile)
-      throws UserProfileAlreadyExistsException, MobileNumberAlreadyExistsException, UserNotFoundException;
+     UserProfileResponse createProfile(String userId, UserProfileRequest userProfile)
+         throws UserProfileAlreadyExistsException, MobileNumberAlreadyExistsException, UserNotFoundException;
 
-  void updateProfile(String userId, String profileId, UserProfileRequest userProfile)
-      throws UserProfileNotFoundException, MobileNumberAlreadyExistsException, UsernameAlreadyExistsException;
+     void updateProfile(String userId, String profileId, UserProfileRequest userProfile)
+         throws UserProfileNotFoundException, MobileNumberAlreadyExistsException, UsernameAlreadyExistsException;
 }

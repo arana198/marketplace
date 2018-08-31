@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 class UserQueueFilterImpl implements MessageSelector {
 
-  @ServiceActivator
-  @Override
-  public boolean accept(final Message<?> message) {
-    final Object applicationName = message.getHeaders().get("applicationName");
-    LOGGER.info("Received message from application [ {} ] with action [ {} ]", applicationName, message.getHeaders().get("action"));
-    /**if ("company-service".equals(applicationName)) {
-     return true;
-     }*/
-    return true;
-  }
+     @ServiceActivator
+     @Override
+     public boolean accept(final Message<?> message) {
+          final Object applicationName = message.getHeaders().get("applicationName");
+          LOGGER.info("Received message from application [ {} ] with action [ {} ]", applicationName, message.getHeaders().get("action"));
+          /**if ("company-service".equals(applicationName)) {
+           return true;
+           }*/
+          return true;
+     }
 
 }

@@ -5,7 +5,6 @@ module com.marketplace {
      requires java.annotation;
      requires java.persistence;
      requires java.validation;
-     requires javax.transaction.api;
 
      requires spring.web;
      requires spring.webmvc;
@@ -42,6 +41,8 @@ module com.marketplace {
 
      requires jts.core;
      requires gson;
+     requires java.sql;
+     requires com.fasterxml.jackson.datatype.jsr310;
 
      exports com.marketplace.user.service;
      exports com.marketplace.storage.service;

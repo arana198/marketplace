@@ -11,8 +11,9 @@ import com.marketplace.storage.queue.publish.domain.StoragePublishAction;
 import com.marketplace.storage.service.BucketService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+//import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
 

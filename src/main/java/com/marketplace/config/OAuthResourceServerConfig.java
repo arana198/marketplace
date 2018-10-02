@@ -59,9 +59,7 @@ public class OAuthResourceServerConfig extends ResourceServerConfigurerAdapter {
               // So we just put all other requests types under OAuth control and exclude OPTIONS.
               .authorizeRequests()
               .antMatchers(HttpMethod.OPTIONS).permitAll()
-              .antMatchers("/info").permitAll()
-              .antMatchers("/metrics").permitAll()
-              .antMatchers("/health").permitAll()
+              .antMatchers("/actuator/**").permitAll()
               .antMatchers("/webjars/**").permitAll()
               .antMatchers("/connect/**").denyAll()
               .antMatchers("/swagger-ui.js", "/swagger-ui.min.js", "/api-docs", "/fonts/*", "/api-docs/*", "/api-docs/default/*").permitAll()

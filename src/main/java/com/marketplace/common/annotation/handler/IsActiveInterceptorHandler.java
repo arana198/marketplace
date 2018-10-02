@@ -16,6 +16,10 @@ public class IsActiveInterceptorHandler extends HandlerInterceptorAdapter {
 
      @Override
      public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
+          if (!(handler instanceof HandlerMethod)) {
+               return true;
+          }
+
           final HandlerMethod handlerMethod = (HandlerMethod) handler;
           final IsActive isActive = handlerMethod.getMethodAnnotation(IsActive.class);
 
